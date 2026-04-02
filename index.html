@@ -17,7 +17,6 @@
 <link rel="stylesheet" href="style.css">
 <style>
 .hero{min-height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative}
-.hero-bg-symbol{position:absolute;width:min(600px,90vw);height:min(600px,90vw);opacity:0.04;animation:spin-slow 120s linear infinite;pointer-events:none}
 .hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.4em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:1.5rem}
 .hero-title{font-size:clamp(3rem,8vw,6rem);line-height:1.05;margin-bottom:1rem}
 .hero-tagline{font-family:'Share Tech Mono',monospace;font-size:clamp(0.65rem,1.5vw,0.82rem);letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3rem}
@@ -54,24 +53,23 @@
     <span class="nav-brand-text">AURAL ALCHEMY</span>
   </a>
   <ul class="nav-links">
-    <li><a href="/aural-alchemy/">Home</a></li>
+    <li><a href="/aural-alchemy/" class="active">Home</a></li>
     <li><a href="/aural-alchemy/frequency-generator">Frequency Generator</a></li>
     <li><a href="/aural-alchemy/midi-generator">MIDI Generator</a></li>
+    <li><a href="/aural-alchemy/breathwork">Breathwork</a></li>
     <li><a href="/aural-alchemy/shop">Shop</a></li>
   </ul>
   <div class="nav-toggle"><span></span><span></span><span></span></div>
 </nav>
 
 <div class="page-wrap">
+<!-- Sacred Geometry Background -->
+<svg class="aa-geometry" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.06"/>
+  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.06"/>
+</svg>
 
   <section class="hero">
-    <svg class="hero-bg-symbol" viewBox="0 0 500 500" fill="none">
-      <circle cx="250" cy="250" r="240" stroke="#2dd4bf" stroke-width="1"/>
-      <path d="M250 30 L450 390 L50 390 Z" stroke="#2dd4bf" stroke-width="1"/>
-      <circle cx="250" cy="250" r="140" stroke="#d4a843" stroke-width="0.5"/>
-      <line x1="120" y1="310" x2="380" y2="310" stroke="#d4a843" stroke-width="1"/>
-      <circle cx="250" cy="250" r="20" stroke="#2dd4bf" stroke-width="0.8"/>
-    </svg>
 
     <p class="hero-eyebrow anim-fade-up">Aural Alchemy</p>
     <h1 class="hero-title grad-title anim-fade-up delay-1">Sacred Tools<br>for Sound<br>and Mind</h1>
@@ -80,6 +78,7 @@
     <div class="hero-cta anim-fade-up delay-3">
       <a href="/aural-alchemy/frequency-generator" class="btn btn-primary">⟡ Frequency Generator</a>
       <a href="/aural-alchemy/midi-generator" class="btn btn-ghost">⬡ MIDI Generator</a>
+      <a href="/aural-alchemy/breathwork" class="btn btn-ghost">◎ Breathwork</a>
       <a href="https://auralalchemy.gumroad.com" target="_blank" class="btn btn-gold">◈ Shop</a>
     </div>
 
@@ -145,7 +144,28 @@
         <span class="btn btn-gold" style="align-self:flex-start;margin-top:0.3rem">Download →</span>
       </a>
 
-      <div class="card tool-card anim-fade-up delay-3" style="position:relative">
+      <a href="/aural-alchemy/breathwork" class="card tool-card anim-fade-up delay-3">
+        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="20" stroke="#2dd4bf" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <ellipse cx="24" cy="24" rx="8" ry="13" stroke="#2dd4bf" stroke-width="1" fill="none" opacity="0.6"/>
+          <circle cx="24" cy="24" r="3" fill="#2dd4bf" opacity="0.7"/>
+        </svg>
+        <div>
+          <p class="tool-tag">Free · Web App</p>
+          <h3>Breathwork</h3>
+          <p>Guided breathing sessions with synthesized breath sounds and animated orb. 25+ science-backed patterns including box breathing, Wim Hof, coherent breathing and physiological sigh.</p>
+        </div>
+        <div class="tool-pills">
+          <span class="pill">Box Breathing</span>
+          <span class="pill">Wim Hof</span>
+          <span class="pill">Coherent</span>
+          <span class="pill">4-7-8</span>
+          <span class="pill">25+ Patterns</span>
+        </div>
+        <span class="btn btn-primary" style="align-self:flex-start;margin-top:0.3rem">Launch →</span>
+      </a>
+
+      <div class="card tool-card anim-fade-up delay-4" style="position:relative">
         <span class="coming-badge">Coming Soon</span>
         <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
           <path d="M8 12 L24 4 L40 12 L40 36 L24 44 L8 36 Z" stroke="#a78bfa" stroke-width="1.2" fill="none" opacity="0.55"/>
@@ -185,10 +205,11 @@
 </div>
 
 <footer>
-  <span class="footer-brand">AURAL ALCHEMY</span>
+    <span class="footer-brand">AURAL ALCHEMY</span>
   <ul class="footer-links">
     <li><a href="/aural-alchemy/frequency-generator">Frequency Generator</a></li>
     <li><a href="/aural-alchemy/midi-generator">MIDI Generator</a></li>
+    <li><a href="/aural-alchemy/breathwork">Breathwork</a></li>
     <li><a href="https://auralalchemy.gumroad.com" target="_blank">Shop</a></li>
   </ul>
   <span class="footer-copy">© 2025 Aural Alchemy</span>

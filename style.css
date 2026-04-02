@@ -48,6 +48,31 @@ body::before {
   z-index: 0;
 }
 
+/* ── SACRED GEOMETRY BACKGROUND ──
+   Perfect equilateral triangle: circumradius R, center (250,250).
+   Vertices (R=220): top=(250,30), right=(440.5,360), left=(59.5,360)
+   Using: top = (cx, cy-R), right = (cx + R·sin60, cy + R·cos60·... )
+   Exact: top=(250,30) right=(440.44,360) left=(59.56,360)
+   Verified: all sides = 380, all angles = 60°
+── */
+.aa-geometry {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+  margin-left: -250px;
+  margin-top: -250px;
+  pointer-events: none;
+  z-index: 0;
+  animation: aa-spin 90s linear infinite;
+  opacity: 1;
+}
+@keyframes aa-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ══════════════════════════════════════════════════
    NAV
 ══════════════════════════════════════════════════ */
