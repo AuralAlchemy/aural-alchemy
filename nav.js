@@ -17,7 +17,7 @@
   const path=window.location.pathname.replace(/\/$/,'');
   document.querySelectorAll('.nav-links a').forEach(a=>{
     const href=a.getAttribute('href').replace(/\/$/,'');
-    if(href===path||(path===''&&href==='/')){
+    if(href===path||(path==='/aural-alchemy'&&href==='/aural-alchemy/')){
       a.classList.add('active');
     }
   });
