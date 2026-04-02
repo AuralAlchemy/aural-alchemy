@@ -18,213 +18,200 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232dd4bf'/%3E%3Cstop offset='100%25' stop-color='%23d4a843'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='52' height='52' fill='%23080e10'/%3E%3Ccircle cx='26' cy='26' r='24' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.6'/%3E%3Cpath d='M26 7 L43.5 38 L8.5 38 Z' stroke='url(%23g)' stroke-width='1.5' fill='none'/%3E%3Cline x1='15' y1='29.5' x2='37' y2='29.5' stroke='url(%23g)' stroke-width='1.5'/%3E%3Ccircle cx='26' cy='26' r='2.1' fill='%232dd4bf'/%3E%3C/svg%3E">
 
 <link rel="stylesheet" href="/aural-alchemy/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 
 <style>
-/* ── PAGE WRAPPER ── */
+/* ── PAGE LAYOUT ── */
 .breathwork-page {
-  max-width: 560px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 2rem 1.2rem 5rem;
+  padding: 2.5rem 1.2rem 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  z-index: 1;
 }
-
-/* ── SPINNING BG — handled by global aa-geometry in style.css ── */
 
 /* ── HEADER ── */
 .bw-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1.6rem;
+  text-align: center;
+  padding-top: calc(var(--nav-h) + 1.5rem);
+  margin-bottom: 2rem;
   position: relative;
   z-index: 1;
-  padding-top: 1rem;
+  width: 100%;
 }
-.bw-logo svg {
-  width: 42px;
-  height: 42px;
-  margin-bottom: 0.7rem;
-}
-.bw-brand {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  color: #3ecfcf;
+.bw-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  color: var(--text-muted);
   text-transform: uppercase;
-  margin-bottom: 3px;
-}
-.bw-sub {
-  font-family: 'Jost', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #6b8a9a;
-  margin-bottom: 10px;
-}
-.bw-divider {
-  width: 90px;
-  height: 0.5px;
-  background: linear-gradient(90deg, transparent, rgba(62,207,207,.25), transparent);
-  margin-bottom: 8px;
+  margin-bottom: 0.6rem;
 }
 .bw-title {
   font-family: 'Cinzel', serif;
-  font-size: 11px;
-  letter-spacing: 0.28em;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  background: linear-gradient(135deg, #2dd4bf 0%, #d4a843 60%, #2dd4bf 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.3rem;
+}
+.bw-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--text-dim);
   text-transform: uppercase;
-  color: #8aafb8;
 }
 
-/* ── MAIN PATTERN BUTTONS ── */
-.bw-patterns {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+/* ── SECTION WRAPPER (reuse site card style) ── */
+.bw-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.4rem;
+  margin-bottom: 0.9rem;
+  width: 100%;
   position: relative;
   z-index: 1;
 }
+.bw-section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+/* ── PATTERN BUTTONS ── */
+.bw-patterns {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
 .bw-pat-btn {
-  background: transparent;
-  border: 0.5px solid rgba(62,207,207,.18);
-  color: #6b8a9a;
-  font-family: 'Jost', sans-serif;
-  font-size: 11px;
-  font-weight: 300;
-  padding: 6px 12px;
-  border-radius: 2px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 0.38rem 0.75rem;
+  border-radius: 4px;
   cursor: pointer;
   transition: all .2s;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.bw-pat-btn:hover { border-color: #3ecfcf; color: #3ecfcf; }
-.bw-pat-btn.active { background: rgba(62,207,207,.08); border-color: #3ecfcf; color: #3ecfcf; }
+.bw-pat-btn:hover { border-color: var(--teal-dim); color: var(--teal); }
+.bw-pat-btn.active { background: rgba(45,212,191,0.07); border-color: var(--teal); color: var(--teal); }
 
 /* ── MORE DROPDOWN ── */
-.bw-more-wrap {
-  position: relative;
-  margin-bottom: 14px;
-  z-index: 10;
-}
+.bw-more-wrap { position: relative; }
 .bw-more-btn {
-  background: transparent;
-  border: 0.5px solid rgba(107,138,154,.2);
-  color: #6b8a9a;
-  font-family: 'Jost', sans-serif;
-  font-size: 11px;
-  font-weight: 300;
-  padding: 6px 14px;
-  border-radius: 2px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 0.38rem 0.75rem;
+  border-radius: 4px;
   cursor: pointer;
   transition: all .2s;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.4rem;
 }
 .bw-more-btn:hover,
-.bw-more-btn.open { border-color: #3ecfcf; color: #3ecfcf; }
-.bw-more-btn.open { background: rgba(62,207,207,.04); }
-.bw-chevron {
-  font-size: 8px;
-  transition: transform .2s;
-  display: inline-block;
-}
+.bw-more-btn.open { border-color: var(--teal-dim); color: var(--teal); }
+.bw-chevron { font-size: 0.5rem; transition: transform .2s; display: inline-block; }
 .bw-more-btn.open .bw-chevron { transform: rotate(180deg); }
 
 .bw-dropdown {
   position: absolute;
-  top: calc(100% + 5px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0b131c;
-  border: 0.5px solid rgba(62,207,207,.15);
-  border-radius: 4px;
-  padding: 5px;
-  min-width: 260px;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem;
+  min-width: 280px;
   max-height: 300px;
   overflow-y: auto;
   z-index: 200;
-  box-shadow: 0 12px 40px rgba(0,0,0,.85);
+  box-shadow: 0 12px 40px rgba(0,0,0,.7);
 }
 .bw-dropdown::-webkit-scrollbar { width: 3px; }
-.bw-dropdown::-webkit-scrollbar-thumb { background: rgba(62,207,207,.2); border-radius: 2px; }
-.bw-dd-group { margin-bottom: 3px; }
+.bw-dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.bw-dd-group { margin-bottom: 0.2rem; }
 .bw-dd-group-label {
-  font-size: 9px;
-  letter-spacing: 0.14em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(62,207,207,.35);
-  padding: 5px 9px 3px;
-  font-family: 'Cinzel', serif;
+  color: var(--text-muted);
+  padding: 0.5rem 0.6rem 0.25rem;
 }
 .bw-dd-item {
-  font-size: 11px;
-  color: #6b8a9a;
-  padding: 6px 9px;
-  border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
   cursor: pointer;
   transition: all .15s;
-  letter-spacing: 0.05em;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  letter-spacing: 0.05em;
 }
-.bw-dd-item:hover { background: rgba(62,207,207,.07); color: #d4e8ec; }
-.bw-dd-item.active { background: rgba(62,207,207,.1); color: #3ecfcf; }
-.bw-dd-tag {
-  font-size: 10px;
-  color: rgba(62,207,207,.3);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
+.bw-dd-item:hover { background: rgba(45,212,191,0.06); color: var(--text); }
+.bw-dd-item.active { background: rgba(45,212,191,0.08); color: var(--teal); }
+.bw-dd-tag { font-size: 0.52rem; color: var(--text-muted); text-transform: uppercase; }
 
 /* ── ROUTE PILLS ── */
 .bw-route-bar {
   display: flex;
-  gap: 7px;
-  margin-bottom: 14px;
+  gap: 0.5rem;
   align-items: center;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 1rem;
 }
 .bw-route-pill {
-  font-family: 'Jost', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.1em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 4px 11px;
-  border-radius: 2px;
-  border: 0.5px solid rgba(107,138,154,.18);
-  color: #6b8a9a;
-  transition: opacity .3s;
+  padding: 0.25rem 0.65rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: all .3s;
 }
-.bw-route-pill.active-in  { border-color: rgba(62,207,207,.4); color: #3ecfcf; background: rgba(62,207,207,.05); }
-.bw-route-pill.active-out { border-color: rgba(62,207,207,.25); color: #7de0d0; background: rgba(62,207,207,.03); }
-.bw-route-sep { font-size: 11px; color: rgba(62,207,207,.2); }
+.bw-route-pill.active-in  { border-color: var(--teal-dim); color: var(--teal); background: rgba(45,212,191,0.05); }
+.bw-route-pill.active-out { border-color: var(--teal-dim); color: var(--teal); background: rgba(45,212,191,0.03); opacity: 0.7; }
+.bw-route-sep { font-size: 0.65rem; color: var(--border); }
 
 /* ── ORB ── */
 .bw-orb-wrap {
   position: relative;
   width: 220px;
   height: 220px;
-  margin-bottom: 6px;
+  margin: 0.5rem 0 0.5rem;
   z-index: 1;
 }
 .bw-orb {
   position: absolute;
   inset: 44px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 32%, rgba(62,207,207,.22), rgba(20,100,100,.06) 55%, transparent);
-  border: 0.5px solid rgba(62,207,207,.2);
+  background: radial-gradient(circle at 38% 32%, rgba(45,212,191,0.18), rgba(20,80,80,0.05) 55%, transparent);
+  border: 1px solid rgba(45,212,191,0.2);
   will-change: transform;
 }
 .bw-orb-label {
@@ -238,34 +225,34 @@
 }
 .bw-phase-text {
   font-family: 'Cinzel', serif;
-  font-size: 14px;
+  font-size: 0.85rem;
   font-weight: 400;
-  color: #d4e8ec;
+  color: var(--text);
   letter-spacing: 0.12em;
   text-align: center;
   padding: 0 10px;
   text-transform: uppercase;
 }
 .bw-count-text {
-  font-family: 'Jost', sans-serif;
-  font-size: 26px;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.8rem;
   font-weight: 200;
-  color: #3ecfcf;
+  color: var(--teal);
   line-height: 1;
-  margin-top: 6px;
+  margin-top: 0.4rem;
   font-variant-numeric: tabular-nums;
-  min-height: 34px;
+  min-height: 2.2rem;
 }
 
 /* ── CYCLES BADGE ── */
 .bw-cycles {
-  font-family: 'Jost', sans-serif;
-  font-size: 10px;
-  color: rgba(62,207,207,.35);
-  letter-spacing: 0.1em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  min-height: 14px;
+  margin-bottom: 1rem;
+  min-height: 1rem;
   position: relative;
   z-index: 1;
 }
@@ -273,66 +260,64 @@
 /* ── INFO ROW ── */
 .bw-info-row {
   display: flex;
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: 1.2rem;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
   position: relative;
   z-index: 1;
 }
 .bw-info-box { text-align: center; }
 .bw-info-label {
-  font-family: 'Cinzel', serif;
-  font-size: 9px;
-  letter-spacing: 0.14em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(62,207,207,.35);
-  margin-bottom: 3px;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
 }
 .bw-info-val {
-  font-family: 'Jost', sans-serif;
-  font-size: 12px;
-  color: #8aafb8;
-  font-weight: 300;
-  letter-spacing: 0.04em;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 400;
 }
 
 /* ── CONTROLS ── */
 .bw-controls {
   display: flex;
-  gap: 9px;
+  gap: 0.6rem;
   align-items: center;
-  margin-bottom: 14px;
   position: relative;
   z-index: 1;
 }
 .bw-ctrl-btn {
   background: transparent;
-  border: 0.5px solid rgba(62,207,207,.3);
-  color: #3ecfcf;
+  border: 1px solid var(--teal);
+  color: var(--teal);
   font-family: 'Cinzel', serif;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 400;
-  padding: 9px 30px;
-  border-radius: 2px;
+  padding: 0.8rem 2.5rem;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all .2s;
-  letter-spacing: 0.18em;
+  transition: all .25s;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
-.bw-ctrl-btn:hover { background: rgba(62,207,207,.07); }
-.bw-ctrl-btn.stop { border-color: rgba(107,138,154,.2); color: #6b8a9a; }
+.bw-ctrl-btn:hover { background: rgba(45,212,191,0.08); box-shadow: 0 0 16px rgba(45,212,191,0.12); }
+.bw-ctrl-btn.stop { border-color: var(--border); color: var(--text-dim); }
+.bw-ctrl-btn.stop:hover { border-color: var(--teal-dim); color: var(--teal); background: transparent; box-shadow: none; }
 
 /* ── DESC ── */
 .bw-desc {
-  max-width: 300px;
+  max-width: 380px;
   text-align: center;
-  font-family: 'Jost', sans-serif;
-  font-size: 11px;
-  color: #6b8a9a;
-  line-height: 1.8;
-  margin-bottom: 14px;
-  letter-spacing: 0.02em;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.75;
+  font-weight: 300;
   position: relative;
   z-index: 1;
 }
@@ -341,7 +326,7 @@
 .bw-bottom {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 1.2rem;
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
@@ -350,28 +335,44 @@
 .bw-sound-toggle {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-family: 'Jost', sans-serif;
-  font-size: 11px;
-  color: #6b8a9a;
+  gap: 0.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
   cursor: pointer;
-  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.bw-sound-toggle input { cursor: pointer; accent-color: #3ecfcf; }
-.bw-vol-row { display: flex; align-items: center; gap: 8px; }
+.bw-sound-toggle input { cursor: pointer; accent-color: var(--teal); }
+.bw-vol-row { display: flex; align-items: center; gap: 0.5rem; }
 .bw-vol-label {
-  font-family: 'Jost', sans-serif;
-  font-size: 11px;
-  color: #6b8a9a;
-  letter-spacing: 0.06em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
   text-transform: uppercase;
 }
-.bw-vol-slider { width: 75px; cursor: pointer; accent-color: #3ecfcf; }
+.bw-vol-slider {
+  width: 80px;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+}
+.bw-vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--teal);
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(45,212,191,0.4);
+}
 .bw-vol-num {
-  font-family: 'Jost', sans-serif;
-  font-size: 10px;
-  color: #6b8a9a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--teal);
   min-width: 24px;
 }
 </style>
@@ -402,91 +403,91 @@
 </svg>
 <div class="breathwork-page">
 
-
   <!-- Header -->
   <div class="bw-header">
-    <div class="bw-logo">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="30,3 57,54 3,54" fill="none" stroke="#3ecfcf" stroke-width="1.5" opacity="0.9"/>
-        <polygon points="30,16 46,48 14,48" fill="none" stroke="#3ecfcf" stroke-width="1" opacity="0.45"/>
-        <polygon points="30,26 38,44 22,44" fill="#080c10" stroke="none"/>
-        <circle cx="30" cy="53.5" r="1.4" fill="#3ecfcf" opacity="0.8"/>
-      </svg>
-    </div>
-    <div class="bw-brand">Aural Alchemy</div>
-    <div class="bw-sub">Sound &amp; Breath</div>
-    <div class="bw-divider"></div>
-    <div class="bw-title">Breathwork</div>
+    <p class="bw-eyebrow">Aural Alchemy</p>
+    <h2 class="bw-title">Breathwork</h2>
+    <p class="bw-subtitle">25+ Science-Backed Patterns</p>
   </div>
 
-  <!-- Main pattern buttons -->
-  <div class="bw-patterns" id="bwPatterns"></div>
-
-  <!-- More dropdown -->
-  <div class="bw-more-wrap" id="bwMoreWrap">
-    <button class="bw-more-btn" id="bwMoreBtn">
-      more practices <span class="bw-chevron">&#9660;</span>
-    </button>
-    <div class="bw-dropdown" id="bwDropdown" style="display:none"></div>
-  </div>
-
-  <!-- Route pills -->
-  <div class="bw-route-bar">
-    <div class="bw-route-pill active-in" id="bwPillIn">nose in</div>
-    <span class="bw-route-sep">-</span>
-    <div class="bw-route-pill active-out" id="bwPillOut">mouth out</div>
-  </div>
-
-  <!-- Orb -->
-  <div class="bw-orb-wrap">
-    <div class="bw-orb" id="bwOrb"></div>
-    <div class="bw-orb-label">
-      <div class="bw-phase-text" id="bwPhaseText">ready</div>
-      <div class="bw-count-text" id="bwCountText"></div>
+  <!-- Pattern selection card -->
+  <div class="bw-section">
+    <div class="bw-section-label">Choose a Pattern</div>
+    <div class="bw-patterns" id="bwPatterns"></div>
+    <div class="bw-more-wrap" id="bwMoreWrap">
+      <button class="bw-more-btn" id="bwMoreBtn">
+        more practices <span class="bw-chevron">&#9660;</span>
+      </button>
+      <div class="bw-dropdown" id="bwDropdown" style="display:none"></div>
     </div>
   </div>
 
-  <!-- Cycles -->
-  <div class="bw-cycles" id="bwCycles"></div>
+  <!-- Session card -->
+  <div class="bw-section" style="display:flex;flex-direction:column;align-items:center;gap:0.8rem">
+    <div class="bw-section-label" style="margin-bottom:0;align-self:flex-start">Session</div>
 
-  <!-- Info row -->
-  <div class="bw-info-row">
-    <div class="bw-info-box">
-      <div class="bw-info-label">pattern</div>
-      <div class="bw-info-val" id="bwInfoName">-</div>
+    <!-- Route pills -->
+    <div class="bw-route-bar">
+      <div class="bw-route-pill active-in" id="bwPillIn">nose in</div>
+      <span class="bw-route-sep">–</span>
+      <div class="bw-route-pill active-out" id="bwPillOut">mouth out</div>
     </div>
-    <div class="bw-info-box">
-      <div class="bw-info-label">cycle</div>
-      <div class="bw-info-val" id="bwInfoCycle">-</div>
+
+    <!-- Orb -->
+    <div class="bw-orb-wrap">
+      <div class="bw-orb" id="bwOrb"></div>
+      <div class="bw-orb-label">
+        <div class="bw-phase-text" id="bwPhaseText">ready</div>
+        <div class="bw-count-text" id="bwCountText"></div>
+      </div>
     </div>
-    <div class="bw-info-box">
-      <div class="bw-info-label">benefit</div>
-      <div class="bw-info-val" id="bwInfoBenefit">-</div>
-    </div>
-    <div class="bw-info-box">
-      <div class="bw-info-label">origin</div>
-      <div class="bw-info-val" id="bwInfoOrigin">-</div>
+
+    <!-- Cycles -->
+    <div class="bw-cycles" id="bwCycles"></div>
+
+    <!-- Controls -->
+    <div class="bw-controls">
+      <button class="bw-ctrl-btn" id="bwStartBtn">Begin Session</button>
+      <button class="bw-ctrl-btn stop" id="bwStopBtn" style="display:none">Stop</button>
     </div>
   </div>
 
-  <!-- Controls -->
-  <div class="bw-controls">
-    <button class="bw-ctrl-btn" id="bwStartBtn">begin</button>
-    <button class="bw-ctrl-btn stop" id="bwStopBtn" style="display:none">stop</button>
+  <!-- Info card -->
+  <div class="bw-section">
+    <div class="bw-section-label">Pattern Info</div>
+    <div class="bw-info-row">
+      <div class="bw-info-box">
+        <div class="bw-info-label">Pattern</div>
+        <div class="bw-info-val" id="bwInfoName">—</div>
+      </div>
+      <div class="bw-info-box">
+        <div class="bw-info-label">Cycle</div>
+        <div class="bw-info-val" id="bwInfoCycle">—</div>
+      </div>
+      <div class="bw-info-box">
+        <div class="bw-info-label">Benefit</div>
+        <div class="bw-info-val" id="bwInfoBenefit">—</div>
+      </div>
+      <div class="bw-info-box">
+        <div class="bw-info-label">Origin</div>
+        <div class="bw-info-val" id="bwInfoOrigin">—</div>
+      </div>
+    </div>
+    <p class="bw-desc" id="bwDesc" style="margin-top:1rem;margin-bottom:0;text-align:left">Choose a breathing pattern above to begin.</p>
   </div>
 
-  <!-- Description -->
-  <p class="bw-desc" id="bwDesc">choose a breathing pattern above to begin</p>
-
-  <!-- Bottom controls -->
-  <div class="bw-bottom">
-    <label class="bw-sound-toggle">
-      <input type="checkbox" id="bwSoundOn" checked> breath sounds
-    </label>
-    <div class="bw-vol-row">
-      <span class="bw-vol-label">volume</span>
-      <input type="range" class="bw-vol-slider" id="bwVolSlider" min="0" max="100" value="50" step="1">
-      <span class="bw-vol-num" id="bwVolNum">50</span>
+  <!-- Sound card -->
+  <div class="bw-section">
+    <div class="bw-section-label">Sound</div>
+    <div class="bw-bottom">
+      <label class="bw-sound-toggle">
+        <input type="checkbox" id="bwSoundOn" checked> Breath sounds
+      </label>
+      <div class="bw-vol-row">
+        <span class="bw-vol-label">Volume</span>
+        <input type="range" class="bw-vol-slider" id="bwVolSlider" min="0" max="100" value="50" step="1">
+        <span class="bw-vol-num" id="bwVolNum">50</span>
+      </div>
     </div>
   </div>
 

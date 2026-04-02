@@ -45,12 +45,10 @@ body{background:var(--bg);color:var(--text);font-family:'Raleway',sans-serif;fon
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(45,212,191,0.06) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(212,168,67,0.04) 0%,transparent 50%);pointer-events:none;z-index:0}
 
 /* HEADER — no absolute positioning for reset */
-header{text-align:center;padding:2rem 1rem 0.5rem;padding-top:calc(var(--nav-h) + 2rem);position:relative;z-index:1}
-.logo-wrap{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:0.4rem}
-.logo-symbol{width:48px;height:48px;flex-shrink:0}
-.logo-symbol svg{width:100%;height:100%}
-h1{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:700;letter-spacing:0.15em;background:linear-gradient(135deg,#2dd4bf 0%,#d4a843 60%,#2dd4bf 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.subtitle{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-top:0.2rem}
+header{text-align:center;padding:2.5rem 1rem 0.5rem;padding-top:calc(var(--nav-h) + 2.5rem);position:relative;z-index:1}
+.header-eyebrow{font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.6rem}
+h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;letter-spacing:0.12em;background:linear-gradient(135deg,#2dd4bf 0%,#d4a843 60%,#2dd4bf 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.2rem}
+.subtitle{font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.2rem}
 .header-actions{display:flex;justify-content:flex-end;padding:0.7rem 0.8rem 0.3rem}
 .reset-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;padding:0.42rem 1rem;cursor:pointer;text-transform:uppercase;transition:all .2s;border-radius:3px}
 .reset-btn:hover{border-color:var(--teal);color:var(--teal)}
@@ -217,26 +215,9 @@ canvas#waveCanvas{width:100%;height:100%}
 </svg>
 
 <header>
-  <div class="logo-wrap">
-    <div class="logo-symbol">
-      <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#2dd4bf"/>
-            <stop offset="100%" stop-color="#d4a843"/>
-          </linearGradient>
-          <filter id="glow"><feGaussianBlur stdDeviation="1.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <circle cx="26" cy="26" r="24" stroke="url(#lg1)" stroke-width="1" fill="none" opacity="0.52" filter="url(#glow)"/>
-        <path d="M26 7 L43.5 38 L8.5 38 Z" stroke="url(#lg1)" stroke-width="1.5" fill="none" filter="url(#glow)"/>
-        <line x1="15" y1="29.5" x2="37" y2="29.5" stroke="url(#lg1)" stroke-width="1.5" filter="url(#glow)"/>
-        <circle cx="26" cy="26" r="2.1" fill="#2dd4bf" opacity="0.95"/>
-        <circle cx="26" cy="26" r="8" stroke="#d4a843" stroke-width="0.5" fill="none" opacity="0.36"/>
-      </svg>
-    </div>
-    <h1>AURAL ALCHEMY</h1>
-  </div>
-  <p class="subtitle">Frequency &amp; Tone Generator</p>
+  <p class="header-eyebrow">Aural Alchemy</p>
+  <h1>Frequency Generator</h1>
+  <p class="subtitle">Binaural · Isochronic · Pure Tone</p>
 </header>
 <div class="header-actions">
   <button class="reset-btn" onclick="resetAll()">RESET</button>
