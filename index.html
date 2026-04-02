@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aural Alchemy — Sacred Tools for Sound and Mind</title>
+<meta name="description" content="Aural Alchemy creates professional tools for healing, meditation and music production. Binaural beats, isochronic tones, MIDI generation and sacred frequency tools.">
+<meta name="theme-color" content="#080e10">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://alchemyaural.com">
+<meta property="og:title" content="Aural Alchemy — Sacred Tools for Sound and Mind">
+<meta property="og:description" content="Professional tools for healing, meditation and music production.">
+<meta property="og:image" content="https://alchemyaural.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://alchemyaural.com/og-image.png">
+<link rel="canonical" href="https://alchemyaural.com">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232dd4bf'/%3E%3Cstop offset='100%25' stop-color='%23d4a843'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='52' height='52' fill='%23080e10'/%3E%3Ccircle cx='26' cy='26' r='24' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.6'/%3E%3Cpath d='M26 7 L43.5 38 L8.5 38 Z' stroke='url(%23g)' stroke-width='1.5' fill='none'/%3E%3Cline x1='15' y1='29.5' x2='37' y2='29.5' stroke='url(%23g)' stroke-width='1.5'/%3E%3Ccircle cx='26' cy='26' r='2.1' fill='%232dd4bf'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+.hero{min-height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative}
+.hero-bg-symbol{position:absolute;width:min(600px,90vw);height:min(600px,90vw);opacity:0.04;animation:spin-slow 120s linear infinite;pointer-events:none}
+.hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.4em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:1.5rem}
+.hero-title{font-size:clamp(3rem,8vw,6rem);line-height:1.05;margin-bottom:1rem}
+.hero-tagline{font-family:'Share Tech Mono',monospace;font-size:clamp(0.65rem,1.5vw,0.82rem);letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3rem}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3.5rem}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.4rem;opacity:0.3;animation:fadeIn 1s ease 1.5s both}
+.scroll-hint span{font-family:'Share Tech Mono',monospace;font-size:0.5rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase}
+.scroll-arrow{width:1px;height:36px;background:linear-gradient(to bottom,var(--teal-dim),transparent)}
+.tools-section{max-width:1100px;margin:0 auto;padding:4rem 2rem}
+.section-header{text-align:center;margin-bottom:3rem}
+.section-header h2{font-size:clamp(1.5rem,3vw,2.1rem);margin-top:0.5rem}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.tool-card{display:flex;flex-direction:column;gap:1.1rem;text-decoration:none;color:inherit}
+.tool-icon{width:44px;height:44px}
+.tool-tag{font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:0.22em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:0.2rem}
+.tool-card h3{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;letter-spacing:0.08em;background:linear-gradient(135deg,#2dd4bf,#d4a843);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.4rem}
+.tool-card p{font-size:0.8rem;color:var(--text-dim);line-height:1.75;flex:1}
+.tool-pills{display:flex;flex-wrap:wrap;gap:0.35rem;margin:0.2rem 0}
+.pill{font-family:'Share Tech Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;color:var(--text-muted);border:1px solid var(--border);border-radius:3px;padding:0.18rem 0.45rem;text-transform:uppercase}
+.shop-section{max-width:1100px;margin:0 auto;padding:0 2rem 5rem}
+.shop-banner{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:2.5rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;position:relative;overflow:hidden}
+.shop-banner::after{content:'';position:absolute;right:-60px;top:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(212,168,67,0.06),transparent 70%);pointer-events:none}
+.shop-banner h2{font-size:clamp(1.2rem,2.5vw,1.7rem);margin-bottom:0.5rem}
+.shop-banner p{font-size:0.8rem;color:var(--text-dim);max-width:480px;line-height:1.7}
+.coming-badge{position:absolute;top:1rem;right:1rem;font-family:'Share Tech Mono',monospace;font-size:0.5rem;letter-spacing:0.18em;color:var(--gold);border:1px solid var(--gold-dim);border-radius:3px;padding:0.18rem 0.45rem;text-transform:uppercase;background:rgba(212,168,67,0.05)}
+.freq-wave{width:min(700px,90vw);height:55px;opacity:0.45;margin-bottom:1rem}
+@media(max-width:600px){.shop-banner,.hero-cta{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">
+    <svg viewBox="0 0 52 52" fill="none"><defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient></defs><circle cx="26" cy="26" r="24" stroke="url(#ng)" stroke-width="1" fill="none" opacity="0.55"/><path d="M26 7 L43.5 38 L8.5 38 Z" stroke="url(#ng)" stroke-width="1.5" fill="none"/><line x1="15" y1="29.5" x2="37" y2="29.5" stroke="url(#ng)" stroke-width="1.5"/><circle cx="26" cy="26" r="2.1" fill="#2dd4bf" opacity="0.95"/></svg>
+    <span class="nav-brand-text">AURAL ALCHEMY</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/frequency-generator">Frequency Generator</a></li>
+    <li><a href="/midi-generator">MIDI Generator</a></li>
+    <li><a href="/shop">Shop</a></li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-wrap">
+
+  <section class="hero">
+    <svg class="hero-bg-symbol" viewBox="0 0 500 500" fill="none">
+      <circle cx="250" cy="250" r="240" stroke="#2dd4bf" stroke-width="1"/>
+      <path d="M250 30 L450 390 L50 390 Z" stroke="#2dd4bf" stroke-width="1"/>
+      <circle cx="250" cy="250" r="140" stroke="#d4a843" stroke-width="0.5"/>
+      <line x1="120" y1="310" x2="380" y2="310" stroke="#d4a843" stroke-width="1"/>
+      <circle cx="250" cy="250" r="20" stroke="#2dd4bf" stroke-width="0.8"/>
+    </svg>
+
+    <p class="hero-eyebrow anim-fade-up">Aural Alchemy</p>
+    <h1 class="hero-title grad-title anim-fade-up delay-1">Sacred Tools<br>for Sound<br>and Mind</h1>
+    <p class="hero-tagline anim-fade-up delay-2">Healing frequencies · MIDI tools · Sacred acoustics</p>
+
+    <div class="hero-cta anim-fade-up delay-3">
+      <a href="/frequency-generator" class="btn btn-primary">⟡ Frequency Generator</a>
+      <a href="/midi-generator" class="btn btn-ghost">⬡ MIDI Generator</a>
+      <a href="https://auralalchemy.gumroad.com" target="_blank" class="btn btn-gold">◈ Shop</a>
+    </div>
+
+    <canvas class="freq-wave anim-fade-in delay-4" id="heroWave"></canvas>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <div class="divider"><span class="divider-symbol">🜁</span></div>
+
+  <section class="tools-section">
+    <div class="section-header anim-fade-up">
+      <p class="label">Tools</p>
+      <h2 class="grad-title">What We Build</h2>
+    </div>
+
+    <div class="tools-grid">
+
+      <a href="/frequency-generator" class="card tool-card anim-fade-up delay-1">
+        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="#2dd4bf" stroke-width="1" opacity="0.45"/>
+          <path d="M4,24 Q10,10 16,24 Q22,38 28,24 Q34,10 40,24 Q43,30 46,24" stroke="#2dd4bf" stroke-width="1.5" fill="none"/>
+          <circle cx="24" cy="24" r="3" fill="#2dd4bf"/>
+        </svg>
+        <div>
+          <p class="tool-tag">Free · Web App</p>
+          <h3>Frequency Generator</h3>
+          <p>Professional healing frequency generator with binaural beats, isochronic tones and pure frequencies. Solfeggio, chakras, Pythagorean tuning and Schumann resonance. WAV export included.</p>
+        </div>
+        <div class="tool-pills">
+          <span class="pill">Binaural Beats</span>
+          <span class="pill">Isochronic</span>
+          <span class="pill">Solfeggio</span>
+          <span class="pill">Chakras</span>
+          <span class="pill">WAV Export</span>
+        </div>
+        <span class="btn btn-primary" style="align-self:flex-start;margin-top:0.3rem">Launch →</span>
+      </a>
+
+      <a href="/midi-generator" class="card tool-card anim-fade-up delay-2">
+        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
+          <rect x="4" y="16" width="7" height="20" rx="1" stroke="#d4a843" stroke-width="1.2" fill="none"/>
+          <rect x="15" y="10" width="7" height="26" rx="1" stroke="#d4a843" stroke-width="1.2" fill="none"/>
+          <rect x="26" y="19" width="7" height="17" rx="1" stroke="#d4a843" stroke-width="1.2" fill="none"/>
+          <rect x="37" y="13" width="7" height="10" rx="1" fill="#d4a843" opacity="0.5"/>
+          <line x1="3" y1="40" x2="45" y2="40" stroke="#d4a843" stroke-width="0.7" opacity="0.3"/>
+        </svg>
+        <div>
+          <p class="tool-tag">Free Download · Mac &amp; Windows</p>
+          <h3>MIDI Generator</h3>
+          <p>AI-powered desktop MIDI generation tool for music producers. Generate chord progressions, melodies and patterns tuned to sacred frequencies and alchemical scales.</p>
+        </div>
+        <div class="tool-pills">
+          <span class="pill">Mac</span>
+          <span class="pill">Windows</span>
+          <span class="pill">AI Powered</span>
+          <span class="pill">Sacred Scales</span>
+          <span class="pill">MIDI Export</span>
+        </div>
+        <span class="btn btn-gold" style="align-self:flex-start;margin-top:0.3rem">Download →</span>
+      </a>
+
+      <div class="card tool-card anim-fade-up delay-3" style="position:relative">
+        <span class="coming-badge">Coming Soon</span>
+        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
+          <path d="M8 12 L24 4 L40 12 L40 36 L24 44 L8 36 Z" stroke="#a78bfa" stroke-width="1.2" fill="none" opacity="0.55"/>
+          <path d="M8 12 L24 20 L40 12" stroke="#a78bfa" stroke-width="1" fill="none" opacity="0.4"/>
+          <line x1="24" y1="20" x2="24" y2="44" stroke="#a78bfa" stroke-width="1" opacity="0.35"/>
+          <circle cx="24" cy="24" r="4" stroke="#a78bfa" stroke-width="1" fill="none" opacity="0.5"/>
+        </svg>
+        <div>
+          <p class="tool-tag">Sample Packs · Presets</p>
+          <h3>Sample Library</h3>
+          <p>Curated sample packs and frequency presets rooted in sacred acoustics. Designed for producers working with healing and conscious music.</p>
+        </div>
+        <div class="tool-pills">
+          <span class="pill">Sample Packs</span>
+          <span class="pill">432 Hz Tuned</span>
+          <span class="pill">Presets</span>
+        </div>
+        <span class="btn btn-ghost" style="align-self:flex-start;margin-top:0.3rem;opacity:0.4;cursor:default">Soon</span>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"><span class="divider-symbol">◈</span></div>
+
+  <section class="shop-section">
+    <div class="shop-banner anim-fade-up">
+      <div>
+        <p class="label" style="margin-bottom:0.5rem">Gumroad</p>
+        <h2 class="grad-title">Digital Products</h2>
+        <p>Sample packs and tools for producers and sound healers. All products on Gumroad.</p>
+      </div>
+      <a href="https://auralalchemy.gumroad.com" target="_blank" rel="noopener" class="btn btn-gold">Visit Shop →</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span class="footer-brand">AURAL ALCHEMY</span>
+  <ul class="footer-links">
+    <li><a href="/frequency-generator">Frequency Generator</a></li>
+    <li><a href="/midi-generator">MIDI Generator</a></li>
+    <li><a href="https://auralalchemy.gumroad.com" target="_blank">Shop</a></li>
+  </ul>
+  <span class="footer-copy">© 2025 Aural Alchemy</span>
+</footer>
+
+<script src="nav.js"></script>
+<script>
+(function(){
+  const canvas=document.getElementById('heroWave');
+  if(!canvas)return;
+  const c=canvas.getContext('2d');
+  let frame,start;
+  function draw(ts){
+    if(!start)start=ts;
+    const e=(ts-start)*0.001;
+    const W=canvas.offsetWidth,H=canvas.offsetHeight;
+    canvas.width=W;canvas.height=H;
+    c.clearRect(0,0,W,H);
+    [[1.4,'#2dd4bf',0.68],[0.85,'#d4a843',0.42],[0.5,'#a78bfa',0.28]].forEach(([spd,col,amp],i)=>{
+      c.beginPath();c.strokeStyle=col;c.lineWidth=1.3;c.globalAlpha=0.65;
+      for(let x=0;x<=W;x++){
+        const t=x/W;
+        const y=H/2+Math.sin(t*Math.PI*2*(3+i)+e*spd)*H*amp*0.4;
+        x===0?c.moveTo(x,y):c.lineTo(x,y);
+      }
+      c.stroke();
+    });
+    c.globalAlpha=1;
+    frame=requestAnimationFrame(draw);
+  }
+  frame=requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

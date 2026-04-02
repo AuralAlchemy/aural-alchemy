@@ -1,0 +1,96 @@
+<!-- 
+  og-image.svg — Open Graph preview image for alchemyaural.com
+  Size: 1200×630px (standard OG image size)
+  Save as og-image.png by opening in browser and screenshotting,
+  or use: npx sharp-cli og-image.svg -o og-image.png
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="50%" stop-color="#d4a843"/>
+      <stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#d4a843"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="bgGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#0d1618"/>
+      <stop offset="100%" stop-color="#080e10"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGlow)"/>
+  
+  <!-- Subtle top glow -->
+  <ellipse cx="600" cy="0" rx="500" ry="200" fill="rgba(45,212,191,0.06)"/>
+  
+  <!-- Alchemical symbol — centered left -->
+  <g transform="translate(200, 315)">
+    <!-- Outer circle -->
+    <circle cx="0" cy="0" r="110" stroke="url(#logoGrad)" stroke-width="1.5" fill="none" opacity="0.6" filter="url(#glow)"/>
+    <!-- Triangle -->
+    <path d="M0,-95 L82,47 L-82,47 Z" stroke="url(#logoGrad)" stroke-width="2.5" fill="none" filter="url(#glow)"/>
+    <!-- Crossbar -->
+    <line x1="-55" y1="20" x2="55" y2="20" stroke="url(#logoGrad)" stroke-width="2.5" filter="url(#glow)"/>
+    <!-- Center dot -->
+    <circle cx="0" cy="0" r="6" fill="#2dd4bf" opacity="0.95"/>
+    <!-- Inner circle -->
+    <circle cx="0" cy="0" r="36" stroke="#d4a843" stroke-width="0.8" fill="none" opacity="0.4"/>
+  </g>
+
+  <!-- Decorative wave lines — right side -->
+  <g opacity="0.15">
+    <path d="M650,180 Q750,160 850,180 Q950,200 1050,180 Q1100,170 1150,180" stroke="#2dd4bf" stroke-width="1.5" fill="none"/>
+    <path d="M650,200 Q750,180 850,200 Q950,220 1050,200 Q1100,190 1150,200" stroke="#2dd4bf" stroke-width="1" fill="none"/>
+    <path d="M650,420 Q750,440 850,420 Q950,400 1050,420 Q1100,430 1150,420" stroke="#d4a843" stroke-width="2" fill="none"/>
+    <path d="M650,445 Q750,465 850,445 Q950,425 1050,445 Q1100,455 1150,445" stroke="#d4a843" stroke-width="1.5" fill="none"/>
+    <path d="M650,470 Q750,490 850,470 Q950,450 1050,470 Q1100,480 1150,470" stroke="#a78bfa" stroke-width="1" fill="none"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="380" y="280" 
+    font-family="Georgia, serif" 
+    font-size="72" 
+    font-weight="700"
+    letter-spacing="8"
+    fill="url(#titleGrad)"
+    filter="url(#glow)">AURAL ALCHEMY</text>
+
+  <!-- Subtitle -->
+  <text x="383" y="330" 
+    font-family="'Courier New', monospace" 
+    font-size="18" 
+    letter-spacing="6"
+    fill="#5a7a78">FREQUENCY  &amp;  TONE  GENERATOR</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(383, 380)">
+    <!-- Binaural -->
+    <rect x="0" y="0" width="180" height="36" rx="4" fill="none" stroke="#2dd4bf" stroke-width="1" opacity="0.5"/>
+    <text x="90" y="23" font-family="'Courier New', monospace" font-size="12" letter-spacing="2" fill="#2dd4bf" text-anchor="middle">BINAURAL BEATS</text>
+    <!-- Isochronic -->
+    <rect x="196" y="0" width="200" height="36" rx="4" fill="none" stroke="#2dd4bf" stroke-width="1" opacity="0.5"/>
+    <text x="296" y="23" font-family="'Courier New', monospace" font-size="12" letter-spacing="2" fill="#2dd4bf" text-anchor="middle">ISOCHRONIC TONES</text>
+    <!-- Frequencies -->
+    <rect x="412" y="0" width="180" height="36" rx="4" fill="none" stroke="#d4a843" stroke-width="1" opacity="0.5"/>
+    <text x="502" y="23" font-family="'Courier New', monospace" font-size="12" letter-spacing="2" fill="#d4a843" text-anchor="middle">528 · 432 · 396</text>
+  </g>
+
+  <!-- URL -->
+  <text x="600" y="560" 
+    font-family="'Courier New', monospace" 
+    font-size="22" 
+    letter-spacing="3"
+    fill="#3a5550"
+    text-anchor="middle">alchemyaural.com</text>
+
+  <!-- Border -->
+  <rect x="20" y="20" width="1160" height="590" rx="8" fill="none" stroke="#1e3035" stroke-width="1"/>
+</svg>
