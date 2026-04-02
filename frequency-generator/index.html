@@ -340,7 +340,14 @@ canvas#waveCanvas{width:100%;height:100%}
       <span id="beginIcon">▶</span>
       <span id="beginLabel">BEGIN SESSION</span>
     </button>
-    <button class="wav-btn" onclick="exportWav()">↓ WAV</button>
+    <button class="wav-btn" onclick="exportWav()" id="wavBtn">↓ WAV</button>
+    <select id="wavLen" style="background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.58rem;padding:0.82rem 0.5rem;border-radius:5px;cursor:pointer;outline:none">
+      <option value="60">1 min</option>
+      <option value="120">2 min</option>
+      <option value="180">3 min</option>
+      <option value="240">4 min</option>
+      <option value="300" selected>5 min</option>
+    </select>
   </div>
   <p class="footer-note">Stereo headphones required for binaural beats. The beat is created inside your brain from two slightly different frequencies.</p>
 </div>
@@ -1247,40 +1254,94 @@ function stopWaveAnim(){
 // ═══════════════════════════════ WAV EXPORT ══════════════════════════
 function exportWav(){
   if(!state.intention&&!state.brainwave){alert('Select a session first.');return;}
-  const sr=44100,dur=300,len=sr*dur;
-  const off=new OfflineAudioContext(2,len,sr);
-  const mg=off.createGain(); mg.gain.value=state.volume;
-  const wf=off.createBiquadFilter(); wf.type='highshelf'; wf.frequency.value=600; wf.gain.value=-state.warmth*40;
-  wf.connect(mg); mg.connect(off.destination);
-  const harmonics=state.carrierMode==='harmonic'?[1,2,3]:[1];
+  const btn=document.getElementById('wavBtn');
+  btn.textContent='Rendering…'; btn.disabled=true;
 
-  layersToPlay.forEach((layer,li)=>{
+  const sr=44100;
+  const dur=+(document.getElementById('wavLen')?.value||300);
+  const len=sr*dur;
+  const off=new OfflineAudioContext(2,len,sr);
+
+  const mg=off.createGain(); mg.gain.value=state.volume; mg.connect(off.destination);
+  const wf=off.createBiquadFilter(); wf.type='highshelf'; wf.frequency.value=600;
+  wf.gain.value=-state.warmth*40; wf.connect(mg);
+
+  const harmonics=state.carrierMode==='harmonic'?[1,2,3]:[1];
+  const layers=state.carrierMode==='single'?state.layers.slice(0,1):state.layers;
+
+  layers.forEach((layer,li)=>{
     const carrier=getCarrierForLayer(li);
-    const lg=off.createGain(); lg.gain.value=li===0?0.5:li===1?0.25:0.15; lg.connect(wf);
+    const beat=layer.beatHz;
+    const layerVol=li===0?0.45:li===1?0.22:0.13;
+
     if(state.method==='binaural'){
-      const merger=off.createChannelMerger(2); merger.connect(lg);
       harmonics.forEach((h,hi)=>{
-        const fL=carrier*h, fR=fL+(hi===0?layer.beatHz:layer.beatHz*0.5/(hi));
-        [fL,fR].forEach((f,si)=>{
-          const o=off.createOscillator(),g=off.createGain();
-          o.type='sine'; o.frequency.value=f; g.gain.value=0.45/(hi+1);
-          o.connect(g); g.connect(merger,0,si); o.start();
-        });
+        const fL=carrier*h;
+        const fR=hi===0?fL+beat:fL;
+        const amp=layerVol*0.5/(hi+1);
+        const panL=off.createStereoPanner(); panL.pan.value=-1; panL.connect(wf);
+        const panR=off.createStereoPanner(); panR.pan.value=+1; panR.connect(wf);
+        const gL=off.createGain(); gL.gain.value=amp; gL.connect(panL);
+        const gR=off.createGain(); gR.gain.value=amp; gR.connect(panR);
+        const oscL=off.createOscillator(); oscL.type='sine'; oscL.frequency.value=fL;
+        const oscR=off.createOscillator(); oscR.type='sine'; oscR.frequency.value=fR;
+        oscL.connect(gL); oscR.connect(gR); oscL.start(); oscR.start();
+      });
+    } else if(state.method==='isochronic'){
+      // Pre-compute Hann envelope buffer for offline context
+      const periodSamples=Math.round(sr/beat);
+      const pulseSamples=Math.floor(periodSamples*0.5);
+      const buf=off.createBuffer(1,periodSamples,sr);
+      const data=buf.getChannelData(0);
+      for(let i=0;i<pulseSamples;i++) data[i]=layerVol*Math.sin(Math.PI*i/(pulseSamples-1))**2;
+      const envSrc=off.createBufferSource(); envSrc.buffer=buf; envSrc.loop=true;
+      const gate=off.createGain(); gate.gain.value=0;
+      envSrc.connect(gate.gain); envSrc.start();
+      const hp=off.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=20;
+      gate.connect(hp); hp.connect(wf);
+      harmonics.forEach((h,hi)=>{
+        const osc=off.createOscillator(); const g=off.createGain();
+        osc.type='sine'; osc.frequency.value=carrier*h; g.gain.value=0.6/(hi+1);
+        osc.connect(g); g.connect(gate); osc.start();
       });
     } else {
+      const vg=off.createGain(); vg.gain.value=layerVol; vg.connect(wf);
       harmonics.forEach((h,hi)=>{
-        const o=off.createOscillator(),g=off.createGain();
-        o.type='sine'; o.frequency.value=carrier*h; g.gain.value=0.48/(hi+1);
-        o.connect(g); g.connect(lg); o.start();
+        const osc=off.createOscillator(); const g=off.createGain();
+        osc.type='sine'; osc.frequency.value=carrier*h; g.gain.value=0.48/(hi+1);
+        osc.connect(g); g.connect(vg); osc.start();
       });
     }
   });
 
+  // Add noise if active
+  if(state.pinkVol>0){
+    const src=makePinkNoise(off); const g=off.createGain();
+    g.gain.value=state.pinkVol*0.06; src.connect(g); g.connect(mg); src.start();
+  }
+  if(state.brownVol>0){
+    const src=makeBrownNoise(off); const g=off.createGain();
+    g.gain.value=state.brownVol*0.06; src.connect(g); g.connect(mg); src.start();
+  }
+
   off.startRendering().then(buf=>{
     const ab=toWav(buf);
+    // Build descriptive filename
+    const label=state.intention
+      ? INTENTIONS.find(i=>i.id===state.intention)?.label.toLowerCase()
+      : BRAINWAVES.find(b=>b.id===state.brainwave)?.label.toLowerCase();
+    const methodTag=state.method==='binaural'?'binaural':state.method==='isochronic'?'isochronic':'pure';
+    const carrier=getCarrierForLayer(0).toFixed(0);
+    const beat=state.layers[0].beatHz;
+    const mins=Math.round(dur/60);
+    const filename=`aural-alchemy_${label||'session'}_${methodTag}_${carrier}hz_${beat}beat_${mins}min.wav`;
     const url=URL.createObjectURL(new Blob([ab],{type:'audio/wav'}));
-    const a=document.createElement('a'); a.href=url; a.download='aural-alchemy.wav'; a.click();
+    const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
     URL.revokeObjectURL(url);
+    btn.textContent='↓ WAV'; btn.disabled=false;
+  }).catch(e=>{
+    console.error('WAV render error',e);
+    btn.textContent='↓ WAV'; btn.disabled=false;
   });
 }
 
@@ -1319,7 +1380,7 @@ requestAnimationFrame(()=>{drawOsterCanvas();updateOsterNeedle(state.layers[0].b
     <li><a href="/aural-alchemy/breathwork">Breathwork</a></li>
     <li><a href="https://auralalchemy.gumroad.com" target="_blank">Shop</a></li>
   </ul>
-  <span class="footer-copy">© 2025 Aural Alchemy</span>
+  <span class="footer-copy">© 2026 Aural Alchemy</span>
 </footer>
 <script src="/aural-alchemy/nav.js"></script>
 </body>
