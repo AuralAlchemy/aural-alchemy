@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIDI Generator — Aural Alchemy</title>
+<meta name="description" content="Generate endless ambient MIDI chord progressions tuned to sacred frequencies. Free, runs in your browser.">
+<meta name="theme-color" content="#080e10">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232dd4bf'/%3E%3Cstop offset='100%25' stop-color='%23d4a843'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='52' height='52' fill='%23080e10'/%3E%3Ccircle cx='26' cy='26' r='24' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.6'/%3E%3Cpath d='M26 7 L43.5 38 L8.5 38 Z' stroke='url(%23g)' stroke-width='1.5' fill='none'/%3E%3Cline x1='15' y1='29.5' x2='37' y2='29.5' stroke='url(%23g)' stroke-width='1.5'/%3E%3Ccircle cx='26' cy='26' r='2.1' fill='%232dd4bf'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/aural-alchemy/style.css">
+<style>
+/* ── PAGE LAYOUT ── */
+.midi-page { max-width: 700px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+/* ── HERO ── */
+.midi-hero { text-align: center; padding: 3rem 0 2.5rem; position: relative; }
+.midi-hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0.5rem 0 0.4rem; }
+.midi-hero p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.7; max-width: 480px; margin: 0 auto; }
+
+/* ── PANEL ── */
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.4rem;
+  margin-bottom: 1rem;
+}
+.panel-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+
+/* ── SLIDER ROW ── */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+}
+.slider-row label {
+  font-size: 0.78rem;
+  color: var(--text);
+  min-width: 180px;
+}
+.slider-row input[type=range] {
+  flex: 1;
+  min-width: 80px;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.slider-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--teal);
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(45,212,191,0.5);
+}
+.slider-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--teal);
+  width: 52px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.2rem 0.4rem;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s;
+  -moz-appearance: textfield;
+}
+.slider-num:focus { border-color: var(--teal-dim); }
+.slider-num::-webkit-inner-spin-button,
+.slider-num::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* ── TOGGLE ── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+}
+.toggle-row label { font-size: 0.82rem; color: var(--text); }
+.toggle-row small { font-size: 0.68rem; color: var(--text-dim); display: block; margin-top: 0.1rem; }
+.toggle {
+  position: relative;
+  width: 42px; height: 22px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 22px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.toggle input:checked + .toggle-track { background: var(--teal-dim); }
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: transform .2s, background .2s;
+}
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(20px);
+  background: var(--teal);
+}
+
+/* ── ACCORDION ── */
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  user-select: none;
+}
+.accordion-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  transition: color .2s;
+}
+.accordion-header:hover .accordion-title { color: var(--teal); }
+.accordion-arrow { font-size: 0.6rem; color: var(--text-muted); transition: transform .25s; }
+.accordion-arrow.open { transform: rotate(180deg); }
+.accordion-body { overflow: hidden; max-height: 0; transition: max-height .35s ease; }
+.accordion-body.open { max-height: 2000px; }
+
+/* ── CHORD BALANCE GRID ── */
+.balance-section-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  margin: 1rem 0 0.6rem;
+}
+.balance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.2rem;
+}
+.balance-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.balance-item label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  min-width: 72px;
+}
+.balance-item input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.balance-item input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+}
+.balance-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--gold-dim);
+  min-width: 24px;
+  text-align: right;
+}
+
+/* ── VOICING PROFILE SELECT ── */
+.profile-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  margin-bottom: 0.8rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.profile-select:focus { border-color: var(--teal-dim); }
+
+/* ── BANLIST ── */
+.file-upload-area {
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s;
+  margin-top: 0.8rem;
+}
+.file-upload-area:hover { border-color: var(--teal-dim); }
+.file-upload-area input { display: none; }
+.file-upload-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.banlist-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--teal);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* ── RESET BTN ── */
+.reset-link {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: none;
+  transition: color .2s;
+}
+.reset-link:hover { color: var(--teal); }
+
+/* ── GENERATE BUTTON ── */
+.generate-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  padding: 0.9rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .3s;
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.generate-btn:hover {
+  background: rgba(45,212,191,0.08);
+  box-shadow: 0 0 20px rgba(45,212,191,0.15);
+}
+.generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.generate-btn.loading {
+  animation: pulse-border 1.5s infinite;
+}
+@keyframes pulse-border {
+  0%,100% { box-shadow: 0 0 8px rgba(45,212,191,0.2); }
+  50% { box-shadow: 0 0 24px rgba(45,212,191,0.45); }
+}
+
+/* ── STATUS ── */
+.status-bar {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+.status-dot.active { background: var(--teal); animation: blink 1.5s infinite; }
+.status-dot.done { background: var(--gold); }
+.status-dot.error { background: var(--red); }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ── DOWNLOAD ── */
+.download-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  padding: 0.85rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .25s;
+  text-decoration: none;
+  margin-top: 0.8rem;
+}
+.download-btn:hover {
+  background: rgba(212,168,67,0.1);
+  box-shadow: 0 0 20px rgba(212,168,67,0.15);
+}
+
+/* ── RESULTS TABLE ── */
+.results-wrap { margin-top: 1.2rem; }
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+.results-table th {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+.results-table td {
+  padding: 0.38rem 0.6rem;
+  color: var(--text-dim);
+  border-bottom: 1px solid rgba(30,48,53,0.5);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+}
+.results-table td:first-child { color: var(--text-muted); }
+.results-table td:nth-child(4) { color: var(--teal); }
+.results-table tr:last-child td { border-bottom: none; }
+.results-scroll { max-height: 320px; overflow-y: auto; }
+
+/* ── METRICS ── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.metric-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  text-align: center;
+}
+.metric-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, #2dd4bf, #d4a843);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.metric-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+@media(max-width:520px) {
+  .balance-grid { grid-template-columns: 1fr; }
+  .metrics-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/aural-alchemy/" class="nav-brand">
+    <svg viewBox="0 0 52 52" fill="none"><defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient></defs><circle cx="26" cy="26" r="24" stroke="url(#ng)" stroke-width="1" fill="none" opacity="0.55"/><path d="M26 7 L43.5 38 L8.5 38 Z" stroke="url(#ng)" stroke-width="1.5" fill="none"/><line x1="15" y1="29.5" x2="37" y2="29.5" stroke="url(#ng)" stroke-width="1.5"/><circle cx="26" cy="26" r="2.1" fill="#2dd4bf" opacity="0.95"/></svg>
+    <span class="nav-brand-text">AURAL ALCHEMY</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/aural-alchemy/">Home</a></li>
+    <li><a href="/aural-alchemy/frequency-generator">Frequency Generator</a></li>
+    <li><a href="/aural-alchemy/midi-generator">MIDI Generator</a></li>
+    <li><a href="/aural-alchemy/shop">Shop</a></li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-wrap">
+<div class="midi-page">
+
+  <!-- HERO -->
+  <div class="midi-hero anim-fade-up">
+    <p class="label">Aural Alchemy</p>
+    <h1 class="grad-title">MIDI Generator</h1>
+    <p>Endless ambient chord progressions. Diatonic, loop-safe, voice-led. Export as MIDI ZIP — drag straight into your DAW.</p>
+  </div>
+
+  <!-- MAIN CONTROLS -->
+  <div class="panel anim-fade-up delay-1">
+    <div class="panel-title">Generation Settings</div>
+
+    <div class="slider-row">
+      <label>Progressions to generate</label>
+      <input type="range" id="nProgs" min="1" max="200" value="10" oninput="syncNum('nProgs','nProgsNum',this.value)">
+      <input type="number" id="nProgsNum" class="slider-num" min="1" max="200" value="10" oninput="syncSlider('nProgs','nProgsNum',this.value,1,200)">
+    </div>
+
+    <div class="slider-row">
+      <label>Seed (0 = random)</label>
+      <input type="range" id="seedSlider" min="0" max="999" value="0" oninput="syncNum('seedSlider','seedNum',this.value)">
+      <input type="number" id="seedNum" class="slider-num" min="0" max="999999" value="0" style="width:68px" oninput="syncSlider('seedSlider','seedNum',this.value,0,999)">
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <label>Re-Voicing</label>
+        <small>Smooth voice-leading between chords</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="revoiceToggle">
+        <div class="toggle-track"></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- BANLIST -->
+  <div class="panel anim-fade-up delay-2">
+    <div class="accordion-header" onclick="toggleAccordion('banlist')">
+      <span class="accordion-title">Banlist (Optional)</span>
+      <span class="accordion-arrow" id="banlist-arrow">▼</span>
+    </div>
+    <div class="accordion-body" id="banlist-body">
+      <p style="font-size:0.72rem;color:var(--text-dim);margin:0.8rem 0 0.4rem;line-height:1.6">Upload a .txt file with progressions to exclude — one per line. Example: <span style="color:var(--teal);font-family:'Share Tech Mono',monospace">Cmin7 - Fmaj9 - Gmaj7</span></p>
+      <div class="file-upload-area" onclick="document.getElementById('banlistFile').click()">
+        <input type="file" id="banlistFile" accept=".txt" onchange="loadBanlist(this)">
+        <label class="file-upload-label">↑ Upload .txt banlist</label>
+        <div class="banlist-status" id="banlistStatus">No banlist loaded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVANCED -->
+  <div class="panel anim-fade-up delay-3">
+    <div class="accordion-header" onclick="toggleAccordion('advanced')">
+      <span class="accordion-title">Advanced Settings</span>
+      <span class="accordion-arrow" id="advanced-arrow">▼</span>
+    </div>
+    <div class="accordion-body" id="advanced-body">
+
+      <div style="margin-top:0.9rem">
+        <div class="panel-title" style="margin-bottom:0.5rem">Voicing Profile</div>
+        <select class="profile-select" id="voicingProfile">
+          <option value="default">Default (Tight Voice-Led)</option>
+          <option value="wide">Wide (Cinematic)</option>
+          <option value="low">Low Ambient (Prefer Lower)</option>
+        </select>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
+        <span class="balance-section-title" style="margin:0">Chord Type Balance — 0=off · 50=default · 100=heavy</span>
+        <button class="reset-link" onclick="resetBalance()">Reset</button>
+      </div>
+
+      <div class="balance-section-title">MAJOR FAMILY</div>
+      <div class="balance-grid" id="majorGrid"></div>
+
+      <div class="balance-section-title">MINOR FAMILY</div>
+      <div class="balance-grid" id="minorGrid"></div>
+
+      <div class="balance-section-title">SUS FAMILY</div>
+      <div class="balance-grid" id="susGrid"></div>
+
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="generate-btn" id="generateBtn" onclick="runGenerate()">⟡ Generate Progressions</button>
+
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Configure settings and generate</span>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsSection" style="display:none">
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-val" id="metricProgs">0</div>
+        <div class="metric-label">Progressions</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricChords">0</div>
+        <div class="metric-label">Individual Chords</div>
+      </div>
+    </div>
+
+    <a class="download-btn" id="downloadBtn" href="#" onclick="downloadZip(event)">↓ Download MIDI ZIP</a>
+
+    <div class="results-wrap">
+      <div class="panel-title" style="margin-bottom:0.5rem">Generated Progressions</div>
+      <div class="results-scroll">
+        <table class="results-table">
+          <thead>
+            <tr><th>#</th><th>Key</th><th>Bars</th><th>Chords</th></tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <span class="footer-brand">AURAL ALCHEMY</span>
+  <ul class="footer-links">
+    <li><a href="/aural-alchemy/frequency-generator">Frequency Generator</a></li>
+    <li><a href="/aural-alchemy/midi-generator">MIDI Generator</a></li>
+    <li><a href="https://auralalchemy.gumroad.com" target="_blank">Shop</a></li>
+  </ul>
+  <span class="footer-copy">© 2025 Aural Alchemy</span>
+</footer>
+
+<script src="/aural-alchemy/nav.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// MUSICAL DATA
+// ═══════════════════════════════════════════════════════════════════
+const NOTE_TO_PC = {
+  'C':0,'B#':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'Fb':4,'E#':5,'F':5,
+  'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11,'Cb':11
+};
+
+const KEYS = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+
+const SCALES = {
+  'C':['C','D','E','F','G','A','B'],
+  'Db':['Db','Eb','F','Gb','Ab','Bb','C'],
+  'D':['D','E','F#','G','A','B','C#'],
+  'Eb':['Eb','F','G','Ab','Bb','C','D'],
+  'E':['E','F#','G#','A','B','C#','D#'],
+  'F':['F','G','A','Bb','C','D','E'],
+  'Gb':['Gb','Ab','Bb','Cb','Db','Eb','F'],
+  'G':['G','A','B','C','D','E','F#'],
+  'Ab':['Ab','Bb','C','Db','Eb','F','G'],
+  'A':['A','B','C#','D','E','F#','G#'],
+  'Bb':['Bb','C','D','Eb','F','G','A'],
+  'B':['B','C#','D#','E','F#','G#','A#']
+};
+
+const QUAL_TO_INTERVALS = {
+  'maj':[0,4,7],'min':[0,3,7],
+  'maj7':[0,4,7,11],'maj9':[0,4,7,11,14],
+  'add9':[0,4,7,14],'6':[0,4,7,9],'6add9':[0,4,7,9,14],
+  'min7':[0,3,7,10],'min9':[0,3,7,10,14],'min11':[0,3,7,10,14,17],
+  'sus2':[0,2,7],'sus4':[0,5,7],
+  'sus2add9':[0,2,7,14],'sus4add9':[0,5,7,14]
+};
+
+const ADV_QUALITIES = [
+  ['maj9','MAJ9'],['maj7','MAJ7'],['add9','ADD9'],['6add9','6ADD9'],['6','6'],['maj','MAJ'],
+  ['min9','MIN9'],['min7','MIN7'],['min11','MIN11'],['min','MIN'],
+  ['sus2add9','SUS2ADD9'],['sus4add9','SUS4ADD9'],['sus2','SUS2'],['sus4','SUS4']
+];
+
+const MAJOR_QUALS = ['maj9','maj7','add9','6add9','6','maj'];
+const MINOR_QUALS = ['min9','min7','min11','min'];
+const SUS_QUALS = ['sus2add9','sus4add9','sus2','sus4'];
+
+const TEMPLATES_BY_LEN = {
+  2:[[[0,3],10],[[0,5],7],[[5,3],5],[[3,0],4],[[0,4],3]],
+  3:[[[0,5,3],14],[[0,3,4],12],[[0,3,5],10],[[0,5,4],9],[[0,2,3],7],[[0,2,5],6],[[3,5,0],5],[[5,3,0],5],[[0,1,3],3],[[0,6,3],2]],
+  4:[[[0,5,3,4],18],[[0,5,3,0],12],[[0,3,4,3],12],[[0,3,5,3],12],[[0,2,5,3],10],[[0,2,3,4],10],[[0,1,3,4],6],[[0,1,3,0],5],[[5,3,4,0],5],[[3,4,0,5],4],[[0,4,3,5],4]],
+  5:[[[0,5,3,4,3],4],[[0,3,0,5,3],3],[[0,2,3,4,3],3]],
+  6:[[[0,5,3,4,3,0],3],[[0,3,0,5,3,0],3]]
+};
+
+const DURATIONS = {
+  '2_4':[[[2,2],10]],
+  '3_4':[[[2,1,1],10],[[1,1,2],8]],
+  '4_4':[[[1,1,1,1],12]],
+  '2_8':[[[4,4],12]],
+  '3_8':[[[4,2,2],10],[[2,2,4],9],[[2,4,2],2]],
+  '4_8':[[[2,2,2,2],12],[[4,2,1,1],1],[[2,1,1,4],1]],
+  '5_8':[[[2,2,2,1,1],3],[[1,2,2,2,1],1],[[2,1,2,1,2],7]],
+  '6_8':[[[2,1,1,2,1,1],5],[[1,1,2,1,1,2],4],[[2,1,2,1,1,1],3]],
+  '2_16':[[[8,8],8]],
+  '3_16':[[[8,4,4],4],[[4,4,8],3],[[6,6,4],3]],
+  '4_16':[[[4,4,4,4],12],[[6,4,4,2],4]],
+  '5_16':[[[4,4,4,2,2],3],[[2,2,4,4,4],3],[[4,2,4,2,4],7]],
+  '6_16':[[[4,2,2,4,2,2],5],[[4,2,2,2,2,4],4],[[2,4,2,4,2,2],5]]
+};
+
+const TOTAL_BARS_W = {4:0.35,8:0.40,16:0.25};
+const CHORD_COUNT_W = {2:0.20,3:0.35,4:0.40,5:0.03,6:0.02};
+
+const VOICING_PROFILES = {
+  default:{globalLow:40,globalHigh:88,bassMin:40,bassMax:52,bassHardMax:60,bassCenter:46,maxBassJump:7,targetCenter:60,idealSpan:12,minSpan:8,maxSpan:18,minAdjGap:2,maxAdjGap:9,hardMaxAdjGap:12,wMove:220,wLeap:260,wCenter:70,wSpan:55,wShared:180},
+  wide:{globalLow:40,globalHigh:92,bassMin:40,bassMax:52,bassHardMax:60,bassCenter:46,maxBassJump:8,targetCenter:66,idealSpan:18,minSpan:10,maxSpan:28,minAdjGap:2,maxAdjGap:11,hardMaxAdjGap:14,wMove:95,wLeap:120,wCenter:55,wSpan:25,wShared:70},
+  low:{globalLow:40,globalHigh:76,bassMin:40,bassMax:48,bassHardMax:55,bassCenter:43,maxBassJump:6,targetCenter:54,idealSpan:12,minSpan:8,maxSpan:18,minAdjGap:2,maxAdjGap:9,hardMaxAdjGap:12,wMove:240,wLeap:300,wCenter:120,wSpan:60,wShared:200}
+};
+
+const BPM = 85;
+const SEC_PER_BAR = (60/BPM)*4;
+const VELOCITY = 100;
+const GLOBAL_TRANSPOSE = 12;
+const ABS_FLOOR = 40, ABS_CEIL = 88;
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let balance = {};
+let banSet = new Set();
+let lastResult = null;
+
+// ═══════════════════════════════════════════════════════════════════
+// RNG
+// ═══════════════════════════════════════════════════════════════════
+class SeededRNG {
+  constructor(seed){ this.s = seed|0; }
+  next(){
+    this.s = (this.s * 1664525 + 1013904223) & 0xffffffff;
+    return (this.s >>> 0) / 4294967296;
+  }
+  int(lo,hi){ return lo + Math.floor(this.next()*(hi-lo)); }
+  choice(arr){ return arr[this.int(0,arr.length)]; }
+  wchoice(items){
+    const total = items.reduce((s,[,w])=>s+w,0);
+    let r = this.next()*total;
+    for(const [v,w] of items){ r-=w; if(r<=0) return v; }
+    return items[items.length-1][0];
+  }
+  shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j=this.int(0,i+1);
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MUSIC HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function pc(note){ return NOTE_TO_PC[note]; }
+function keyPcSet(key){ return new Set(SCALES[key].map(n=>pc(n))); }
+function chordPcSet(root,qual){
+  const r=pc(root);
+  return new Set(QUAL_TO_INTERVALS[qual].map(iv=>(r+iv)%12));
+}
+function isDiatonic(key,root,qual){
+  const kps=keyPcSet(key);
+  for(const p of chordPcSet(root,qual)) if(!kps.has(p)) return false;
+  return true;
+}
+function sharedTones(roots,quals){
+  const pcs=roots.map((r,i)=>chordPcSet(r,quals[i]));
+  const n=pcs.length;
+  let min=Infinity;
+  for(let i=0;i<n;i++){
+    const j=(i+1)%n;
+    let shared=0;
+    for(const p of pcs[i]) if(pcs[j].has(p)) shared++;
+    if(shared<min) min=shared;
+  }
+  return min;
+}
+function balanceFactor(v){ v=Math.max(0,Math.min(100,v)); if(v===0)return 0; if(v===50)return 1; if(v<50)return Math.max(0.02,v/50); return 1+(v-50)/50; }
+
+// ═══════════════════════════════════════════════════════════════════
+// GENERATOR
+// ═══════════════════════════════════════════════════════════════════
+function buildDegAllowed(key){
+  const out={};
+  for(let deg=0;deg<7;deg++){
+    const root=SCALES[key][deg];
+    const items=[];
+    for(const [q] of ADV_QUALITIES){
+      if(!isDiatonic(key,root,q)) continue;
+      const v=balance[q]??50;
+      if(v===0) continue;
+      items.push([q,balanceFactor(v)]);
+    }
+    out[deg]=items;
+  }
+  return out;
+}
+
+function pickQuality(rng,deg,degAllowed){
+  const pool=degAllowed[deg]||[];
+  if(!pool.length) return null;
+  return rng.wchoice(pool);
+}
+
+function pickTemplate(rng,m){ return rng.wchoice(TEMPLATES_BY_LEN[m]).slice(); }
+
+function pickDurations(rng,m,total){
+  const key=`${m}_${total}`;
+  const opts=DURATIONS[key];
+  if(!opts) return null;
+  return rng.wchoice(opts).slice();
+}
+
+function pickTotalAndM(rng){
+  const combos=[];
+  for(const [total,tw] of Object.entries(TOTAL_BARS_W)){
+    for(const [m,cw] of Object.entries(CHORD_COUNT_W)){
+      const key=`${m}_${total}`;
+      if(DURATIONS[key]) combos.push([[+total,+m],tw*cw]);
+    }
+  }
+  return rng.wchoice(combos);
+}
+
+function dedupeInProgression(rng,key,degs,quals){
+  const scale=SCALES[key];
+  const used=new Set();
+  for(let i=0;i<degs.length;i++){
+    const d=degs[i];
+    const root=scale[d];
+    const q=quals[i];
+    const sym=root+q;
+    if(!used.has(sym)){ used.add(sym); continue; }
+    // Try alternate quality
+    let fixed=false;
+    const fallback=['maj9','maj7','add9','6add9','6','min9','min7','min11','maj','min','sus2add9','sus4add9','sus2','sus4'];
+    rng.shuffle(fallback);
+    for(const q2 of fallback){
+      if(q2===q) continue;
+      if(isDiatonic(key,root,q2)){
+        const sym2=root+q2;
+        if(!used.has(sym2)){ quals[i]=q2; used.add(sym2); fixed=true; break; }
+      }
+    }
+    if(fixed) continue;
+    // Try neighbor degree
+    const steps=[1,-1,2,-2,3,-3];
+    rng.shuffle(steps);
+    for(const stp of steps){
+      const d2=(d+stp+7)%7;
+      const r2=scale[d2];
+      for(const q2 of fallback){
+        if(isDiatonic(key,r2,q2)&&!used.has(r2+q2)){
+          degs[i]=d2; quals[i]=q2; used.add(r2+q2); fixed=true; break;
+        }
+      }
+      if(fixed) break;
+    }
+    if(!fixed) return null;
+  }
+  return [degs,quals];
+}
+
+function normChordToken(tok){
+  const m=tok.trim().match(/^([A-G][#b]?)(.*)$/);
+  if(!m) return '';
+  const root=m[1]; const qual=(m[2]||'').trim().toLowerCase().replace(/\s/g,'').replace('6/9','6add9');
+  if(!NOTE_TO_PC.hasOwnProperty(root)) return '';
+  if(!QUAL_TO_INTERVALS.hasOwnProperty(qual)) return '';
+  return root+qual;
+}
+
+function tryBuildProgression(rng,key,degAllowed){
+  const [total,m]=pickTotalAndM(rng);
+  const degs=pickTemplate(rng,m);
+  const quals=[];
+  for(const d of degs){
+    const q=pickQuality(rng,d,degAllowed);
+    if(q===null) return null;
+    quals.push(q);
+  }
+  if(quals[0].startsWith('sus')) return null;
+  const ded=dedupeInProgression(rng,key,degs.slice(),quals.slice());
+  if(!ded) return null;
+  const [fd,fq]=ded;
+  const roots=fd.map(d=>SCALES[key][d]);
+  for(let i=0;i<roots.length;i++) if(!isDiatonic(key,roots[i],fq[i])) return null;
+  if(sharedTones(roots,fq)<1) return null;
+  const durs=pickDurations(rng,m,total);
+  if(!durs) return null;
+  const chords=roots.map((r,i)=>r+fq[i]);
+  return {chords,durs,key,total};
+}
+
+function pickKeysEven(n,rng){
+  const base=Math.floor(n/KEYS.length);
+  const rem=n%KEYS.length;
+  let out=[];
+  for(const k of KEYS) for(let i=0;i<base;i++) out.push(k);
+  const extra=KEYS.slice(); rng.shuffle(extra);
+  out=out.concat(extra.slice(0,rem));
+  rng.shuffle(out);
+  return out;
+}
+
+function generateProgressions(n,seed){
+  const rawSeed=seed>0?seed:(Math.floor(Math.random()*2e9));
+  const rng=new SeededRNG(rawSeed);
+  const keys=pickKeysEven(n,rng);
+  const usedExact=new Set();
+  const result=[];
+
+  for(let i=0;i<n;i++){
+    const key=keys[i];
+    const degAllowed=buildDegAllowed(key);
+    let built=null;
+
+    for(let t=0;t<40000;t++){
+      const prog=tryBuildProgression(rng,key,degAllowed);
+      if(!prog) continue;
+      const ek=prog.chords.join('|');
+      if(usedExact.has(ek)) continue;
+      if(banSet.size>0&&isProgBanned(prog.chords)) continue;
+      usedExact.add(ek);
+      built=prog;
+      break;
+    }
+    if(!built) throw new Error(`Could not build progression ${i+1}. Try reducing count or adjusting balance.`);
+    result.push(built);
+  }
+  return result;
+}
+
+function isProgBanned(chords){
+  const norm=chords.map(c=>normChordToken(c)).join('|');
+  return banSet.has(norm);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// VOICING ENGINE
+// ═══════════════════════════════════════════════════════════════════
+function chordToMidi(chordName){
+  const m=chordName.match(/^([A-G][#b]?)(.+)$/);
+  if(!m) return [];
+  const root=m[1], qual=m[2];
+  if(!QUAL_TO_INTERVALS[qual]) return [];
+  const rootPc=NOTE_TO_PC[root];
+  const rootMidi=12*4+rootPc; // octave 3 = midi 4*12
+  return QUAL_TO_INTERVALS[qual].map(iv=>rootMidi+iv);
+}
+
+function forceRange(notes,lo,hi){
+  return notes.map(n=>{
+    while(n<lo) n+=12;
+    while(n>hi) n-=12;
+    return n;
+  }).sort((a,b)=>a-b);
+}
+
+function sanitize(notes){
+  let v=[...new Set(notes.map(n=>Math.round(n)))].sort((a,b)=>a-b);
+  v=forceRange(v,ABS_FLOOR,ABS_CEIL);
+  return v;
+}
+
+function preferBassZone(notes,prof){
+  const v=sanitize(notes);
+  const options=[];
+  for(let k=-4;k<=4;k++){
+    const vv=v.map(n=>n+12*k);
+    const b=Math.min(...vv);
+    if(b<prof.bassMin-4||b>prof.bassHardMax) continue;
+    if(Math.min(...vv)<ABS_FLOOR||Math.max(...vv)>ABS_CEIL) continue;
+    const dist=Math.abs(b-prof.bassCenter)*2+(b<prof.bassMin?(prof.bassMin-b)*25:b>prof.bassMax?(b-prof.bassMax)*25:0);
+    options.push([dist,vv]);
+  }
+  if(!options.length) return v;
+  options.sort((a,b)=>a[0]-b[0]);
+  return sanitize(options[0][1]);
+}
+
+function voicingCost(v,prev,prof){
+  if(!v.length) return 1e12;
+  const b=Math.min(...v);
+  if(b<ABS_FLOOR||Math.max(...v)>ABS_CEIL) return 1e12;
+  let cost=0;
+  // Bass preference
+  if(b<prof.bassMin) cost+=(prof.bassMin-b)*300;
+  else if(b>prof.bassMax) cost+=(b-prof.bassMax)*300;
+  // Register
+  const ctr=(Math.min(...v)+Math.max(...v))/2;
+  cost+=Math.abs(ctr-prof.targetCenter)*prof.wCenter;
+  // Span
+  const sp=Math.max(...v)-Math.min(...v);
+  cost+=Math.abs(sp-prof.idealSpan)*prof.wSpan;
+  if(sp<prof.minSpan) cost+=(prof.minSpan-sp)*1200;
+  if(sp>prof.maxSpan) cost+=(sp-prof.maxSpan)*800;
+  // Adjacent gaps
+  const sorted=[...v].sort((a,b)=>a-b);
+  for(let i=0;i<sorted.length-1;i++){
+    const g=sorted[i+1]-sorted[i];
+    if(g<prof.minAdjGap) cost+=(prof.minAdjGap-g)*900;
+    if(g>prof.maxAdjGap) cost+=(g-prof.maxAdjGap)*420;
+    if(g>prof.hardMaxAdjGap) cost+=(g-prof.hardMaxAdjGap)*1200;
+  }
+  if(prev){
+    // Voice leading
+    const m=Math.min(prev.length,v.length);
+    const ps=[...prev].sort((a,b)=>a-b);
+    const cs=[...v].sort((a,b)=>a-b);
+    let move=0,maxLeap=0;
+    for(let i=0;i<m;i++){ const d=Math.abs(cs[i]-ps[i]); move+=d; if(d>maxLeap)maxLeap=d; }
+    cost+=move*prof.wMove;
+    if(maxLeap>5) cost+=((maxLeap-5)**2)*prof.wLeap;
+    // Shared pc bonus
+    const ppc=new Set(prev.map(n=>n%12));
+    const cpc=new Set(v.map(n=>n%12));
+    let sh=0; for(const p of ppc) if(cpc.has(p)) sh++;
+    cost-=sh*prof.wShared;
+    // Bass jump
+    const bj=Math.abs(Math.min(...v)-Math.min(...prev));
+    if(bj>prof.maxBassJump) cost+=(bj-prof.maxBassJump)*260;
+    // Repeat penalty
+    if(JSON.stringify([...v].sort())===JSON.stringify([...prev].sort())) cost+=900;
+  }
+  return cost;
+}
+
+function generateCandidates(raw,prof){
+  const base=preferBassZone(raw,prof);
+  const n=base.length;
+  const cands=new Set();
+  const add=v=>{
+    const s=sanitize(preferBassZone(v,prof));
+    if(s.length===n&&Math.min(...s)>=ABS_FLOOR&&Math.max(...s)<=ABS_CEIL)
+      cands.add(JSON.stringify(s));
+  };
+  add(base);
+  // Inversions
+  let inv=[...base];
+  for(let i=0;i<n-1;i++){ inv=[...inv.slice(1),inv[0]+12]; add(inv); }
+  // Shifts
+  for(const sh of[-24,-12,0,12,24]) add(base.map(n=>n+sh));
+  // Spread up/down
+  for(let k=1;k<=Math.min(2,n-1);k++){
+    const up=base.slice(); for(let i=n-k;i<n;i++) up[i]+=12; add(up);
+    const dn=base.slice(); for(let i=0;i<k;i++) dn[i]-=12; add(dn);
+  }
+  return [...cands].map(s=>JSON.parse(s));
+}
+
+function chooseVoicing(raw,prev,chordName,prof){
+  const cands=generateCandidates(raw,prof);
+  if(!cands.length) return preferBassZone(raw,prof);
+  let best=null,bestCost=Infinity;
+  for(const c of cands){
+    const cost=voicingCost(c,prev,prof);
+    if(cost<bestCost){ bestCost=cost; best=c; }
+  }
+  return best||cands[0];
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MIDI WRITER (pure JS, no libraries)
+// ═══════════════════════════════════════════════════════════════════
+function writeVarLen(val){
+  const out=[];
+  let v=val&0x7f;
+  val>>=7;
+  while(val>0){ out.unshift((val&0x7f)|0x80); val>>=7; }
+  out.push(v);
+  return out;
+}
+
+function writeMidiFile(notes_timed){
+  // notes_timed: [{pitch, startTick, endTick, velocity}]
+  const TICKS_PER_BEAT=480;
+  const TEMPO=Math.round(60000000/BPM); // microseconds per beat
+
+  function buildTrack(events){
+    // Sort by tick then by type (note off before note on at same tick)
+    events.sort((a,b)=>a.tick-b.tick||(a.type==='off'?-1:1));
+    const bytes=[];
+    let prevTick=0;
+    for(const ev of events){
+      const delta=ev.tick-prevTick;
+      prevTick=ev.tick;
+      bytes.push(...writeVarLen(delta));
+      if(ev.type==='on') bytes.push(0x90,ev.pitch,ev.velocity);
+      else if(ev.type==='off') bytes.push(0x80,ev.pitch,0);
+    }
+    // End of track
+    bytes.push(0x00,0xff,0x2f,0x00);
+    return bytes;
+  }
+
+  // Tempo track
+  const tempoBytes=[
+    0x00,0xff,0x51,0x03,
+    (TEMPO>>16)&0xff,(TEMPO>>8)&0xff,TEMPO&0xff,
+    0x00,0xff,0x2f,0x00
+  ];
+
+  // Note events
+  const events=[];
+  for(const n of notes_timed){
+    events.push({tick:n.startTick,type:'on',pitch:n.pitch,velocity:n.velocity});
+    events.push({tick:n.endTick,type:'off',pitch:n.pitch,velocity:0});
+  }
+  const noteBytes=buildTrack(events);
+
+  function track(data){
+    const len=data.length;
+    return [0x4d,0x54,0x72,0x6b,
+      (len>>24)&0xff,(len>>16)&0xff,(len>>8)&0xff,len&0xff,
+      ...data];
+  }
+
+  const header=[
+    0x4d,0x54,0x68,0x64, // MThd
+    0,0,0,6,             // length=6
+    0,1,                 // format=1
+    0,2,                 // 2 tracks
+    (TICKS_PER_BEAT>>8)&0xff,TICKS_PER_BEAT&0xff
+  ];
+
+  const allBytes=[...header,...track(tempoBytes),...track(noteBytes)];
+  return new Uint8Array(allBytes);
+}
+
+function progressionToMidi(prog,revoice,profKey){
+  const prof=VOICING_PROFILES[profKey]||VOICING_PROFILES.default;
+  const TPBAR=480*4; // ticks per bar (4/4)
+
+  let notesRaw=prog.chords.map(ch=>{
+    let notes=chordToMidi(ch).map(n=>n+GLOBAL_TRANSPOSE);
+    notes=forceRange(notes,ABS_FLOOR,ABS_CEIL);
+    return notes;
+  });
+
+  let voiced;
+  if(revoice){
+    voiced=[];
+    let prev=null;
+    for(let i=0;i<notesRaw.length;i++){
+      const v=chooseVoicing(notesRaw[i],prev,prog.chords[i],prof);
+      voiced.push(v);
+      prev=v;
+    }
+  } else {
+    voiced=notesRaw.map(n=>sanitize(n));
+  }
+
+  const notesTimed=[];
+  let tick=0;
+  for(let i=0;i<voiced.length;i++){
+    const durBars=prog.durs[i];
+    const durTicks=durBars*TPBAR;
+    for(const p of voiced[i]){
+      notesTimed.push({pitch:p,startTick:tick,endTick:tick+durTicks-10,velocity:VELOCITY});
+    }
+    tick+=durTicks;
+  }
+  return writeVarFile(notesTimed);
+}
+
+function writeVarFile(notesTimed){ return writeMidiFile(notesTimed); }
+
+function singleChordMidi(chordName,revoice,profKey){
+  const prof=VOICING_PROFILES[profKey]||VOICING_PROFILES.default;
+  const TPBAR=480*4;
+  let notes=chordToMidi(chordName).map(n=>n+GLOBAL_TRANSPOSE);
+  notes=forceRange(notes,ABS_FLOOR,ABS_CEIL);
+  if(revoice) notes=chooseVoicing(notes,null,chordName,prof);
+  else notes=sanitize(notes);
+  const notesTimed=notes.map(p=>({pitch:p,startTick:0,endTick:TPBAR*4-10,velocity:VELOCITY}));
+  return writeMidiFile(notesTimed);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ZIP BUILDER (pure JS, no library needed for simple deflate=0)
+// ═══════════════════════════════════════════════════════════════════
+class ZipWriter {
+  constructor(){ this.files=[]; }
+  add(name,data){ this.files.push({name,data}); }
+  build(){
+    const enc=new TextEncoder();
+    const parts=[];
+    const central=[];
+    let offset=0;
+
+    for(const f of this.files){
+      const nameBytes=enc.encode(f.name);
+      const data=f.data instanceof Uint8Array?f.data:new Uint8Array(f.data);
+      const crc=crc32(data);
+      const local=[
+        0x50,0x4b,0x03,0x04, // sig
+        0x14,0x00,           // version
+        0x00,0x00,           // flags
+        0x00,0x00,           // compression=store
+        0x00,0x00,0x00,0x00, // mod time/date
+        ...u32le(crc),
+        ...u32le(data.length),
+        ...u32le(data.length),
+        ...u16le(nameBytes.length),
+        0x00,0x00,           // extra length
+        ...nameBytes,
+        ...data
+      ];
+      central.push({nameBytes,crc,size:data.length,offset});
+      offset+=local.length;
+      parts.push(new Uint8Array(local));
+    }
+
+    const centralDir=[];
+    for(const c of central){
+      const ce=[
+        0x50,0x4b,0x01,0x02,
+        0x14,0x00,0x14,0x00,
+        0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,
+        ...u32le(c.crc),
+        ...u32le(c.size),
+        ...u32le(c.size),
+        ...u16le(c.nameBytes.length),
+        0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,
+        0x00,0x00,
+        ...u32le(c.offset),
+        ...c.nameBytes
+      ];
+      centralDir.push(...ce);
+    }
+
+    const cdSize=centralDir.length;
+    const eocd=[
+      0x50,0x4b,0x05,0x06,
+      0x00,0x00,0x00,0x00,
+      ...u16le(this.files.length),
+      ...u16le(this.files.length),
+      ...u32le(cdSize),
+      ...u32le(offset),
+      0x00,0x00
+    ];
+
+    const all=[...parts.flatMap(p=>[...p]),...centralDir,...eocd];
+    return new Uint8Array(all);
+  }
+}
+
+function u16le(v){ return [v&0xff,(v>>8)&0xff]; }
+function u32le(v){ return [v&0xff,(v>>8)&0xff,(v>>16)&0xff,(v>>24)&0xff]; }
+
+function crc32(data){
+  let crc=0xffffffff;
+  for(let i=0;i<data.length;i++){
+    crc^=data[i];
+    for(let j=0;j<8;j++) crc=(crc&1)?(crc>>>1)^0xedb88320:(crc>>>1);
+  }
+  return (crc^0xffffffff)>>>0;
+}
+
+function safeToken(s){ return s.replace(/[^A-Za-z0-9_#\-]/g,''); }
+function barDir(total){ return {4:'4-bar',8:'8-bar',16:'16-bar'}[total]||`${total}-bar`; }
+
+// ═══════════════════════════════════════════════════════════════════
+// BUILD PACK
+// ═══════════════════════════════════════════════════════════════════
+function buildPack(progressions,revoice,profKey){
+  const zip=new ZipWriter();
+  const uniqueChords=new Set();
+  const rv=revoice?'_Revoiced':'';
+  const progFolder=revoice?'Progressions_Revoiced':'Progressions';
+  const chordsFolder=revoice?'Chords_Revoiced':'Chords';
+
+  for(let i=0;i<progressions.length;i++){
+    const prog=progressions[i];
+    prog.chords.forEach(c=>uniqueChords.add(c));
+    const midi=progressionToMidi(prog,revoice,profKey);
+    const dir=barDir(prog.total);
+    const fname=`${progFolder}/${dir}/Prog_${String(i+1).padStart(3,'0')}_in_${safeToken(prog.key)}_${prog.chords.map(safeToken).join('-')}${rv}.mid`;
+    zip.add(fname,midi);
+  }
+
+  for(const ch of uniqueChords){
+    const midi=singleChordMidi(ch,revoice,profKey);
+    zip.add(`${chordsFolder}/${safeToken(ch)}${rv}.mid`,midi);
+  }
+
+  return {zipData:zip.build(),uniqueChords:uniqueChords.size};
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BANLIST PARSER
+// ═══════════════════════════════════════════════════════════════════
+function parseBanlist(text){
+  const set=new Set();
+  let added=0;
+  for(const line of text.split('\n')){
+    const s=line.trim().replace(/[–—−]/g,'-');
+    if(!s||s.match(/^(PACK\s*\d+|4-BAR|8-BAR|16-BAR)$/i)) continue;
+    const tokens=s.split(/[\-\s,;]+/).map(t=>normChordToken(t.trim())).filter(Boolean);
+    if(tokens.length>=2){ set.add(tokens.join('|')); added++; }
+  }
+  return {set,added};
+}
+
+function loadBanlist(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const {set,added}=parseBanlist(e.target.result);
+    banSet=set;
+    document.getElementById('banlistStatus').textContent=`Loaded ${added} banned progressions`;
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════════════════════
+function toggleAccordion(id){
+  const body=document.getElementById(`${id}-body`);
+  const arrow=document.getElementById(`${id}-arrow`);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  arrow.classList.toggle('open',!isOpen);
+}
+
+function setStatus(type,text){
+  const dot=document.getElementById('statusDot');
+  dot.className='status-dot'+(type?' '+type:'');
+  document.getElementById('statusText').textContent=text;
+}
+
+function syncNum(sliderId,numId,val){
+  const n=document.getElementById(numId);
+  if(n) n.value=val;
+}
+function syncSlider(sliderId,numId,val,lo,hi){
+  const clamped=Math.max(lo,Math.min(hi,+val||0));
+  const s=document.getElementById(sliderId);
+  if(s) s.value=clamped;
+}
+
+function buildBalanceSliders(){
+  const grids={major:'majorGrid',minor:'minorGrid',sus:'susGrid'};
+  const groups={major:MAJOR_QUALS,minor:MINOR_QUALS,sus:SUS_QUALS};
+  for(const [group,gridId] of Object.entries(grids)){
+    const el=document.getElementById(gridId);
+    el.innerHTML='';
+    for(const q of groups[group]){
+      const label=q.toUpperCase();
+      balance[q]=50;
+      const div=document.createElement('div');
+      div.className='balance-item';
+      div.innerHTML=`<label>${label}</label>`+
+        `<input type="range" min="0" max="100" value="50" id="br_${q}" oninput="balance['${q}']=+this.value;document.getElementById('bv_${q}').value=this.value">`+
+        `<input type="number" id="bv_${q}" class="balance-val" min="0" max="100" value="50" style="width:36px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:0.1rem 0.3rem;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;text-align:center;outline:none;-moz-appearance:textfield" oninput="balance['${q}']=Math.max(0,Math.min(100,+this.value||0));document.getElementById('br_${q}').value=balance['${q}']">`;
+      el.appendChild(div);
+    }
+  }
+}
+
+function resetBalance(){
+  for(const [q] of ADV_QUALITIES){
+    balance[q]=50;
+    const inp=document.getElementById(`br_${q}`);
+    const val=document.getElementById(`bv_${q}`);
+    if(inp) inp.value=50;
+    if(val) val.value=50;
+  }
+}
+
+let lastZipData=null;
+
+function runGenerate(){
+  const btn=document.getElementById('generateBtn');
+  btn.disabled=true;
+  btn.classList.add('loading');
+  setStatus('active','Generating progressions…');
+
+  setTimeout(()=>{
+    try{
+      const n=Math.max(1,Math.min(200,+document.getElementById('nProgsNum').value||10));
+      const seedRaw=Math.max(0,+document.getElementById('seedNum').value||0);
+      const revoice=document.getElementById('revoiceToggle').checked;
+      const profKey=document.getElementById('voicingProfile').value;
+
+      const progressions=generateProgressions(n,seedRaw);
+      const {zipData,uniqueChords}=buildPack(progressions,revoice,profKey);
+      lastZipData=zipData;
+
+      document.getElementById('metricProgs').textContent=progressions.length;
+      document.getElementById('metricChords').textContent=uniqueChords;
+
+      const tbody=document.getElementById('resultsBody');
+      tbody.innerHTML='';
+      progressions.forEach((p,i)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${i+1}</td><td>${p.key}</td><td>${p.total}</td><td>${p.chords.join(' – ')}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('resultsSection').style.display='block';
+      setStatus('done','Done — '+progressions.length+' progressions ready');
+    }catch(e){
+      setStatus('error','Error: '+e.message);
+      console.error(e);
+    }
+    btn.disabled=false;
+    btn.classList.remove('loading');
+  },20);
+}
+
+function downloadZip(e){
+  e.preventDefault();
+  if(!lastZipData) return;
+  const revoice=document.getElementById('revoiceToggle').checked;
+  const name=`MIDI_Progressions_Aural_Alchemy${revoice?'_Revoiced':''}.zip`;
+  const blob=new Blob([lastZipData],{type:'application/zip'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+buildBalanceSliders();
+;
+</script>
+</body>
+</html>
