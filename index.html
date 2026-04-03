@@ -19,7 +19,7 @@
 .hero{min-height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative}
 .hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.4em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:1.5rem}
 .hero-title{font-size:clamp(3rem,8vw,6rem);line-height:1.05;margin-bottom:1rem}
-.hero-tagline{font-family:'Share Tech Mono',monospace;font-size:clamp(0.65rem,1.5vw,0.82rem);letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3rem}
+.hero-tagline{font-family:'Share Tech Mono',monospace;font-size:clamp(0.65rem,1.5vw,0.82rem);letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem}
 .hero-cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3.5rem}
 .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.4rem;opacity:0.3;animation:fadeIn 1s ease 1.5s both}
 .scroll-hint span{font-family:'Share Tech Mono',monospace;font-size:0.5rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase}
@@ -49,7 +49,7 @@
 
 <nav>
   <a href="/aural-alchemy/" class="nav-brand">
-    <svg viewBox="0 0 52 52" fill="none"><defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient></defs><circle cx="26" cy="26" r="24" stroke="url(#ng)" stroke-width="1" fill="none" opacity="0.55"/><path d="M26 7 L43.5 38 L8.5 38 Z" stroke="url(#ng)" stroke-width="1.5" fill="none"/><line x1="15" y1="29.5" x2="37" y2="29.5" stroke="url(#ng)" stroke-width="1.5"/><circle cx="26" cy="26" r="2.1" fill="#2dd4bf" opacity="0.95"/></svg>
+    <svg viewBox="0 0 52 52" fill="none"><defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient><clipPath id="nc"><circle cx="26" cy="26" r="26"/></clipPath></defs><circle cx="26" cy="26" r="26" fill="#080e10"/><g clip-path="url(#nc)"><circle cx="26" cy="26" r="22" stroke="url(#ng)" stroke-width="1" fill="none" opacity="0.65"/><polygon points="26,5 7.81,36.5 44.19,36.5" stroke="url(#ng)" stroke-width="1.5" fill="none"/><line x1="13.88" y1="26" x2="38.12" y2="26" stroke="url(#ng)" stroke-width="1.5"/><circle cx="26" cy="26" r="2" fill="#2dd4bf" opacity="0.9"/></g></svg>
     <span class="nav-brand-text">AURAL ALCHEMY</span>
   </a>
   <ul class="nav-links">
@@ -73,8 +73,9 @@
   <section class="hero">
 
     <p class="hero-eyebrow anim-fade-up">Aural Alchemy</p>
-    <h1 class="hero-title grad-title anim-fade-up delay-1">Sacred Tools<br>for Sound<br>and Mind</h1>
-    <p class="hero-tagline anim-fade-up delay-2">Healing frequencies · MIDI tools · Ambient samples</p>
+    <h1 class="hero-title grad-title anim-fade-up delay-1">Sound.<br>Vibration.<br>Transcendence.</h1>
+    <p class="hero-tagline anim-fade-up delay-2">Healing frequencies · MIDI tools · Ambient music &amp; samples</p>
+    <p class="hero-desc anim-fade-up delay-2" style="font-size:0.82rem;color:var(--text-dim);line-height:1.85;max-width:520px;margin:0 auto 2.5rem;font-weight:300">Embrace the transformative potential of aural magic. Let the power of sound, vibration and profound meditations guide you on a journey to inner peace, creative expansion and transcendence.</p>
 
     <div class="hero-cta anim-fade-up delay-3">
       <a href="/aural-alchemy/frequency-generator" class="btn btn-primary">⟡ Frequency Generator</a>
