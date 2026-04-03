@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIDI Generator — Aural Alchemy</title>
+<title>MIDI Generator · Aural Alchemy</title>
 <meta name="description" content="Generate endless ambient MIDI chord progressions tuned to sacred frequencies. Free, runs in your browser.">
 <meta name="theme-color" content="#080e10">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%232dd4bf'/><stop offset='100%' stop-color='%23d4a843'/></linearGradient><clipPath id='c'><circle cx='26' cy='26' r='26'/></clipPath></defs><circle cx='26' cy='26' r='26' fill='%23080e10'/><g clip-path='url(%23c)'><circle cx='26' cy='26' r='22' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.65'/><polygon points='26,5 7.81,36.5 44.19,36.5' stroke='url(%23g)' stroke-width='1.5' fill='none'/><line x1='13.88' y1='26' x2='38.12' y2='26' stroke='url(%23g)' stroke-width='1.5'/><circle cx='26' cy='26' r='2' fill='%232dd4bf'/></g></svg>">
@@ -423,8 +423,8 @@
 <div class="page-wrap">
 <!-- Sacred Geometry Background -->
 <svg class="aa-geometry" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.06"/>
-  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.06"/>
+  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.10"/>
+  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.10"/>
 </svg>
 <div class="midi-page">
 
@@ -432,7 +432,7 @@
   <div class="midi-hero anim-fade-up">
     <p class="label">Aural Alchemy</p>
     <h1 class="grad-title">MIDI Generator</h1>
-    <p>Endless ambient chord progressions. Diatonic, loop-safe, voice-led. Export as MIDI ZIP — drag straight into your DAW.</p>
+    <p>Endless ambient chord progressions. Diatonic, loop-safe, voice-led. Export as MIDI ZIP · drag straight into your DAW.</p>
   </div>
 
   <!-- MAIN CONTROLS -->
@@ -470,7 +470,7 @@
       <span class="accordion-arrow" id="banlist-arrow">▼</span>
     </div>
     <div class="accordion-body" id="banlist-body">
-      <p style="font-size:0.72rem;color:var(--text-dim);margin:0.8rem 0 0.4rem;line-height:1.6">Upload a .txt file with progressions to exclude — one per line. Example: <span style="color:var(--teal);font-family:'Share Tech Mono',monospace">Cmin7 - Fmaj9 - Gmaj7</span></p>
+      <p style="font-size:0.72rem;color:var(--text-dim);margin:0.8rem 0 0.4rem;line-height:1.6">Upload a .txt file with progressions to exclude · one per line. Example: <span style="color:var(--teal);font-family:'Share Tech Mono',monospace">Cmin7 - Fmaj9 - Gmaj7</span></p>
       <div class="file-upload-area" onclick="document.getElementById('banlistFile').click()">
         <input type="file" id="banlistFile" accept=".txt" onchange="loadBanlist(this)">
         <label class="file-upload-label">↑ Upload .txt banlist</label>
@@ -497,7 +497,7 @@
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
-        <span class="balance-section-title" style="margin:0">Chord Type Balance — 0=off · 50=default · 100=heavy</span>
+        <span class="balance-section-title" style="margin:0">Chord Type Balance · 0=off · 50=default · 100=heavy</span>
         <button class="reset-link" onclick="resetBalance()">Reset</button>
       </div>
 
@@ -1230,7 +1230,7 @@ function parseBanlist(text){
   const set=new Set();
   let added=0;
   for(const line of text.split('\n')){
-    const s=line.trim().replace(/[–—−]/g,'-');
+    const s=line.trim().replace(/[··−]/g,'-');
     if(!s||s.match(/^(PACK\s*\d+|4-BAR|8-BAR|16-BAR)$/i)) continue;
     const tokens=s.split(/[\-\s,;]+/).map(t=>normChordToken(t.trim())).filter(Boolean);
     if(tokens.length>=2){ set.add(tokens.join('|')); added++; }
@@ -1332,12 +1332,12 @@ function runGenerate(){
       tbody.innerHTML='';
       progressions.forEach((p,i)=>{
         const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${i+1}</td><td>${p.key}</td><td>${p.total}</td><td>${p.chords.join(' – ')}</td>`;
+        tr.innerHTML=`<td>${i+1}</td><td>${p.key}</td><td>${p.total}</td><td>${p.chords.join(' · ')}</td>`;
         tbody.appendChild(tr);
       });
 
       document.getElementById('resultsSection').style.display='block';
-      setStatus('done','Done — '+progressions.length+' progressions ready');
+      setStatus('done','Done · '+progressions.length+' progressions ready');
     }catch(e){
       setStatus('error','Error: '+e.message);
       console.error(e);

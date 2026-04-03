@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Breathwork — Aural Alchemy</title>
+<title>Breathwork · Aural Alchemy</title>
 <meta name="description" content="Guided breathwork with synthesized breath sounds. Box breathing, Wim Hof, physiological sigh and 25+ science-backed patterns for sleep, focus, stress and energy.">
 <meta name="keywords" content="breathwork, breathing exercises, box breathing, wim hof, 4-7-8, binaural, meditation, anxiety, sleep">
 <meta name="author" content="Aural Alchemy">
 <meta name="theme-color" content="#080e10">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://alchemyaural.com/breathwork">
-<meta property="og:title" content="Breathwork — Aural Alchemy">
+<meta property="og:title" content="Breathwork · Aural Alchemy">
 <meta property="og:description" content="Guided breathwork with synthesized breath sounds. 25+ science-backed patterns.">
 <meta property="og:image" content="https://alchemyaural.com/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -79,6 +79,10 @@
   position: relative;
   z-index: 1;
 }
+.bw-section.overflow-visible {
+  overflow: visible;
+  z-index: 10;
+}
 .bw-section-label {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.62rem;
@@ -145,8 +149,8 @@
   min-width: 280px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 200;
-  box-shadow: 0 12px 40px rgba(0,0,0,.7);
+  z-index: 500;
+  box-shadow: 0 12px 40px rgba(0,0,0,.9);
 }
 .bw-dropdown::-webkit-scrollbar { width: 3px; }
 .bw-dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -399,8 +403,8 @@
 <div class="page-wrap">
 <!-- Sacred Geometry Background -->
 <svg class="aa-geometry" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.06"/>
-  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.06"/>
+  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.10"/>
+  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.10"/>
 </svg>
 <div class="breathwork-page">
 
@@ -412,7 +416,7 @@
   </div>
 
   <!-- Pattern selection card -->
-  <div class="bw-section">
+  <div class="bw-section overflow-visible">
     <div class="bw-section-label">Choose a Pattern</div>
     <div class="bw-patterns" id="bwPatterns"></div>
     <div class="bw-more-wrap" id="bwMoreWrap">
@@ -430,7 +434,7 @@
     <!-- Route pills -->
     <div class="bw-route-bar">
       <div class="bw-route-pill active-in" id="bwPillIn">nose in</div>
-      <span class="bw-route-sep">–</span>
+      <span class="bw-route-sep">·</span>
       <div class="bw-route-pill active-out" id="bwPillOut">mouth out</div>
     </div>
 
@@ -459,19 +463,19 @@
     <div class="bw-info-row">
       <div class="bw-info-box">
         <div class="bw-info-label">Pattern</div>
-        <div class="bw-info-val" id="bwInfoName">—</div>
+        <div class="bw-info-val" id="bwInfoName">·</div>
       </div>
       <div class="bw-info-box">
         <div class="bw-info-label">Cycle</div>
-        <div class="bw-info-val" id="bwInfoCycle">—</div>
+        <div class="bw-info-val" id="bwInfoCycle">·</div>
       </div>
       <div class="bw-info-box">
         <div class="bw-info-label">Benefit</div>
-        <div class="bw-info-val" id="bwInfoBenefit">—</div>
+        <div class="bw-info-val" id="bwInfoBenefit">·</div>
       </div>
       <div class="bw-info-box">
         <div class="bw-info-label">Origin</div>
-        <div class="bw-info-val" id="bwInfoOrigin">—</div>
+        <div class="bw-info-val" id="bwInfoOrigin">·</div>
       </div>
     </div>
     <p class="bw-desc" id="bwDesc" style="margin-top:1rem;margin-bottom:0;text-align:left">Choose a breathing pattern above to begin.</p>

@@ -4,27 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Frequency Generator — Aural Alchemy</title>
+<title>Frequency Generator · Aural Alchemy</title>
 <meta name="description" content="Professional healing frequency generator. Binaural beats, isochronic tones and pure frequencies for sleep, meditation, focus and healing. Free to use.">
 <meta name="keywords" content="binaural beats, isochronic tones, healing frequencies, brainwave entrainment, solfeggio, chakra, meditation, sleep, focus">
 <meta name="author" content="Aural Alchemy">
 <meta name="theme-color" content="#080e10">
 
-<!-- Open Graph — controls how link looks when shared on social / WhatsApp / Telegram -->
+<!-- Open Graph · controls how link looks when shared on social / WhatsApp / Telegram -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://auralalchemy.github.io/aural-alchemy/">
-<meta property="og:title" content="Aural Alchemy — Frequency & Tone Generator">
+<meta property="og:title" content="Aural Alchemy · Frequency & Tone Generator">
 <meta property="og:description" content="Professional healing frequency generator. Binaural beats, isochronic tones and pure frequencies for sleep, meditation, focus and healing.">
 <meta property="og:image" content="https://alchemyaural.com/og-image.png">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://auralalchemy.github.io/aural-alchemy/">
-<meta name="twitter:title" content="Aural Alchemy — Frequency & Tone Generator">
+<meta name="twitter:title" content="Aural Alchemy · Frequency & Tone Generator">
 <meta name="twitter:description" content="Professional healing frequency generator. Binaural beats, isochronic tones and pure frequencies for sleep, meditation, focus and healing.">
 <meta name="twitter:image" content="https://alchemyaural.com/og-image.png">
 
-<!-- Favicon — inline SVG as data URI so no extra file needed -->
+<!-- Favicon · inline SVG as data URI so no extra file needed -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%232dd4bf'/><stop offset='100%' stop-color='%23d4a843'/></linearGradient><clipPath id='c'><circle cx='26' cy='26' r='26'/></clipPath></defs><circle cx='26' cy='26' r='26' fill='%23080e10'/><g clip-path='url(%23c)'><circle cx='26' cy='26' r='22' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.65'/><polygon points='26,5 7.81,36.5 44.19,36.5' stroke='url(%23g)' stroke-width='1.5' fill='none'/><line x1='13.88' y1='26' x2='38.12' y2='26' stroke='url(%23g)' stroke-width='1.5'/><circle cx='26' cy='26' r='2' fill='%232dd4bf'/></g></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Crect width='52' height='52' fill='%23080e10'/%3E%3Cpath d='M26 7 L43.5 38 L8.5 38 Z' stroke='%232dd4bf' stroke-width='2' fill='none'/%3E%3Cline x1='15' y1='29.5' x2='37' y2='29.5' stroke='%23d4a843' stroke-width='2'/%3E%3C/svg%3E">
 
@@ -44,7 +44,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Raleway',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(45,212,191,0.06) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(212,168,67,0.04) 0%,transparent 50%);pointer-events:none;z-index:0}
 
-/* HEADER — no absolute positioning for reset */
+/* HEADER · no absolute positioning for reset */
 header{text-align:center;padding:2.5rem 1rem 0.5rem;padding-top:calc(var(--nav-h) + 2.5rem);position:relative;z-index:1}
 .header-eyebrow{font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.6rem}
 h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;letter-spacing:0.12em;background:linear-gradient(135deg,#2dd4bf 0%,#d4a843 60%,#2dd4bf 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.2rem}
@@ -59,7 +59,7 @@ h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;let
 .help-icon{width:13px;height:13px;border:1px solid var(--text-muted);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.5rem;color:var(--text-muted);cursor:help;flex-shrink:0;position:relative}
 .help-icon:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a2e30;border:1px solid var(--border);color:var(--text);font-size:0.6rem;padding:0.35rem 0.6rem;border-radius:4px;white-space:nowrap;z-index:100;font-family:'Raleway',sans-serif;pointer-events:none}
 
-/* SESSION GRID — 2 cols, equal-height cards via grid */
+/* SESSION GRID · 2 cols, equal-height cards via grid */
 .session-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem}
 .col-header{font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:0.22em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.45rem}
 /* Equal-height cards: both cols use same row count */
@@ -79,7 +79,7 @@ h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;let
 .card-title{font-family:'Cinzel',serif;font-size:0.72rem;font-weight:600;letter-spacing:0.08em;color:var(--teal)}
 .card-sub{font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem}
 .card-freq{font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:0.08rem}
-/* Brainwave cards are 6 rows, intention cards 8 — pad brainwaves with 2 empty slots visually */
+/* Brainwave cards are 6 rows, intention cards 8 · pad brainwaves with 2 empty slots visually */
 .card-empty{background:transparent;border:1px solid transparent;border-radius:6px;cursor:default}
 
 /* METHOD */
@@ -211,8 +211,8 @@ canvas#waveCanvas{width:100%;height:100%}
 <div class="page-wrap">
 <!-- Sacred Geometry Background -->
 <svg class="aa-geometry" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.06"/>
-  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.06"/>
+  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.10"/>
+  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.10"/>
 </svg>
 
 <header>
@@ -347,23 +347,23 @@ const INTENTIONS=[
   {id:'manifest',emoji:'🌟',label:'MANIFEST', sub:'Intention',         bw:'gamma',   baseFreq:432,   beatHz:40},
 ];
 const BRAINWAVES=[
-  {id:'delta',   label:'DELTA',   range:'0.5–4 Hz', beatHz:2},
-  {id:'theta',   label:'THETA',   range:'4–8 Hz',   beatHz:6},
-  {id:'alpha',   label:'ALPHA',   range:'8–13 Hz',  beatHz:10},
-  {id:'beta',    label:'BETA',    range:'13–30 Hz', beatHz:18},
+  {id:'delta',   label:'DELTA',   range:'0.5·4 Hz', beatHz:2},
+  {id:'theta',   label:'THETA',   range:'4·8 Hz',   beatHz:6},
+  {id:'alpha',   label:'ALPHA',   range:'8·13 Hz',  beatHz:10},
+  {id:'beta',    label:'BETA',    range:'13·30 Hz', beatHz:18},
   {id:'gamma',   label:'GAMMA',   range:'30+ Hz',   beatHz:40},
   {id:'schumann',label:'SCHUMANN',range:'7.83 Hz',  beatHz:7.83},
 ];
 const FREQ_FAMILIES=[
   {id:'none',        label:'None',         desc:'Intention default',           freqs:null},
-  // Original 6 Solfeggio tones (Guido d'Arezzo / Joseph Puleo) — sacred isolated healing freqs
+  // Original 6 Solfeggio tones (Guido d'Arezzo / Joseph Puleo) · sacred isolated healing freqs
   // NOT a musical scale by design. Each tone is a standalone healing frequency.
   {id:'solfeggio',   label:'Solfeggio',    desc:'UT RE MI FA SOL LA',          freqs:[396,417,528,639,741,852]},
-  // Chakra frequencies — ascending Root→Crown, solfeggio-mapped
+  // Chakra frequencies · ascending Root→Crown, solfeggio-mapped
   // Root=396, Sacral=417, Solar Plexus=528, Heart=639, Throat=741, Third Eye=852, Crown=963
   {id:'chakra',      label:'Chakras',      desc:'Root → Crown (ascending)',     freqs:[396,417,528,639,741,852,963]},
   // True Pythagorean scale, root C=256 Hz, built from pure 3:2 fifths.
-  // Ratios: 1, 9/8, 81/64, 4/3, 3/2, 27/16, 243/128, 2 — sounds like a real musical scale.
+  // Ratios: 1, 9/8, 81/64, 4/3, 3/2, 27/16, 243/128, 2 · sounds like a real musical scale.
   {id:'pythagorean', label:'Pythagorean',  desc:'Pure 3:2 fifths · C=256 Hz',    freqs:[256,288,324,341.33,384,432,486,512]},
   {id:'432hz',       label:'432 Hz',       desc:'Natural A tuning',            freqs:[432]},
   {id:'528hz',       label:'528 Hz',       desc:'MI · DNA repair',                freqs:[528]},
@@ -380,7 +380,7 @@ const METHODS=[
 ];
 const CARRIER_MODES=[
   {id:'single',  label:'SINGLE CARRIER',  desc:'One pure carrier pitch.'},
-  {id:'harmonic',label:'HARMONIC STACK',  desc:'Overtones ×1 ×2 ×3 — richer tone.'},
+  {id:'harmonic',label:'HARMONIC STACK',  desc:'Overtones ×1 ×2 ×3 · richer tone.'},
 ];
 
 // ═══════════════════════════════ STATE ══════════════════════════════
@@ -457,7 +457,7 @@ function stopAllAudio(){
 
 // ── PROFESSIONAL ISOCHRONIC ENGINE ──────────────────────────────────
 // Uses a looping AudioBuffer containing one Hann-windowed pulse cycle.
-// The buffer IS the envelope — no LFO, no WaveShaper, no modulation leakage.
+// The buffer IS the envelope · no LFO, no WaveShaper, no modulation leakage.
 //
 // Graph:
 //   carrier osc → gateGain ──────────────────→ output
@@ -468,23 +468,23 @@ function stopAllAudio(){
 //   - Raised cosine pulse (sin²) for 50% of the period
 //   - Exact 0.0 for the remaining 50%
 // This loops seamlessly. Because it's a pre-computed PCM buffer,
-// there is ZERO computation at runtime — no oscillators, no shapers,
+// there is ZERO computation at runtime · no oscillators, no shapers,
 // no floating-point leakage. The gain param values are exact 0.0 during silence.
 function buildIsoEnvelope(ac, beatHz, peakGain){
   const sr=ac.sampleRate;
   const periodSamples=Math.round(sr/beatHz);
-  const pulseSamples=Math.floor(periodSamples*0.50); // 50% duty — pulse
-  const silenceSamples=periodSamples-pulseSamples;    // 50% — true zero
+  const pulseSamples=Math.floor(periodSamples*0.50); // 50% duty · pulse
+  const silenceSamples=periodSamples-pulseSamples;    // 50% · true zero
 
   // Build one period of envelope
   const buf=ac.createBuffer(1, periodSamples, sr);
   const data=buf.getChannelData(0);
   for(let i=0;i<pulseSamples;i++){
-    // Hann window — sin²(π·i/(N-1)) — starts and ends at exactly 0
+    // Hann window · sin²(π·i/(N-1)) · starts and ends at exactly 0
     data[i]=peakGain * Math.sin(Math.PI*i/(pulseSamples-1))**2;
   }
   for(let i=pulseSamples;i<periodSamples;i++){
-    data[i]=0.0; // hard zero — no leakage possible from a buffer value of 0
+    data[i]=0.0; // hard zero · no leakage possible from a buffer value of 0
   }
 
   // Loop the buffer continuously
@@ -494,7 +494,7 @@ function buildIsoEnvelope(ac, beatHz, peakGain){
 
   // gateGain: audio flows through, .gain is modulated by envelope buffer
   const gateGain=ac.createGain();
-  gateGain.gain.value=0; // base value — envelope adds on top
+  gateGain.gain.value=0; // base value · envelope adds on top
 
   envSrc.connect(gateGain.gain); // buffer → AudioParam modulation
   envSrc.start();
@@ -513,7 +513,7 @@ function startAudio(){
   //
   // Using StereoPannerNode is the cleanest way to keep L and R truly separate
   // through the entire Web Audio graph. No ChannelMerger, no channelCount juggling.
-  // Each oscillator is panned hard left or right — they NEVER mix in the same node.
+  // Each oscillator is panned hard left or right · they NEVER mix in the same node.
 
   masterGain=ac.createGain();
   masterGain.gain.value=state.volume;
@@ -540,7 +540,7 @@ function startAudio(){
     const layerVol=li===0?0.45:li===1?0.22:0.13;
 
     if(state.method==='binaural'){
-      // Hard pan L and R — cleanest possible stereo separation
+      // Hard pan L and R · cleanest possible stereo separation
       harmonics.forEach((h,hi)=>{
         const fL=carrier*h;
         const fR=hi===0 ? fL+beat : fL; // beat only on fundamental
@@ -607,7 +607,7 @@ function startAudio(){
 
   // Noise
   pinkGainNode=null; brownGainNode=null;
-  // Noise bypasses warmthFilter — filter should only affect tones, not noise.
+  // Noise bypasses warmthFilter · filter should only affect tones, not noise.
   // Noise connects directly to masterGain.
   // Scale: 0.06 so the slider feels natural (full = gentle ambient bed)
   if(state.pinkVol>0){
@@ -661,7 +661,7 @@ function renderIntentions(){
 }
 
 function renderBrainwaves(){
-  // 8 slots to match intention count — last 2 empty
+  // 8 slots to match intention count · last 2 empty
   const bwHtml=BRAINWAVES.map(b=>`<div class="card ${state.brainwave===b.id?'active':''}" onclick="selectBrainwave('${b.id}')">
     <div class="card-title">${b.label}</div>
     <div class="card-freq">${b.range}</div>
@@ -715,7 +715,7 @@ function renderCarrierModes(){
   renderFineTuneLayers();
 }
 
-// Oster curve zones — brainwave bands mapped to beat Hz ranges
+// Oster curve zones · brainwave bands mapped to beat Hz ranges
 const OSTER_ZONES=[
   {label:'DELTA',  min:0.5,  max:4,   color:'rgba(167,139,250,0.55)'},  // purple
   {label:'THETA',  min:4,    max:8,   color:'rgba(45,212,191,0.55)'},   // teal
@@ -726,7 +726,7 @@ const OSTER_ZONES=[
 const OSTER_MIN=0.5, OSTER_MAX=40;
 
 function beatToX(beatHz, w){
-  // Log scale feels more natural across the wide 0.5–40 Hz range
+  // Log scale feels more natural across the wide 0.5·40 Hz range
   const logMin=Math.log(OSTER_MIN), logMax=Math.log(OSTER_MAX);
   return ((Math.log(Math.max(beatHz,OSTER_MIN))-logMin)/(logMax-logMin))*w;
 }
@@ -773,7 +773,7 @@ function updateOsterNeedle(beatHz){
   // Find zone name
   const zone=OSTER_ZONES.find(z=>beatHz>=z.min&&beatHz<z.max)||OSTER_ZONES[OSTER_ZONES.length-1];
   if(label){
-    label.textContent=beatHz+' Hz — '+zone.label;
+    label.textContent=beatHz+' Hz · '+zone.label;
     label.style.color=zone.color.replace('0.55','1');
   }
 }
@@ -789,17 +789,17 @@ function renderFineTuneLayers(){
   for(let i=0;i<count;i++){
     const layer=state.layers[i];
     const beatHz=layer.beatHz;
-    const title=count===1?'BEAT & CARRIER':('FREQUENCY LAYER '+(i+1)+' — '+titles[i]);
+    const title=count===1?'BEAT & CARRIER':('FREQUENCY LAYER '+(i+1)+' · '+titles[i]);
     html+=`<div class="freq-block"><div class="freq-block-title">${title}</div>`;
 
-    // Beat / Pulse slider — always
+    // Beat / Pulse slider · always
     html+=`<div class="finetune-row">
       <span class="finetune-label">Beat / Pulse</span>
       <div class="slider-wrap"><input type="range" id="beat${i}" min="0.5" max="40" step="0.5" value="${beatHz}" oninput="updateLayer(${i},'beat',this.value)"></div>
       <span class="value-badge" id="beatVal${i}">${beatHz} Hz</span>
     </div>`;
 
-    // Oster curve — only when binaural, layer 0 only
+    // Oster curve · only when binaural, layer 0 only
     if(isBinaural&&i===0){
       html+=`<div class="oster-wrap">
         <div class="oster-label">Brainwave Zone (Oster Curve)</div>
@@ -811,7 +811,7 @@ function renderFineTuneLayers(){
       </div>`;
     }
 
-    // Carrier Hz picker — always (all layers, all methods, all modes)
+    // Carrier Hz picker · always (all layers, all methods, all modes)
     const carrierHz=(layer.carrierHz!=null?layer.carrierHz:getBaseCarrier());
     html+=`<div class="finetune-row" style="margin-top:0.5rem">
       <span class="finetune-label">Carrier Hz</span>
@@ -871,11 +871,11 @@ function updateStatus(){
     const parts=[];
     if(state.intention) parts.push(INTENTIONS.find(i=>i.id===state.intention)?.label);
     if(state.brainwave) parts.push(BRAINWAVES.find(b=>b.id===state.brainwave)?.label);
-    txt.textContent='SESSION ACTIVE — '+(parts.join(' · ')||'Custom');
+    txt.textContent='SESSION ACTIVE · '+(parts.join(' · ')||'Custom');
   } else if(!state.intention&&!state.brainwave){
     dot.className='status-dot'; txt.textContent='Select a session to begin';
   } else {
-    dot.className='status-dot'; txt.textContent='Ready — press Begin Session';
+    dot.className='status-dot'; txt.textContent='Ready · press Begin Session';
   }
 }
 
@@ -893,7 +893,7 @@ function getDefaultState(){
 function resetOutputControls(){
   const d=getDefaultState();
   state.freqFamily=d.freqFamily; state.freqFamilyIndex=d.freqFamilyIndex;
-  // PRESERVE method and carrierMode — user chose them intentionally
+  // PRESERVE method and carrierMode · user chose them intentionally
   // state.method and state.carrierMode are NOT reset here
   state.octaveShift=d.octaveShift;
   state.layers=d.layers.map(l=>({...l,carrierHz:null}));
@@ -994,7 +994,7 @@ let pinkGainNode=null, brownGainNode=null;
 function updateNoise(type,v){
   const val=parseFloat(v);
   const targetGain=val*0.06;
-  const RAMP=0.08; // 80ms ramp — smooth, no click
+  const RAMP=0.08; // 80ms ramp · smooth, no click
 
   if(type==='pink'){
     state.pinkVol=val;
@@ -1006,7 +1006,7 @@ function updateNoise(type,v){
         pinkGainNode.gain.setValueAtTime(pinkGainNode.gain.value,actx.currentTime);
         pinkGainNode.gain.linearRampToValueAtTime(targetGain,actx.currentTime+RAMP);
       } else if(val>0){
-        // Node doesn't exist yet — create it without restarting everything
+        // Node doesn't exist yet · create it without restarting everything
         const ac=getCtx();
         const src=makePinkNoise(ac);
         pinkGainNode=ac.createGain();
@@ -1104,19 +1104,19 @@ function startWaveAnim(){
   const dpr=window.devicePixelRatio||1;
 
   // Three waves:
-  //   1. TEAL  — left ear carrier sine
-  //   2. PURPLE — right ear carrier sine (same freq visually, but phase drifts = the beat)
-  //   3. GOLD  — the beat sine itself: a slow sine at the beat frequency,
+  //   1. TEAL  · left ear carrier sine
+  //   2. PURPLE · right ear carrier sine (same freq visually, but phase drifts = the beat)
+  //   3. GOLD  · the beat sine itself: a slow sine at the beat frequency,
   //              sitting between the two carriers, showing what the brain perceives
   //
   // Speed rules:
-  //   - Carrier scroll: always slow and constant (0.3 cycles/sec) — never spastic
+  //   - Carrier scroll: always slow and constant (0.3 cycles/sec) · never spastic
   //   - Phase drift between L and R: drives from beat Hz but hard-capped
   //     so even 40Hz gamma feels fast-but-readable, not seizure-inducing
   //   - Beat sine: oscillates at visual beat rate, always clearly visible
 
-  const CARRIER_SCROLL = 0.3;   // carrier phase cycles per second — always calm
-  const MAX_VIS_BEAT   = 1.2;   // max visual beat cycles/sec — cap for high Hz
+  const CARRIER_SCROLL = 0.3;   // carrier phase cycles per second · always calm
+  const MAX_VIS_BEAT   = 1.2;   // max visual beat cycles/sec · cap for high Hz
   const BEAT_SCALE     = 0.08;  // beat Hz multiplier before cap
 
   function draw(ts){
@@ -1132,13 +1132,13 @@ function startWaveAnim(){
     const carrierReal=getCarrierForLayer(0);
     const method=state.method;
 
-    // Visual beat rate — capped so it never goes insane
+    // Visual beat rate · capped so it never goes insane
     const visBeat=Math.min(beat*BEAT_SCALE, MAX_VIS_BEAT);
 
-    // Carrier phase — slow constant scroll, identical for both ears
+    // Carrier phase · slow constant scroll, identical for both ears
     const cPhase=elapsed*CARRIER_SCROLL*2*Math.PI;
 
-    // Phase difference between ears grows at visBeat — this IS the beat animation
+    // Phase difference between ears grows at visBeat · this IS the beat animation
     const phaseDiff=elapsed*visBeat*2*Math.PI;
 
     const N=8; // carrier cycles across canvas
@@ -1149,7 +1149,7 @@ function startWaveAnim(){
 
     if(method==='binaural'){
 
-      // 1. TEAL — left ear
+      // 1. TEAL · left ear
       c.beginPath(); c.strokeStyle='#2dd4bf'; c.lineWidth=1.6; c.globalAlpha=0.85;
       for(let x=0;x<=W;x++){
         const p=(x/W)*N*2*Math.PI + cPhase;
@@ -1158,7 +1158,7 @@ function startWaveAnim(){
       }
       c.stroke();
 
-      // 2. PURPLE — right ear (same carrier display freq, phase offset = beat)
+      // 2. PURPLE · right ear (same carrier display freq, phase offset = beat)
       c.beginPath(); c.strokeStyle='#a78bfa'; c.lineWidth=1.3; c.globalAlpha=0.60;
       for(let x=0;x<=W;x++){
         const p=(x/W)*N*2*Math.PI + cPhase + phaseDiff;
@@ -1167,7 +1167,7 @@ function startWaveAnim(){
       }
       c.stroke();
 
-      // 3. GOLD — the beat sine: slow wave the brain perceives
+      // 3. GOLD · the beat sine: slow wave the brain perceives
       // One full spatial cycle across canvas, phase animates at visBeat rate
       // Amplitude gently pulses so it reads as "the result" of the two above
       c.beginPath(); c.strokeStyle='#d4a843'; c.lineWidth=2.2; c.globalAlpha=0.80;
@@ -1182,7 +1182,7 @@ function startWaveAnim(){
     } else if(method==='isochronic'){
       // Pulses: always show exactly 2-3 beat cycles across canvas
       // Slow beats = wide pulses with big silence gaps
-      // Fast beats = tight pulses — but capped so still readable
+      // Fast beats = tight pulses · but capped so still readable
       const visPeriod=1/visBeat;
       const timeWindow=visPeriod*2.5; // show 2.5 cycles
 
