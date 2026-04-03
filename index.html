@@ -27,8 +27,8 @@
 .tools-section{max-width:1100px;margin:0 auto;padding:4rem 2rem}
 .section-header{text-align:center;margin-bottom:3rem}
 .section-header h2{font-size:clamp(1.5rem,3vw,2.1rem);margin-top:0.5rem}
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
-.tool-card{display:flex;flex-direction:column;gap:1.1rem;text-decoration:none;color:inherit}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;align-items:stretch}
+.tool-card{display:flex;flex-direction:column;gap:1.1rem;text-decoration:none;color:inherit;height:100%}
 .tool-icon{width:44px;height:44px}
 .tool-tag{font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:0.22em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:0.2rem}
 .tool-card h3{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;letter-spacing:0.08em;background:linear-gradient(135deg,#2dd4bf,#d4a843);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.4rem}
@@ -97,8 +97,7 @@
 
   <section class="tools-section">
     <div class="section-header anim-fade-up">
-      <p class="label">Tools</p>
-      <h2 class="grad-title">What We Built</h2>
+      <h2 class="grad-title">Tools</h2>
     </div>
 
     <div class="tools-grid">
@@ -107,7 +106,6 @@
         <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
           <circle cx="24" cy="24" r="22" stroke="#2dd4bf" stroke-width="1" opacity="0.45"/>
           <path d="M4,24 Q10,10 16,24 Q22,38 28,24 Q34,10 40,24 Q43,30 46,24" stroke="#2dd4bf" stroke-width="1.5" fill="none"/>
-          <circle cx="24" cy="24" r="3" fill="#2dd4bf"/>
         </svg>
         <div>
           <p class="tool-tag">Web App</p>
@@ -121,7 +119,7 @@
           <span class="pill">Chakras</span>
           <span class="pill">WAV Export</span>
         </div>
-        <span class="btn btn-primary" style="align-self:flex-start;margin-top:0.3rem">Launch →</span>
+        <span class="btn btn-primary" style="align-self:flex-start;margin-top:auto">Launch →</span>
       </a>
 
       <a href="/aural-alchemy/midi-generator" class="card tool-card anim-fade-up delay-2">
@@ -142,7 +140,7 @@
           <span class="pill">Sacred Scales</span>
           <span class="pill">MIDI Export</span>
         </div>
-        <span class="btn btn-gold" style="align-self:flex-start;margin-top:0.3rem">Launch →</span>
+        <span class="btn btn-gold" style="align-self:flex-start;margin-top:auto">Launch →</span>
       </a>
 
       <a href="/aural-alchemy/breathwork" class="card tool-card anim-fade-up delay-3">
@@ -152,7 +150,7 @@
           <circle cx="24" cy="24" r="3" fill="#2dd4bf" opacity="0.7"/>
         </svg>
         <div>
-          <p class="tool-tag">Free · Web App</p>
+          <p class="tool-tag">Free</p>
           <h3>Breathwork</h3>
           <p>Guided breathing sessions with synthesized breath sounds and animated orb. 25+ science-backed patterns including box breathing, Wim Hof, coherent breathing and physiological sigh.</p>
         </div>
@@ -163,7 +161,7 @@
           <span class="pill">4-7-8</span>
           <span class="pill">25+ Patterns</span>
         </div>
-        <span class="btn btn-primary" style="align-self:flex-start;margin-top:0.3rem">Launch →</span>
+        <span class="btn btn-primary" style="align-self:flex-start;margin-top:auto">Launch →</span>
       </a>
       </div>
     </section>
