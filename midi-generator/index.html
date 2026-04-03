@@ -1295,6 +1295,13 @@ function syncSlider(sliderId,numId,val,lo,hi){
   if(s) s.value=clamped;
 }
 
+// Default balance values — sus chords intentionally lower
+const BALANCE_DEFAULTS = {
+  'maj9':50,'maj7':50,'add9':50,'6add9':50,'6':50,'maj':50,
+  'min9':50,'min7':50,'min11':50,'min':50,
+  'sus2add9':10,'sus4add9':10,'sus2':18,'sus4':18
+};
+
 function buildBalanceSliders(){
   const grids={major:'majorGrid',minor:'minorGrid',sus:'susGrid'};
   const groups={major:MAJOR_QUALS,minor:MINOR_QUALS,sus:SUS_QUALS};
@@ -1303,12 +1310,13 @@ function buildBalanceSliders(){
     el.innerHTML='';
     for(const q of groups[group]){
       const label=q.toUpperCase();
-      balance[q]=50;
+      const def=BALANCE_DEFAULTS[q]??50;
+      balance[q]=def;
       const div=document.createElement('div');
       div.className='balance-item';
       div.innerHTML=`<label>${label}</label>`+
-        `<input type="range" min="0" max="100" value="50" id="br_${q}" oninput="balance['${q}']=+this.value;document.getElementById('bv_${q}').value=this.value">`+
-        `<input type="number" id="bv_${q}" class="balance-val" min="0" max="100" value="50" style="width:36px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:0.1rem 0.3rem;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;text-align:center;outline:none;-moz-appearance:textfield" oninput="balance['${q}']=Math.max(0,Math.min(100,+this.value||0));document.getElementById('br_${q}').value=balance['${q}']">`;
+        `<input type="range" min="0" max="100" value="${def}" id="br_${q}" oninput="balance['${q}']=+this.value;document.getElementById('bv_${q}').value=this.value">`+
+        `<input type="number" id="bv_${q}" class="balance-val" min="0" max="100" value="${def}" style="width:36px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:0.1rem 0.3rem;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;text-align:center;outline:none;-moz-appearance:textfield" oninput="balance['${q}']=Math.max(0,Math.min(100,+this.value||0));document.getElementById('br_${q}').value=balance['${q}']">`;
       el.appendChild(div);
     }
   }
@@ -1316,11 +1324,12 @@ function buildBalanceSliders(){
 
 function resetBalance(){
   for(const [q] of ADV_QUALITIES){
-    balance[q]=50;
+    const def=BALANCE_DEFAULTS[q]??50;
+    balance[q]=def;
     const inp=document.getElementById(`br_${q}`);
     const val=document.getElementById(`bv_${q}`);
-    if(inp) inp.value=50;
-    if(val) val.value=50;
+    if(inp) inp.value=def;
+    if(val) val.value=def;
   }
 }
 
