@@ -2,28 +2,37 @@
 // Each tool has its own key. Stored in localStorage per tool.
 
 (function(){
-  // Determine which tool we're on
   const path = window.location.pathname;
-  const isHz   = path.includes('frequency-generator');
-  const isMidi = path.includes('midi-generator');
+  const isHz       = path.includes('frequency-generator');
+  const isMidi     = path.includes('midi-generator');
+  const isBreath   = path.includes('breathwork');
 
   const CONFIG = {
     'frequency-generator': {
       key: 'AURAL-432-ALCHEMY',
       storage: 'aa_license_hz_v1',
       title: 'Frequency Generator',
-      gumroad: 'https://auralalchemy.gumroad.com'
+      gumroad: 'https://auralalchemy.gumroad.com',
+      free: false
     },
     'midi-generator': {
       key: 'AURAL-MIDI-ALCHEMY',
       storage: 'aa_license_midi_v1',
       title: 'MIDI Generator',
-      gumroad: 'https://auralalchemy.gumroad.com/l/midigenerator'
+      gumroad: 'https://auralalchemy.gumroad.com/l/midigenerator',
+      free: false
+    },
+    'breathwork': {
+      key: 'AURAL-BREATH-ALCHEMY',
+      storage: 'aa_license_breath_v1',
+      title: 'Breathwork App',
+      gumroad: 'https://auralalchemy.gumroad.com/l/breathworkapp',
+      free: true
     }
   };
 
-  const tool = isHz ? CONFIG['frequency-generator'] : isMidi ? CONFIG['midi-generator'] : null;
-  if(!tool) return; // not a gated page
+  const tool = isHz ? CONFIG['frequency-generator'] : isMidi ? CONFIG['midi-generator'] : isBreath ? CONFIG['breathwork'] : null;
+  if(!tool) return;
 
   function isUnlocked(){ return localStorage.getItem(tool.storage) === 'unlocked'; }
   function unlock(){ localStorage.setItem(tool.storage, 'unlocked'); }
@@ -60,11 +69,10 @@
             <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient></defs>
             <circle cx="26" cy="26" r="22" stroke="url(#gg)" stroke-width="1" fill="none" opacity="0.65"/>
             <polygon points="26,5 7.81,36.5 44.19,36.5" stroke="url(#gg)" stroke-width="1.5" fill="none"/>
-            <line x1="13.88" y1="26" x2="38.12" y2="26" stroke="url(#gg)" stroke-width="1.5"/>
           </svg>
           <p style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:0.28em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.6rem">Aural Alchemy</p>
           <h2 style="font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;letter-spacing:0.1em;background:linear-gradient(135deg,#2dd4bf,#d4a843);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem">${tool.title}</h2>
-          <p style="font-size:0.78rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.8rem">Enter your license key to access this tool. Purchase on Gumroad to get your key.</p>
+          <p style="font-size:0.78rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.8rem">${tool.free ? 'Get free access on Gumroad and enter your key below to unlock.' : 'Enter your license key to access this tool. Purchase on Gumroad to get your key.'}</p>
           <input id="aa-key-input" type="text" placeholder="XXXX-XXXX-XXXXXXX"
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;letter-spacing:0.15em;padding:0.75rem 1rem;text-align:center;outline:none;margin-bottom:0.8rem;transition:border-color .2s;box-sizing:border-box"
             onkeydown="if(event.key==='Enter')document.getElementById('aa-gate-submit').click()"
@@ -78,7 +86,7 @@
           <a href="${tool.gumroad}" target="_blank"
             style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--text-muted);text-decoration:none;text-transform:uppercase;transition:color .2s"
             onmouseover="this.style.color='var(--gold)'"
-            onmouseout="this.style.color='var(--text-muted)'">Get Access on Gumroad →</a>
+            onmouseout="this.style.color='var(--text-muted)'">${tool.free ? 'Get Free Access on Gumroad →' : 'Get Access on Gumroad →'}</a>
         </div>
       </div>`;
 
