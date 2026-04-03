@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music — Aural Alchemy</title>
+<meta name="description" content="Listen to Aural Alchemy on Spotify and YouTube. Healing frequencies, ambient music and sacred sound at 432 Hz.">
+<meta name="theme-color" content="#080e10">
+<meta property="og:title" content="Music — Aural Alchemy">
+<meta property="og:description" content="Listen to Aural Alchemy on Spotify and YouTube.">
+<meta property="og:image" content="https://alchemyaural.com/og-image.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%232dd4bf'/><stop offset='100%' stop-color='%23d4a843'/></linearGradient><clipPath id='c'><circle cx='26' cy='26' r='26'/></clipPath></defs><circle cx='26' cy='26' r='26' fill='%23080e10'/><g clip-path='url(%23c)'><circle cx='26' cy='26' r='22' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.65'/><polygon points='26,5 7.81,36.5 44.19,36.5' stroke='url(%23g)' stroke-width='1.5' fill='none'/><line x1='13.88' y1='26' x2='38.12' y2='26' stroke='url(%23g)' stroke-width='1.5'/><circle cx='26' cy='26' r='2' fill='%232dd4bf'/></g></svg>">
+<link rel="stylesheet" href="/aural-alchemy/style.css">
+<style>
+.music-page { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+/* Header */
+.music-header { text-align: center; padding-top: calc(var(--nav-h) + 2.5rem); margin-bottom: 3rem; }
+.music-eyebrow { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.35em; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.6rem; }
+.music-title { font-family:'Cinzel',serif; font-size:clamp(2rem,5vw,3rem); font-weight:700; letter-spacing:0.12em; background:linear-gradient(135deg,#2dd4bf 0%,#d4a843 60%,#2dd4bf 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.3rem; }
+.music-sub { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.3em; color:var(--text-dim); text-transform:uppercase; }
+
+/* Platform links */
+.platform-row { display:flex; gap:1rem; justify-content:center; margin-bottom:3rem; flex-wrap:wrap; }
+.platform-btn { display:inline-flex; align-items:center; gap:0.6rem; font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.15em; padding:0.75rem 1.6rem; border-radius:4px; text-decoration:none; transition:all .25s; border:1px solid; }
+.platform-btn.spotify { border-color:#1db954; color:#1db954; }
+.platform-btn.spotify:hover { background:rgba(29,185,84,0.1); box-shadow:0 0 20px rgba(29,185,84,0.15); }
+.platform-btn.youtube { border-color:#ff3f3f; color:#ff3f3f; }
+.platform-btn.youtube:hover { background:rgba(255,63,63,0.1); box-shadow:0 0 20px rgba(255,63,63,0.15); }
+
+/* Section */
+.music-section { margin-bottom:2.5rem; }
+.section-eyebrow { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.28em; color:var(--text-muted); text-transform:uppercase; margin-bottom:1rem; }
+
+/* Spotify embeds */
+.spotify-embed { border-radius:8px; overflow:hidden; margin-bottom:0.8rem; }
+.spotify-embed iframe { display:block; border-radius:8px; }
+
+/* YouTube section */
+.yt-card { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:2rem; text-align:center; }
+.yt-card p { font-size:0.82rem; color:var(--text-dim); line-height:1.7; margin-bottom:1.5rem; max-width:480px; margin-left:auto; margin-right:auto; }
+
+/* Spotify icon SVG inline */
+.icon-spotify { width:16px; height:16px; flex-shrink:0; }
+.icon-youtube { width:18px; height:14px; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/aural-alchemy/" class="nav-brand">
+    <svg viewBox="0 0 52 52" fill="none"><defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient></defs><circle cx="26" cy="26" r="24" stroke="url(#ng)" stroke-width="1" fill="none" opacity="0.55"/><path d="M26 7 L43.5 38 L8.5 38 Z" stroke="url(#ng)" stroke-width="1.5" fill="none"/><line x1="15" y1="29.5" x2="37" y2="29.5" stroke="url(#ng)" stroke-width="1.5"/><circle cx="26" cy="26" r="2.1" fill="#2dd4bf" opacity="0.95"/></svg>
+    <span class="nav-brand-text">AURAL ALCHEMY</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/aural-alchemy/">Home</a></li>
+    <li><a href="/aural-alchemy/frequency-generator">Frequency Generator</a></li>
+    <li><a href="/aural-alchemy/midi-generator">MIDI Generator</a></li>
+    <li><a href="/aural-alchemy/breathwork">Breathwork</a></li>
+    <li><a href="/aural-alchemy/music" class="active">Music</a></li>
+    <li><a href="/aural-alchemy/shop">Shop</a></li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-wrap">
+<!-- Sacred Geometry Background -->
+<svg class="aa-geometry" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.06"/>
+  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.06"/>
+</svg>
+
+<div class="music-page">
+
+  <div class="music-header anim-fade-up">
+    <p class="music-eyebrow">Aural Alchemy</p>
+    <h1 class="music-title">Music</h1>
+    <p class="music-sub">Healing frequencies · 432 Hz · Ambient</p>
+  </div>
+
+  <!-- Platform links -->
+  <div class="platform-row anim-fade-up delay-1">
+    <a href="https://open.spotify.com/artist/7CHiXE2UIc8oal0jQ3NNpK" target="_blank" rel="noopener" class="platform-btn spotify">
+      <svg class="icon-spotify" viewBox="0 0 24 24" fill="#1db954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+      Spotify
+    </a>
+    <a href="https://www.youtube.com/@AuralAlchemy432" target="_blank" rel="noopener" class="platform-btn youtube">
+      <svg class="icon-youtube" viewBox="0 0 24 17" fill="#ff3f3f"><path d="M23.495 2.205a3.02 3.02 0 0 0-2.122-2.136C19.538 0 12 0 12 0S4.463 0 2.627.07a3.02 3.02 0 0 0-2.122 2.135C0 4.041 0 8.208 0 8.208s0 4.167.505 6.003a3.02 3.02 0 0 0 2.122 2.136C4.463 16.416 12 16.416 12 16.416s7.538 0 9.373-.07a3.02 3.02 0 0 0 2.122-2.135C24 12.375 24 8.208 24 8.208s0-4.167-.505-6.003zM9.545 11.598V4.817l6.272 3.39-6.272 3.391z"/></svg>
+      YouTube
+    </a>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">◈</span></div>
+
+  <!-- Spotify section -->
+  <div class="music-section anim-fade-up delay-2">
+    <p class="section-eyebrow">Listen on Spotify</p>
+
+    <!-- Artist embed — shows latest releases automatically -->
+    <div class="spotify-embed">
+      <iframe
+        src="https://open.spotify.com/embed/artist/7CHiXE2UIc8oal0jQ3NNpK?utm_source=generator&theme=0"
+        width="100%"
+        height="352"
+        frameborder="0"
+        allowfullscreen=""
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style="border-radius:8px">
+      </iframe>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">🜁</span></div>
+
+  <!-- YouTube section -->
+  <div class="music-section anim-fade-up delay-3">
+    <p class="section-eyebrow">Watch on YouTube</p>
+    <div class="yt-card">
+      <svg width="48" height="34" viewBox="0 0 24 17" fill="#ff3f3f" style="margin-bottom:1rem;opacity:0.8"><path d="M23.495 2.205a3.02 3.02 0 0 0-2.122-2.136C19.538 0 12 0 12 0S4.463 0 2.627.07a3.02 3.02 0 0 0-2.122 2.135C0 4.041 0 8.208 0 8.208s0 4.167.505 6.003a3.02 3.02 0 0 0 2.122 2.136C4.463 16.416 12 16.416 12 16.416s7.538 0 9.373-.07a3.02 3.02 0 0 0 2.122-2.135C24 12.375 24 24 8.208 24 8.208s0-4.167-.505-6.003zM9.545 11.598V4.817l6.272 3.39-6.272 3.391z"/></svg>
+      <p>Meditations, frequency sessions and ambient soundscapes on the Aural Alchemy YouTube channel.</p>
+      <a href="https://www.youtube.com/@AuralAlchemy432" target="_blank" rel="noopener" class="btn btn-ghost" style="display:inline-flex">
+        Visit Channel →
+      </a>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <span class="footer-brand">AURAL ALCHEMY</span>
+  <ul class="footer-links">
+    <li><a href="/aural-alchemy/frequency-generator">Frequency Generator</a></li>
+    <li><a href="/aural-alchemy/midi-generator">MIDI Generator</a></li>
+    <li><a href="/aural-alchemy/breathwork">Breathwork</a></li>
+    <li><a href="/aural-alchemy/music">Music</a></li>
+    <li><a href="https://auralalchemy.gumroad.com" target="_blank">Shop</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 Aural Alchemy</span>
+</footer>
+
+<script src="/aural-alchemy/nav.js"></script>
+</body>
+</html>
