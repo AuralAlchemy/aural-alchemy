@@ -9,21 +9,21 @@
 
   const CONFIG = {
     'frequency-generator': {
-      key: 'AURAL-432-ALCHEMY',
+      key: 'FREQ432781934',
       storage: 'aa_license_hz_v1',
       title: 'Frequency Generator',
       gumroad: 'https://auralalchemy.gumroad.com',
       free: false
     },
     'midi-generator': {
-      key: 'AURAL-MIDI-ALCHEMY',
+      key: 'MIDI294857163',
       storage: 'aa_license_midi_v1',
       title: 'MIDI Generator',
       gumroad: 'https://auralalchemy.gumroad.com/l/midigenerator',
       free: false
     },
     'breathwork': {
-      key: 'AURAL-BREATH-ALCHEMY',
+      key: 'BREATH748291053',
       storage: 'aa_license_breath_v1',
       title: 'Breathwork App',
       gumroad: 'https://auralalchemy.gumroad.com/l/breathworkapp',
