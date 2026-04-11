@@ -1450,7 +1450,8 @@ async function loadFF(){
   if(!_createFF)throw new Error('createFFmpeg not found — try a different browser or disable extensions.');
   ff=_createFF({
     log:true,
-    corePath:'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+    // ffmpeg-core-st = single-threaded build, no SharedArrayBuffer needed, works on GitHub Pages
+    corePath:'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
   });
   ff.setProgress(({ratio})=>setProg(72+Math.round(Math.max(0,ratio)*24),`Encoding… ${Math.round(Math.max(0,ratio)*100)}%`));
   await ff.load();
