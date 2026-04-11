@@ -1428,22 +1428,29 @@ async function loadFF(){
   // 0.11 UMD — no workers, no SharedArrayBuffer, works on GitHub Pages as-is
   await new Promise((res,rej)=>{
     const urls=[
-      'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
       'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
+      'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
+      'https://unpkg.com/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js',
     ];
     let i=0;
     function tryNext(){
-      if(i>=urls.length){rej(new Error('FFmpeg failed to load from all CDNs'));return;}
+      if(i>=urls.length){rej(new Error('FFmpeg script failed to load — check network/CSP'));return;}
       const s=document.createElement('script');s.src=urls[i++];
-      s.onload=res;s.onerror=()=>{s.remove();tryNext();};
+      s.onload=()=>{console.log('[ff] loaded:',s.src);res();};
+      s.onerror=()=>{console.warn('[ff] failed:',s.src);s.remove();tryNext();};
       document.head.appendChild(s);
     }
     tryNext();
   });
-  if(typeof createFFmpeg!=='function')throw new Error('createFFmpeg not found.');
-  ff=createFFmpeg({
-    log:false,
-    corePath:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+  // 0.11 UMD may register as window.FFmpeg.createFFmpeg or window.createFFmpeg
+  const _createFF = (typeof createFFmpeg==='function') ? createFFmpeg
+    : (typeof FFmpeg!=='undefined' && FFmpeg.createFFmpeg) ? FFmpeg.createFFmpeg
+    : null;
+  console.log('[ff] createFFmpeg found:', !!_createFF);
+  if(!_createFF)throw new Error('createFFmpeg not found — try a different browser or disable extensions.');
+  ff=_createFF({
+    log:true,
+    corePath:'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
   });
   ff.setProgress(({ratio})=>setProg(72+Math.round(Math.max(0,ratio)*24),`Encoding… ${Math.round(Math.max(0,ratio)*100)}%`));
   await ff.load();
