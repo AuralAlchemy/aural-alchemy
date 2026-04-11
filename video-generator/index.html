@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Generator · Aural Alchemy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080e10;--bg2:#0d1618;--bg3:#111d20;--border:#1e3035;--teal:#2dd4bf;--teal-dim:#1a8a7a;--gold:#d4a843;--gold-dim:#8a6a25;--text:#c8ddd8;--text-dim:#5a7a78;--text-muted:#3a5550;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:'Raleway',sans-serif;font-weight:300;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+.page-header{text-align:center;padding:1.8rem 1rem 1rem;position:relative;z-index:1;}
+.page-eyebrow{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:.45rem;}
+.page-title{font-family:'Cinzel',serif;font-size:clamp(1.3rem,2.8vw,2rem);font-weight:700;letter-spacing:.12em;background:linear-gradient(135deg,var(--teal) 0%,var(--gold) 60%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.22rem;}
+.page-sub{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:.28em;color:var(--text-dim);text-transform:uppercase;}
+.app{display:grid;grid-template-columns:268px 1fr;gap:.75rem;max-width:1280px;margin:0 auto;padding:0 .75rem 2rem;align-items:start;}
+@media(max-width:760px){.app{grid-template-columns:1fr;}}
+.left-col{display:flex;flex-direction:column;gap:.55rem;position:sticky;top:.75rem;max-height:calc(100vh - 1.5rem);overflow-y:auto;padding-right:2px;}
+.main-col{display:flex;flex-direction:column;gap:.55rem;}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem;}
+.pt{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:.7rem;padding-bottom:.38rem;border-bottom:1px solid var(--border);}
+.pt.gold{color:var(--gold);}
+.cg{margin-bottom:.58rem;}.cg:last-child{margin-bottom:0;}
+label.lbl{display:block;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.22rem;}
+.btn-row{display:flex;gap:.18rem;flex-wrap:wrap;}
+.btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:.04em;padding:.22rem .45rem;border-radius:4px;cursor:pointer;transition:all .14s;}
+.btn:hover{border-color:var(--teal-dim);color:var(--teal);}
+.btn.active{background:rgba(45,212,191,.07);border-color:var(--teal);color:var(--teal);}
+input[type=range]{width:100%;cursor:pointer;height:2px;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none;accent-color:var(--teal);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--teal);cursor:pointer;}
+.rr{display:flex;align-items:center;gap:.35rem;}
+.rv{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--teal);min-width:34px;text-align:right;flex-shrink:0;}
+select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.64rem;padding:.28rem .42rem;border-radius:4px;cursor:pointer;outline:none;}
+select:focus{border-color:var(--teal-dim);}select option{background:var(--bg3);}
+.trow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;}
+.tlbl{font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-dim);letter-spacing:.07em;text-transform:uppercase;}
+.toggle{position:relative;width:30px;height:16px;cursor:pointer;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.ttrack{position:absolute;inset:0;background:var(--border);border-radius:99px;transition:.16s;}
+.toggle input:checked+.ttrack{background:var(--teal-dim);}
+.ttrack::after{content:'';position:absolute;left:2px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:var(--text-muted);transition:.16s;}
+.toggle input:checked+.ttrack::after{left:calc(100% - 12px);background:var(--teal);}
+.swatches{display:flex;gap:.2rem;flex-wrap:wrap;align-items:center;}
+.sw{width:17px;height:17px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .14s;flex-shrink:0;}
+.sw.active{border-color:#fff;transform:scale(1.18);}
+.sw-custom{width:17px;height:17px;border-radius:50%;border:1px dashed var(--border);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--text-muted);}
+.sw-custom input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone{border:1px dashed var(--border);border-radius:6px;padding:.48rem;text-align:center;cursor:pointer;transition:all .16s;font-size:.6rem;color:var(--text-muted);position:relative;}
+.upload-zone:hover{border-color:var(--teal-dim);color:var(--teal);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone .ico{font-size:.85rem;display:block;margin-bottom:.1rem;}
+.acc-hd{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:.28rem 0;user-select:none;}
+.acc-ti{font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+.acc-hd:hover .acc-ti{color:var(--teal);}
+.acc-ar{font-size:.54rem;color:var(--text-muted);transition:transform .2s;}
+.acc-ar.open{transform:rotate(180deg);}
+.acc-bd{display:none;padding-top:.35rem;}
+.acc-bd.open{display:block;}
+.acc-sp{height:1px;background:var(--border);margin:.05rem 0 .22rem;}
+.shape-nav{display:flex;align-items:center;gap:.38rem;margin-bottom:.5rem;}
+.nav-arr{background:none;border:1px solid var(--border);color:var(--text-muted);width:26px;height:26px;border-radius:4px;cursor:pointer;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s;}
+.nav-arr:hover{border-color:var(--teal-dim);color:var(--teal);}
+.shape-badge{font-family:'Cinzel',serif;font-size:.6rem;color:var(--teal);letter-spacing:.08em;text-align:center;margin-bottom:.38rem;opacity:.88;min-height:1em;}
+.canvas-outer{background:#000;border-radius:8px;overflow:hidden;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;min-height:200px;}
+#previewCanvas{display:block;max-width:100%;max-height:460px;}
+.status-bar{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:.4rem .65rem;font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);display:flex;align-items:center;gap:.38rem;}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);flex-shrink:0;}
+.sdot.live{background:var(--teal);box-shadow:0 0 5px var(--teal);}
+.sdot.working{background:var(--gold);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.28}}
+.abtn{width:100%;padding:.65rem;border-radius:5px;font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.15em;cursor:pointer;border:1px solid var(--teal);transition:all .2s;text-transform:uppercase;background:transparent;color:var(--teal);}
+.abtn:hover{background:rgba(45,212,191,.08);box-shadow:0 0 18px rgba(45,212,191,.15);}
+.abtn:disabled{opacity:.3;cursor:not-allowed;}
+.prog-wrap{display:none;}.prog-wrap.show{display:block;margin-top:.42rem;}
+.prog-bg{background:var(--bg3);border-radius:99px;height:3px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:99px;transition:width .3s;width:0%;}
+.prog-lbl{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-muted);text-align:center;margin-top:.2rem;}
+.note{font-family:'Share Tech Mono',monospace;font-size:.53rem;color:var(--text-muted);line-height:1.55;margin-top:.22rem;letter-spacing:.03em;}
+.dur-row{display:flex;gap:.25rem;align-items:center;}
+.dur-row input[type=number]{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.66rem;padding:.22rem .36rem;border-radius:4px;width:48px;outline:none;text-align:center;}
+.dur-row input:focus{border-color:var(--teal-dim);}
+.dur-row span{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text-muted);}
+.fx-section{border-bottom:1px solid var(--border);padding:.4rem 0;margin-bottom:.1rem;}
+.fx-section:last-child{border-bottom:none;padding-bottom:0;}
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:.25rem;}
+.tpl-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.52rem;padding:.32rem .38rem;border-radius:4px;cursor:pointer;transition:all .14s;text-align:left;line-height:1.4;}
+.tpl-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
+.tpl-btn.active{background:rgba(212,168,67,.07);border-color:var(--gold);color:var(--gold);}
+.tpl-name{font-size:.56rem;display:block;margin-bottom:.06rem;}
+.tpl-desc{font-size:.48rem;color:var(--text-muted);display:block;}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <p class="page-eyebrow">Aural Alchemy</p>
+  <h1 class="page-title">Video Generator</h1>
+  <p class="page-sub">Sacred Geometry · Background Animation · MP4 Export</p>
+</div>
+<div class="app">
+<div class="left-col">
+
+  <!-- TEMPLATES -->
+  <div class="panel">
+    <div class="pt gold" style="display:flex;align-items:center;justify-content:space-between">
+      <span>✦ Quick Start Templates</span>
+      <button onclick="resetAll()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:.1em;padding:.2rem .5rem;border-radius:3px;cursor:pointer;text-transform:uppercase;transition:all .15s" onmouseover="this.style.borderColor='var(--teal-dim)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↺ Reset</button>
+    </div>
+    <div class="note" style="margin-bottom:.55rem">Pick a template — everything configures instantly. Toggle geometry or bindu independently after.</div>
+
+    <div class="cg">
+      <label class="lbl">⬡ Geometry + Gradient</label>
+      <select id="tplGeometry" onchange="applyTemplate('geo',this.value)">
+        <option value="">— select preset —</option>
+      </select>
+    </div>
+
+    <div class="cg">
+      <label class="lbl">🖼 Image Background Animation</label>
+      <select id="tplImage" onchange="applyTemplate('img',this.value)">
+        <option value="">— select preset —</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="pt">Format & Duration</div>
+    <div class="cg"><label class="lbl">Aspect Ratio</label>
+      <div class="btn-row" id="arBtns"><button class="btn active" data-ar="16:9">16:9</button><button class="btn" data-ar="9:16">9:16</button><button class="btn" data-ar="1:1">1:1</button></div>
+    </div>
+    <div class="cg"><label class="lbl">Duration (max 60 min)</label>
+      <div class="dur-row"><input type="number" id="durMins" value="1" min="0" max="60"><span>min</span><input type="number" id="durSecs" value="0" min="0" max="59"><span>sec</span></div>
+    </div>
+    <div class="cg"><label class="lbl">FPS</label>
+      <div class="btn-row" id="fpsBtns"><button class="btn active" data-fps="24">24</button><button class="btn" data-fps="30">30</button><button class="btn" data-fps="60">60</button></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="pt">Audio (Optional)</div>
+    <div class="cg">
+      <div class="upload-zone" id="audioZone">
+        <input type="file" id="audioFile" accept="audio/*">
+        <span class="ico">♫</span><span id="audioLabel">Drop audio or browse</span>
+      </div>
+    </div>
+    <div class="trow" style="margin-bottom:0"><span class="tlbl">Audio Reactive</span><label class="toggle"><input type="checkbox" id="audioReactive" checked><div class="ttrack"></div></label></div>
+  </div>
+
+  <div class="panel">
+    <div class="pt">Geometry</div>
+    <div class="trow" style="margin-bottom:.5rem"><span class="tlbl">Hide Geometry (BG only)</span><label class="toggle"><input type="checkbox" id="hideGeometry"><div class="ttrack"></div></label></div>
+    <div class="cg"><label class="lbl">Color</label>
+      <div class="swatches" id="geoColors">
+        <div class="sw active" style="background:#4dd9c0" data-c="#4dd9c0"></div>
+        <div class="sw" style="background:#c9a84c" data-c="#c9a84c"></div>
+        <div class="sw" style="background:#a78bfa" data-c="#a78bfa"></div>
+        <div class="sw" style="background:#f472b6" data-c="#f472b6"></div>
+        <div class="sw" style="background:#ffffff" data-c="#ffffff"></div>
+        <div class="sw" style="background:#60a5fa" data-c="#60a5fa"></div>
+        <div class="sw" style="background:#fb923c" data-c="#fb923c"></div>
+        <div class="sw-custom">+<input type="color" id="geoColorPick" value="#4dd9c0"></div>
+      </div>
+    </div>
+    <div class="cg"><label class="lbl">Complexity</label><div class="rr"><input type="range" id="complexity" min="1" max="5" value="3"><span class="rv" id="complexityVal">3</span></div></div>
+    <div class="trow"><span class="tlbl">Unified Spin</span><label class="toggle"><input type="checkbox" id="spinUnified" checked><div class="ttrack"></div></label></div>
+    <div class="trow"><span class="tlbl">Uniform Opacity</span><label class="toggle"><input type="checkbox" id="uniformOpacity"><div class="ttrack"></div></label></div>
+    <div class="trow"><span class="tlbl">Depth Pulse</span><label class="toggle"><input type="checkbox" id="depthPulse"><div class="ttrack"></div></label></div>
+    <div class="trow"><span class="tlbl">Center Dot (Bindu)</span><label class="toggle"><input type="checkbox" id="showBindu" checked><div class="ttrack"></div></label></div>
+    <div class="cg" id="depthPulseSpeedWrap" style="display:none"><label class="lbl">Pulse Speed</label>
+      <div class="rr"><input type="range" id="depthPulseSpeed" min="1" max="100" value="18"><span class="rv" id="depthPulseSpeedVal">slow</span></div>
+      <div class="note">Low = very slow breathing. High = fast throb.</div>
+    </div>
+    <div class="acc-sp"></div>
+    <div class="acc-hd" id="geoAccHd"><span class="acc-ti">More Settings</span><span class="acc-ar" id="geoAccAr">▼</span></div>
+    <div class="acc-bd" id="geoAccBd">
+      <div class="cg"><label class="lbl">Size</label><div class="rr"><input type="range" id="geoSize" min="20" max="95" value="68"><span class="rv" id="geoSizeVal">68%</span></div></div>
+      <div class="cg"><label class="lbl">Line Thickness</label><div class="rr"><input type="range" id="lineThick" min="1" max="30" value="6"><span class="rv" id="lineThickVal">0.6</span></div></div>
+      <div class="cg"><label class="lbl">Glow</label><div class="rr"><input type="range" id="glowAmt" min="0" max="100" value="60"><span class="rv" id="glowAmtVal">60</span></div></div>
+      <div class="cg"><label class="lbl">Opacity</label><div class="rr"><input type="range" id="geoOpacity" min="10" max="100" value="90"><span class="rv" id="geoOpacityVal">90%</span></div></div>
+      <div class="cg"><label class="lbl">Rotation Speed</label><div class="rr"><input type="range" id="rotSpeed" min="0" max="100" value="20"><span class="rv" id="rotSpeedVal">20</span></div></div>
+    </div>
+  </div>
+
+  <!-- GENERATIVE MODE -->
+  <div class="panel" id="genPanel">
+    <div class="pt">✦ Generative Mode</div>
+    <div class="trow"><span class="tlbl">Enable Generative Drift</span><label class="toggle"><input type="checkbox" id="genEnabled"><div class="ttrack"></div></label></div>
+    <div class="note" style="margin-bottom:.5rem">Parameters drift slowly over the video. Every render is unique — never loops visually.</div>
+    <div class="cg"><label class="lbl">Drift Speed</label>
+      <div class="btn-row" id="driftBtns">
+        <button class="btn active" data-drift="0.12">Glacial</button>
+        <button class="btn" data-drift="0.35">Slow</button>
+        <button class="btn" data-drift="0.8">Medium</button>
+        <button class="btn" data-drift="2.0">Fast</button>
+      </div>
+    </div>
+    <div class="acc-sp"></div>
+    <div class="acc-hd" id="morphAccHd"><span class="acc-ti">Shape Morphing</span><span class="acc-ar" id="morphAccAr">▼</span></div>
+    <div class="acc-bd" id="morphAccBd">
+      <div class="trow"><span class="tlbl">Enable Shape Morphing</span><label class="toggle"><input type="checkbox" id="morphEnabled"><div class="ttrack"></div></label></div>
+      <div class="cg"><label class="lbl">Morph To Shape</label>
+        <select id="morphTarget"></select>
+      </div>
+      <div class="cg"><label class="lbl">Crossfade Duration</label>
+        <div class="rr"><input type="range" id="morphDur" min="10" max="300" value="60"><span class="rv" id="morphDurVal">60s</span></div>
+      </div>
+      <div class="note">Shape will crossfade between current and target over the set duration, then reverse — cycling endlessly.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="pt">Background</div>
+    <div class="cg"><label class="lbl">Type</label>
+      <div class="btn-row" id="bgTypeBtns"><button class="btn active" data-bgt="color">Color</button><button class="btn" data-bgt="gradient">Gradient</button><button class="btn" data-bgt="image">Image</button></div>
+    </div>
+    <div id="bgColorWrap" class="cg">
+      <div class="swatches" id="bgColors">
+        <div class="sw active" style="background:#080c18" data-c="#080c18"></div>
+        <div class="sw" style="background:#000000" data-c="#000000"></div>
+        <div class="sw" style="background:#0d1b2a" data-c="#0d1b2a"></div>
+        <div class="sw" style="background:#1a0a2e" data-c="#1a0a2e"></div>
+        <div class="sw" style="background:#0a1a0a" data-c="#0a1a0a"></div>
+        <div class="sw" style="background:#1a0800" data-c="#1a0800"></div>
+        <div class="sw-custom">+<input type="color" id="bgColorPick" value="#080c18"></div>
+      </div>
+    </div>
+    <div id="bgGradWrap" class="cg" style="display:none"><select id="gradPreset"><option value="cosmos">Deep Cosmos</option><option value="forest">Sacred Forest</option><option value="ocean">Ocean Depth</option><option value="fire">Inner Fire</option><option value="aurora">Aurora</option><option value="void">The Void</option></select></div>
+    <div id="bgImageWrap" class="cg" style="display:none">
+      <div class="upload-zone" id="bgImgZone">
+        <input type="file" id="bgImageFile" accept="image/*">
+        <span class="ico">🖼</span><span id="bgImgLabel">Upload background image</span>
+      </div>
+    </div>
+
+    <div class="acc-sp" style="margin-top:.5rem"></div>
+    <div class="acc-hd" id="bgAccHd"><span class="acc-ti">Background FX & Animation</span><span class="acc-ar" id="bgAccAr">▼</span></div>
+    <div class="acc-bd" id="bgAccBd">
+
+      <!-- SLOW ZOOM -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">⊕ Slow Zoom</span><label class="toggle"><input type="checkbox" id="bgZoomEnabled"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Zoom Amount</label><div class="rr"><input type="range" id="bgZoomAmount" min="101" max="200" value="130"><span class="rv" id="bgZoomAmountVal">1.30×</span></div></div>
+        <div class="cg"><label class="lbl">Cycle (in + out)</label><div class="rr"><input type="range" id="bgZoomCycle" min="30" max="1800" value="600"><span class="rv" id="bgZoomCycleVal">10m</span></div></div>
+      </div>
+
+      <!-- SLOW ROTATE -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">↻ Rotate BG</span><label class="toggle"><input type="checkbox" id="bgRotEnabled"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Speed</label><div class="rr"><input type="range" id="bgRotSpeed" min="1" max="100" value="10"><span class="rv" id="bgRotSpeedVal">10</span></div></div>
+      </div>
+
+      <!-- WAVE WARP -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">≋ Wave Warp</span><label class="toggle"><input type="checkbox" id="bgWarpEnabled"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Mode</label>
+          <div class="btn-row" id="warpModeBtns">
+            <button class="btn active" data-wm="drift">Drift</button>
+            <button class="btn" data-wm="pulse">Pulse</button>
+            <button class="btn" data-wm="ripple">Ripple</button>
+          </div>
+        </div>
+        <div class="cg"><label class="lbl">Intensity</label><div class="rr"><input type="range" id="bgWarpAmt" min="1" max="100" value="20"><span class="rv" id="bgWarpAmtVal">20</span></div></div>
+        <div class="cg"><label class="lbl">Speed</label><div class="rr"><input type="range" id="bgWarpSpeed" min="1" max="100" value="15"><span class="rv" id="bgWarpSpeedVal">15</span></div></div>
+      </div>
+
+      <!-- KALEIDOSCOPE -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">⟁ Kaleidoscope</span><label class="toggle"><input type="checkbox" id="fxKalei"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Mode</label>
+          <div class="btn-row" id="kaleiModeBtns">
+            <button class="btn active" data-km="classic">Classic</button>
+            <button class="btn" data-km="tunnel">Tunnel</button>
+            <button class="btn" data-km="crystal">Crystal</button>
+            <button class="btn" data-km="fractal">Fractal</button>
+            <button class="btn" data-km="mandala">Mandala</button>
+          </div>
+        </div>
+        <div class="cg"><label class="lbl">Slices</label><div class="rr"><input type="range" id="kaleiSlices" min="2" max="24" value="8"><span class="rv" id="kaleiSlicesVal">8</span></div></div>
+        <div class="cg"><label class="lbl">Rotation Speed</label><div class="rr"><input type="range" id="kaleiRotSpeed" min="0" max="100" value="0"><span class="rv" id="kaleiRotSpeedVal">0</span></div></div>
+      </div>
+
+      <!-- RADIAL BLUR -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">✶ Radial Blur</span><label class="toggle"><input type="checkbox" id="fxRadialblur"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Mode</label>
+          <div class="btn-row" id="radialModeBtns">
+            <button class="btn active" data-rm="zoom">Zoom</button>
+            <button class="btn" data-rm="spin">Spin</button>
+            <button class="btn" data-rm="burst">Burst</button>
+          </div>
+        </div>
+        <div class="cg"><label class="lbl">Amount</label><div class="rr"><input type="range" id="radialblurAmt" min="1" max="100" value="40"><span class="rv" id="radialblurAmtVal">40</span></div></div>
+        <div class="cg"><label class="lbl">Animate Speed (0 = static)</label><div class="rr"><input type="range" id="radialblurAnimSpeed" min="0" max="100" value="0"><span class="rv" id="radialblurAnimSpeedVal">0</span></div></div>
+      </div>
+      <!-- MIRROR -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">⧎ Mirror</span><label class="toggle"><input type="checkbox" id="fxMirror"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Axis</label>
+          <div class="btn-row" id="mirrorAxisBtns">
+            <button class="btn active" data-axis="h">Horizontal</button>
+            <button class="btn" data-axis="v">Vertical</button>
+            <button class="btn" data-axis="both">Both</button>
+            <button class="btn" data-axis="rotate">Rotating</button>
+          </div>
+        </div>
+        <!-- Animate: mirror split point oscillates between 0 and max -->
+        <div class="cg" id="mirrorRotWrap" style="display:none"><label class="lbl">Rotation Speed</label><div class="rr"><input type="range" id="mirrorRotSpeed" min="1" max="100" value="15"><span class="rv" id="mirrorRotSpeedVal">15</span></div></div>
+      </div>
+
+      <!-- COLOR SHIFT -->
+      <div class="fx-section">
+        <div class="trow"><span class="tlbl" style="color:var(--teal)">⊛ Color Shift</span><label class="toggle"><input type="checkbox" id="fxColorshift"><div class="ttrack"></div></label></div>
+        <div class="cg"><label class="lbl">Cycle Speed</label><div class="rr"><input type="range" id="colorshiftSpeed" min="1" max="100" value="20"><span class="rv" id="colorshiftSpeedVal">20</span></div></div>
+        <div class="cg"><label class="lbl">Intensity</label><div class="rr"><input type="range" id="colorshiftAmt" min="1" max="100" value="15"><span class="rv" id="colorshiftAmtVal">15%</span></div></div>
+        <div class="cg"><label class="lbl">Saturation</label><div class="rr"><input type="range" id="colorshiftSat" min="20" max="100" value="70"><span class="rv" id="colorshiftSatVal">70%</span></div></div>
+      </div>
+
+
+    </div>
+  </div>
+
+</div><!-- /left -->
+
+<div class="main-col">
+  <div class="panel">
+    <div class="pt">Shape</div>
+    <div class="shape-nav">
+      <button class="nav-arr" id="prevShape">&#8592;</button>
+      <select id="shapeSelect" style="flex:1"></select>
+      <button class="nav-arr" id="nextShape">&#8594;</button>
+    </div>
+    <div class="shape-badge" id="shapeBadge"></div>
+  </div>
+  <div class="panel" style="padding:.6rem"><div class="canvas-outer" id="canvasOuter"><canvas id="previewCanvas"></canvas></div></div>
+  <div class="panel">
+    <div class="pt">Export</div>
+    <div class="status-bar" style="margin-bottom:.62rem"><div class="sdot live" id="statusDot"></div><span id="statusText">Preview live — configure and export</span></div>
+    <button class="abtn abtn-export" id="exportBtn">⬇ Render & Export MP4</button>
+    <div class="note">Renders offline at full speed. 1 hour at 24fps ≈ 4–6 min encode.</div>
+    <div class="prog-wrap" id="progWrap"><div class="prog-bg"><div class="prog-fill" id="progFill"></div></div><div class="prog-lbl" id="progLbl"></div></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+const S={
+  ar:'16:9', fps:24, durSecs:60, shapeIdx:0,
+  geoColor:'#4dd9c0', geoSize:68, lineThick:0.6, glowAmt:60, geoOpacity:90,
+  rotSpeed:20, spinUnified:true, uniformOpacity:false, depthPulse:false, depthPulseSpeed:18, complexity:3, showBindu:true,
+  bgType:'color', bgColor:'#080c18', gradPreset:'cosmos', bgImage:null, bgImageEl:null,
+  hideGeometry:false,
+  bgZoomEnabled:false, bgZoomAmount:1.30, bgZoomCycle:600,
+  bgPanEnabled:false, bgPanDir:'right', bgPanSpeed:20,// kept in state for getPanOffset but UI removed
+  bgRotEnabled:false, bgRotSpeed:10,
+  bgWarpEnabled:false, bgWarpAmt:20, bgWarpSpeed:15, warpMode:'drift',
+  fxKalei:false, kaleiSlices:8, kaleiRotSpeed:0, kaleiMode:'classic',
+  fxMirror:false, mirrorAxis:'h', mirrorRotSpeed:15, mirrorAnimSpeed:0,
+  fxColorshift:false, colorshiftSpeed:20, colorshiftAmt:15, colorshiftSat:70,
+  fxRadialblur:false, radialblurAmt:40, radialblurAnimSpeed:0, radialMode:'zoom',
+  fxVignette:false, vignetteAmt:70, vignettePulse:0,// kept functional, just no UI
+  fxScanlines:false,// removed from UI
+  // Generative
+  genEnabled:false, driftSpeed:0.12,
+  morphEnabled:false, morphTarget:1, morphDur:60,
+  t:0,
+};
+
+// ════════════════════════════════════════
+//  DRAWING PRIMITIVES
+// ════════════════════════════════════════
+function hexRgb(h){return`${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)}`;}
+function LW(p=1){return S.lineThick*p;}
+function A(a=1){return S.uniformOpacity?1:a;}
+function SC(c,a=1){c.strokeStyle=`rgba(${hexRgb(S.geoColor)},${A(a)})`;c.lineWidth=LW();}
+function FC(c,a=1){c.fillStyle=`rgba(${hexRgb(S.geoColor)},${A(a)})`;}
+function G(c,lv,m=1){const g=(S.glowAmt/100)*(0.5+lv*.7)*m;c.shadowColor=S.geoColor;c.shadowBlur=3+g*24;}
+function NG(c){c.shadowBlur=0;}
+function circ(c,x,y,r){if(r<.5)return;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke();}
+function circF(c,x,y,r){if(r<.5)return;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+function ngon(c,n,r,a0=0){if(r<.5)return;c.beginPath();for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2+a0;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.stroke();}
+function nstar(c,n,R,r,a0=0){c.beginPath();for(let i=0;i<n*2;i++){const a=(i/(n*2))*Math.PI*2+a0;const rad=i%2===0?R:r;i===0?c.moveTo(Math.cos(a)*rad,Math.sin(a)*rad):c.lineTo(Math.cos(a)*rad,Math.sin(a)*rad);}c.closePath();c.stroke();}
+function ln(c,x0,y0,x1,y1){c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();}
+function bindu(c,R,lv){
+  if(!S.showBindu)return;
+  NG(c);const r=Math.max(1.5,R*.025*(1+lv*.35));
+  const g=c.createRadialGradient(0,0,0,0,0,r*4);g.addColorStop(0,S.geoColor);g.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=g;c.globalAlpha=S.geoOpacity/100;c.beginPath();c.arc(0,0,r*4,0,Math.PI*2);c.fill();
+}
+function hexGrid(rings){
+  const seen=new Set(),res=[];
+  function add(q,r){const k=`${q},${r}`;if(!seen.has(k)){seen.add(k);res.push([q,r]);}}
+  add(0,0);const dirs=[[-1,1],[-1,0],[0,-1],[1,-1],[1,0],[0,1]];
+  for(let ring=1;ring<=rings;ring++){let q=ring,r=0;for(let s=0;s<6;s++)for(let st=0;st<ring;st++){add(q,r);q+=dirs[s][0];r+=dirs[s][1];}}
+  return res;
+}
+function metatronCenters(cr){
+  const pts=[[0,0]];
+  for(let i=0;i<6;i++){const a=i*Math.PI/3;pts.push([Math.cos(a)*cr*2,Math.sin(a)*cr*2]);}
+  for(let i=0;i<6;i++){const a=i*Math.PI/3+Math.PI/6;pts.push([Math.cos(a)*cr*2*Math.sqrt(3),Math.sin(a)*cr*2*Math.sqrt(3)]);}
+  return pts;
+}
+function lotus(c,n,R,iR,rot=0){
+  for(let p=0;p<n;p++){
+    const a0=(p/n)*Math.PI*2+rot,a1=((p+1)/n)*Math.PI*2+rot,am=(a0+a1)/2;
+    const xc=Math.cos(am)*iR,yc=Math.sin(am)*iR;
+    const xo=Math.cos(am)*R,yo=Math.sin(am)*R;
+    c.beginPath();c.moveTo(xc,yc);c.bezierCurveTo(Math.cos(a0)*R*.82,Math.sin(a0)*R*.82,xo,yo,xo,yo);c.stroke();
+    c.beginPath();c.moveTo(xc,yc);c.bezierCurveTo(Math.cos(a1)*R*.82,Math.sin(a1)*R*.82,xo,yo,xo,yo);c.stroke();
+  }
+}
+function rose(c,n,R,rot=0){
+  for(let p=0;p<n;p++){
+    const a0=(p/n)*Math.PI*2+rot,a1=((p+1)/n)*Math.PI*2+rot;
+    const x0=Math.cos(a0)*R,y0=Math.sin(a0)*R,x1=Math.cos(a1)*R,y1=Math.sin(a1)*R;
+    const chord=Math.hypot(x1-x0,y1-y0);
+    const ang01=Math.atan2(y1-y0,x1-x0),ang10=Math.atan2(y0-y1,x0-x1);
+    c.beginPath();c.arc(x0,y0,chord,ang01-Math.PI/3,ang01+Math.PI/3);c.stroke();
+    c.beginPath();c.arc(x1,y1,chord,ang10-Math.PI/3,ang10+Math.PI/3);c.stroke();
+  }
+}
+
+// ════════════════════════════════════════
+//  GENERATIVE PARAMETER DRIFT
+//  Returns a value that drifts sinusoidally over time
+//  Each param has its own phase/frequency so they're uncorrelated
+// ════════════════════════════════════════
+function drift(t, phase, freq, min, max){
+  // Multiple overlapping sines = organic, never loops exactly
+  const v=0.5+0.35*Math.sin(t*freq+phase)+0.15*Math.sin(t*freq*1.618+phase*2.39);
+  return min+v*(max-min);
+}
+
+// ════════════════════════════════════════
+//  SHAPE LIBRARY — 27 curated, perfected shapes
+//  draw(c, R, rot, irot, lv, cx, t, ds)
+//   t  = current time (for generative drift)
+//   ds = drift speed multiplier
+// ════════════════════════════════════════
+const SHAPES=[
+
+{id:'seedoflife',name:'Seed of Life',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const cr=R/3;
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  circ(c,0,0,cr);
+  for(let i=0;i<6;i++){const a=i*Math.PI/3;circ(c,Math.cos(a)*cr,Math.sin(a)*cr,cr);}
+  SC(c,A(.35));circ(c,0,0,R);
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'floweroflife',name:'Flower of Life',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const rings=Math.min(4,Math.max(1,cx));
+  const step=R/(rings+1);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(const[q,r]of hexGrid(rings))circ(c,step*(q+r*.5),step*(r*Math.sqrt(3)/2),step);
+  SC(c,A(.35));circ(c,0,0,R);
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'metatron',name:"Metatron's Cube",
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const cr=R/(2*Math.sqrt(3)+1);const pts=metatronCenters(cr);
+  c.save();c.rotate(rot);
+  SC(c,A(.28));c.lineWidth=LW(.45);
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){c.beginPath();c.moveTo(pts[i][0],pts[i][1]);c.lineTo(pts[j][0],pts[j][1]);c.stroke();}
+  SC(c);c.lineWidth=LW();G(c,lv);
+  for(const[x,y]of pts)circ(c,x,y,cr);
+  SC(c,A(.22));circ(c,0,0,R);
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'merkaba',name:'Merkaba / Star Tetrahedron',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  // Two triangles + 12 internal depth lines matching reference image
+  const iHex=R*.577;
+  SC(c);G(c,lv);
+  c.save();c.rotate(rot);
+  ngon(c,3,R,-Math.PI/2);// upward △
+  c.save();c.rotate(irot-rot);ngon(c,3,R,Math.PI/6);c.restore();// downward ▽
+  // 6 outer star points
+  const op=[];for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2-Math.PI/2;op.push([Math.cos(a)*R,Math.sin(a)*R]);}
+  // 6 inner hexagon vertices
+  const ip=[];for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2+Math.PI/6;ip.push([Math.cos(a)*iHex,Math.sin(a)*iHex]);}
+  SC(c,A(.7));
+  for(let i=0;i<6;i++){ln(c,op[i][0],op[i][1],ip[i][0],ip[i][1]);ln(c,op[i][0],op[i][1],ip[(i+5)%6][0],ip[(i+5)%6][1]);}
+  SC(c,A(.5));ngon(c,6,iHex,Math.PI/6);
+  if(cx>=2){SC(c,A(.2));circ(c,0,0,R);}
+  if(cx>=3){// inner merkaba
+    const iR=R*.5;const iH2=iR*.577;
+    SC(c,A(.38));ngon(c,3,iR,-Math.PI/2);c.save();c.rotate(irot-rot);ngon(c,3,iR,Math.PI/6);c.restore();
+    const op2=[];for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2-Math.PI/2;op2.push([Math.cos(a)*iR,Math.sin(a)*iR]);}
+    const ip2=[];for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2+Math.PI/6;ip2.push([Math.cos(a)*iH2,Math.sin(a)*iH2]);}
+    SC(c,A(.3));for(let i=0;i<6;i++){ln(c,op2[i][0],op2[i][1],ip2[i][0],ip2[i][1]);ln(c,op2[i][0],op2[i][1],ip2[(i+5)%6][0],ip2[(i+5)%6][1]);}
+  }
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'shiva_triangle',name:'Shiva Triangle',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);
+  // Elegant nested triangles all pointing up, with inner star lines
+  for(let l=0;l<cx;l++){
+    const r=R*(1-l*.18);
+    c.save();c.rotate(l%2===0?rot:irot);
+    ngon(c,3,r,-Math.PI/2);
+    // Medial triangle (connecting midpoints)
+    if(l===0){
+      SC(c,A(.42));
+      const mR=r*.5;ngon(c,3,mR,Math.PI/2);// inverted inner
+      // 3 lines from each vertex to opposite midpoint (altitude lines)
+      SC(c,A(.28));
+      for(let v=0;v<3;v++){
+        const a=v*Math.PI*2/3-Math.PI/2;
+        const bx=Math.cos(a)*r,by=Math.sin(a)*r;
+        const mx=Math.cos(a+Math.PI)*mR,my=Math.sin(a+Math.PI)*mR;
+        ln(c,bx,by,mx,my);
+      }
+      SC(c);
+    }
+    c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'octagram',name:'Octagram',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);
+  // cx rings of octagram, alternating rot/irot
+  for(let l=0;l<cx;l++){
+    const r=R*(1-l*.16);
+    c.save();c.rotate(l%2===0?rot:irot);
+    // Two overlapping squares = perfect octagram
+    ngon(c,4,r,Math.PI/4);
+    ngon(c,4,r,Math.PI/4+Math.PI/4);
+    SC(c,A(.3));ngon(c,8,r*Math.cos(Math.PI/8));// inner octagon
+    SC(c,A(.18));circ(c,0,0,r);
+    SC(c);c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'heptagram',name:'Heptagram',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);
+  for(let l=0;l<cx;l++){
+    const r=R*(1-l*.17);
+    c.save();c.rotate(l%2===0?rot:irot);
+    // {7/2} star — clean 7-pointed
+    c.beginPath();for(let i=0;i<=7;i++){const a=(i*2/7)*Math.PI*2-Math.PI/2;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.stroke();
+    // {7/3} star overlaid — the two together make heptagram beautiful
+    SC(c,A(.48));c.beginPath();for(let i=0;i<=7;i++){const a=(i*3/7)*Math.PI*2-Math.PI/2;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.stroke();
+    SC(c,A(.22));ngon(c,7,r,-Math.PI/2);SC(c);
+    c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'vectorequilibrium',name:'Vector Equilibrium',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  // 4 great circles (the VE's defining property)
+  for(let i=0;i<4;i++){const a=(i/4)*Math.PI*2;circ(c,Math.cos(a)*R*.5,Math.sin(a)*R*.5,R*.5);}
+  // Two squares (cuboctahedron projection)
+  ngon(c,4,R*.707,Math.PI/4);
+  SC(c,A(.6));c.save();c.rotate(irot-rot);ngon(c,4,R*.707,Math.PI/4+Math.PI/4);c.restore();
+  // 12-sided polygon outline
+  SC(c,A(.35));ngon(c,12,R,Math.PI/12);
+  if(cx>=2){SC(c,A(.18));circ(c,0,0,R);}
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'hexstar',name:'Hex Star Projection',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);
+  // Concentric hexagram rings, alternating to create depth
+  for(let l=0;l<Math.min(cx+1,5);l++){
+    const r=R*(1-l*.17);
+    c.save();c.rotate(l%2===0?rot:irot);
+    ngon(c,3,r,-Math.PI/2);ngon(c,3,r,Math.PI/6);
+    SC(c,A(.32));ngon(c,6,r*.577);
+    if(l<2){SC(c,A(.15));circ(c,0,0,r);}
+    SC(c);c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'decagram',name:'Decagram Star',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);
+  for(let l=0;l<cx;l++){
+    const r=R*(1-l*.15);
+    c.save();c.rotate(l%2===0?rot:irot);
+    // Two pentagrams = decagram
+    c.beginPath();for(let i=0;i<=5;i++){const a=(i*2/5)*Math.PI*2-Math.PI/2;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.stroke();
+    c.save();c.rotate(Math.PI/5);c.beginPath();for(let i=0;i<=5;i++){const a=(i*2/5)*Math.PI*2-Math.PI/2;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.stroke();c.restore();
+    SC(c,A(.28));ngon(c,10,r*Math.cos(Math.PI/10));SC(c);// inner decagon
+    c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'tetrahedron',name:'Tetrahedron',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  // Outer triangle
+  ngon(c,3,R,-Math.PI/2);
+  // Inner inverted triangle (back face of tetrahedron)
+  const ir=R*.333;
+  SC(c,A(.6));ngon(c,3,ir,Math.PI/2);
+  // 3 edges connecting outer vertices to inner centroid lines
+  SC(c,A(.5));
+  for(let v=0;v<3;v++){
+    const ao=v*Math.PI*2/3-Math.PI/2;
+    // Line from outer vertex to opposite inner edge midpoint
+    const ai1=(v+1)*Math.PI*2/3+Math.PI/2;const ai2=(v+2)*Math.PI*2/3+Math.PI/2;
+    const mx=(Math.cos(ai1)+Math.cos(ai2))*ir*.5,my=(Math.sin(ai1)+Math.sin(ai2))*ir*.5;
+    ln(c,Math.cos(ao)*R,Math.sin(ao)*R,mx,my);
+  }
+  // 3 lines from outer vertices down through inner triangle vertices
+  SC(c,A(.35));
+  for(let v=0;v<3;v++){
+    const ao=v*Math.PI*2/3-Math.PI/2;const ai=v*Math.PI*2/3+Math.PI/2;
+    ln(c,Math.cos(ao)*R,Math.sin(ao)*R,Math.cos(ai)*ir,Math.sin(ai)*ir);
+  }
+  if(cx>=2){SC(c,A(.18));circ(c,0,0,R);}
+  c.restore();
+  if(cx>=3){SC(c,A(.38));c.save();c.rotate(irot);ngon(c,3,R*.55,-Math.PI/2);c.restore();}
+  bindu(c,R,lv);
+}},
+
+{id:'sriyantra',name:'Sri Yantra',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const layers=Math.min(9,Math.max(3,cx*2));
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let l=0;l<layers;l++){
+    const tt=l/Math.max(1,layers-1);const r=R*(1-tt*.72);
+    // Upward triangle
+    c.beginPath();for(let v=0;v<3;v++){const a=v*Math.PI*2/3-Math.PI/2;v===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.stroke();
+    // Downward triangle (slightly smaller for proper interlocking)
+    const r2=r*.91;
+    c.beginPath();for(let v=0;v<3;v++){const a=v*Math.PI*2/3+Math.PI/2;v===0?c.moveTo(Math.cos(a)*r2,Math.sin(a)*r2):c.lineTo(Math.cos(a)*r2,Math.sin(a)*r2);}c.closePath();c.stroke();
+  }
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'fibonacci',name:'Fibonacci Spiral',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const phi=(1+Math.sqrt(5))/2;
+  // Generative: turns drifts as a continuous float — no rounding, no glitch
+  const turns=S.genEnabled?drift(t,1.1,ds*.8,cx+1,cx+4):(cx+2);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  function spiral(dir){
+    c.beginPath();let mv=false;
+    for(let i=0;i<=800;i++){const tt=(i/800)*turns*Math.PI*2;const r=R*.04*Math.pow(phi,tt/Math.PI);if(r>R*.99)break;const a=tt*dir;mv?c.lineTo(Math.cos(a)*r,Math.sin(a)*r):(c.moveTo(Math.cos(a)*r,Math.sin(a)*r),mv=true);}
+    c.stroke();
+  }
+  spiral(1);SC(c,A(.32));spiral(-1);
+  // Use fixed circle count based on cx only — not on drifting turns (was causing glitch)
+  SC(c,A(.18));let r2=R;for(let i=0;i<cx+3;i++){circ(c,0,0,r2);r2/=phi;if(r2<2)break;}
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'torusknot',name:'Torus Knot',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  // p drifts continuously — crossfade between floor and ceil to avoid hard jumps
+  const pRaw=S.genEnabled?drift(t,2.2,ds*.6,2,5):(2+cx);
+  const q=3;
+  function drawKnot(p,alpha){
+    SC(c,A(alpha));c.save();c.rotate(rot);
+    c.beginPath();for(let i=0;i<=1400;i++){const tt=(i/1400)*Math.PI*2*q;const r=R*(.5+.5*Math.cos(p*tt/q));i===0?c.moveTo(Math.cos(tt)*r,Math.sin(tt)*r):c.lineTo(Math.cos(tt)*r,Math.sin(tt)*r);}c.stroke();
+    c.restore();
+    SC(c,A(alpha*.3));c.save();c.rotate(irot);
+    c.beginPath();for(let i=0;i<=1400;i++){const tt=(i/1400)*Math.PI*2*q+Math.PI/q;const r=R*(.32+.32*Math.cos(p*tt/q));i===0?c.moveTo(Math.cos(tt)*r,Math.sin(tt)*r):c.lineTo(Math.cos(tt)*r,Math.sin(tt)*r);}c.stroke();
+    c.restore();
+  }
+  SC(c);G(c,lv);
+  if(S.genEnabled&&pRaw!==Math.floor(pRaw)){
+    const lo=Math.floor(pRaw),hi=Math.ceil(pRaw),frac=pRaw-lo;
+    drawKnot(lo,1-frac);drawKnot(hi,frac);
+  }else{drawKnot(Math.round(pRaw),1);}
+  bindu(c,R,lv);
+}},
+
+{id:'infinity',name:'Infinity Symbol ∞',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);
+  for(let l=0;l<cx;l++){
+    const scale=R*(1-l*.15)*(1+lv*.05);
+    c.save();c.rotate(l%2===0?rot:irot);
+    SC(c,A(1-l*.12));
+    c.beginPath();
+    for(let i=0;i<=800;i++){const tt=(i/800)*Math.PI*2;const d=1+Math.sin(tt)*Math.sin(tt);const x=scale*Math.cos(tt)/d,y=scale*Math.sin(tt)*Math.cos(tt)/d;i===0?c.moveTo(x,y):c.lineTo(x,y);}
+    c.closePath();c.stroke();
+    c.restore();
+  }
+  SC(c,A(.3));circ(c,0,0,R*.05*(1+lv*.5));
+  bindu(c,R,lv);
+}},
+
+{id:'spirograph',name:'Spirograph',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const kV=[3/7,5/8,2/5,3/5,4/7];
+  const k=S.genEnabled?drift(t,3.3,ds*.5,.2,.75):kV[Math.min(cx-1,4)];
+  const l=0.65;
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  c.beginPath();for(let i=0;i<=2400;i++){const tt=(i/2400)*Math.PI*2*7;const x=R*((1-k)*Math.cos(tt)+l*k*Math.cos((1-k)*tt/k));const y=R*((1-k)*Math.sin(tt)-l*k*Math.sin((1-k)*tt/k));i===0?c.moveTo(x,y):c.lineTo(x,y);}c.stroke();
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'rosecurve',name:'Rose Curve',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const petalOpts=[3,4,5,6,8];
+  const nRaw=S.genEnabled?drift(t,4.4,ds*.4,3,9):petalOpts[Math.min(cx-1,4)];
+  function drawRose(n,alpha){
+    SC(c,A(alpha));c.save();c.rotate(rot);
+    c.beginPath();for(let i=0;i<=1400;i++){const tt=(i/1400)*Math.PI*(n%2===0?2:1)*Math.PI;const r=R*Math.abs(Math.cos(n*tt));i===0?c.moveTo(Math.cos(tt)*r,Math.sin(tt)*r):c.lineTo(Math.cos(tt)*r,Math.sin(tt)*r);}c.stroke();
+    if(cx>=2){SC(c,A(alpha*.22));circ(c,0,0,R);}
+    c.restore();
+  }
+  SC(c);G(c,lv);
+  if(S.genEnabled&&nRaw!==Math.floor(nRaw)){
+    const lo=Math.floor(nRaw),hi=Math.ceil(nRaw),frac=nRaw-lo;
+    drawRose(lo,1-frac);drawRose(hi,frac);
+  }else{drawRose(Math.round(nRaw),1);}
+  bindu(c,R,lv);
+}},
+
+{id:'lissajous',name:'Lissajous Figure',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const pairs=[[3,2],[5,4],[5,3],[7,6],[4,3]];
+  let[a,b]=pairs[Math.min(cx-1,4)];
+  // Use continuous floats — Lissajous with non-integer ratios creates beautiful organic shapes
+  if(S.genEnabled){a=drift(t,5.5,ds*.35,2,8);b=drift(t,7.7,ds*.42,1,7);}
+  const offset=irot-rot;
+  SC(c);G(c,lv);
+  for(let layer=0;layer<Math.min(cx,3);layer++){
+    const sc=R*(1-layer*.15);const phase=S.t*.8+layer*.5;
+    c.save();c.rotate(rot+layer*offset);SC(c,A(1-layer*.18));
+    c.beginPath();for(let i=0;i<=1000;i++){const tt=(i/1000)*Math.PI*2;const x=sc*Math.sin(a*tt+phase),y=sc*Math.sin(b*tt);i===0?c.moveTo(x,y):c.lineTo(x,y);}c.stroke();
+    SC(c);c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'cymatics',name:'Cymatics',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  // m and n as continuous floats — cymatics formula handles non-integers gracefully
+  const m=S.genEnabled?drift(t,8.1,ds*.45,2,8):(cx+1);
+  const n=S.genEnabled?drift(t,9.9,ds*.38,3,12):(cx*2+2);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  const rings=cx+3;
+  for(let ring=1;ring<=rings;ring++){
+    const r=R*(ring/rings);
+    c.beginPath();
+    for(let i=0;i<=360;i++){
+      const theta=(i/360)*Math.PI*2;
+      const mod=r*.1*Math.cos(m*theta)*Math.sin(n*(ring/rings)*Math.PI);
+      const rr=Math.max(0,r+mod);
+      i===0?c.moveTo(Math.cos(theta)*rr,Math.sin(theta)*rr):c.lineTo(Math.cos(theta)*rr,Math.sin(theta)*rr);
+    }
+    c.closePath();c.stroke();
+  }
+  SC(c,A(.35));c.save();c.rotate(irot);lotus(c,Math.round(m)*2,R*.55,R*.22);c.restore();
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'vortex',name:'Vortex Spiral',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const arms=S.genEnabled?Math.max(1,Math.round(drift(t,10.1,ds*.4,1,6))):(cx+1);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let arm=0;arm<arms;arm++){
+    const offset=(arm/arms)*Math.PI*2;
+    c.beginPath();for(let i=0;i<=500;i++){const tt=(i/500)*Math.PI*4;const r=R*(tt/(Math.PI*4));const a=tt+offset;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.stroke();
+  }
+  SC(c,A(.25));for(let ring=1;ring<=cx+1;ring++)circ(c,0,0,R*(ring/(cx+1)));
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'crystalgrid',name:'Crystal Grid',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  const layers=cx+1;const step=R/(layers+.5);
+  for(let q=-layers;q<=layers;q++)for(let rr=-layers;rr<=layers;rr++){
+    if(Math.abs(q+rr)>layers)continue;
+    const px=step*(q+rr*.5),py=step*(rr*Math.sqrt(3)/2);
+    if(Math.hypot(px,py)>R*.97)continue;
+    FC(c,A(1));circF(c,px,py,LW()*1.3);
+    SC(c,A(.28));circ(c,px,py,step*.44);SC(c);
+  }
+  SC(c,A(.42));ngon(c,6,R);SC(c,A(.18));circ(c,0,0,R);
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'atomicorbital',name:'Atomic Orbital',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  SC(c);G(c,lv);FC(c);circF(c,0,0,LW()*2.2);
+  const shells=cx+1;
+  for(let s=1;s<=shells;s++){
+    const r=R*(s/shells);
+    c.save();c.rotate(s%2===0?rot:irot);
+    SC(c,A(1-s*.09));
+    // 3 ellipses at 60° intervals = atomic orbital visualization
+    for(let e=0;e<3;e++){
+      c.save();c.rotate(e*Math.PI/3);
+      c.beginPath();c.ellipse(0,0,r,r*.55,0,0,Math.PI*2);c.stroke();
+      c.restore();
+    }
+    SC(c,A(.2));circ(c,0,0,r);SC(c);
+    c.restore();
+  }
+  bindu(c,R,lv);
+}},
+
+{id:'sunburst',name:'Sunburst',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  // rays as continuous float - interpolate position smoothly
+  const raysF=S.genEnabled?drift(t,11.2,ds*.35,8,36):(8+cx*4);
+  const rays=Math.round(raysF);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let s=0;s<rays;s++){
+    const a=(s/rays)*Math.PI*2;
+    const inner=R*.25+R*.04*(s%2);const outer=R*(s%2===0?1:.7);
+    ln(c,Math.cos(a)*inner,Math.sin(a)*inner,Math.cos(a)*outer,Math.sin(a)*outer);
+  }
+  SC(c,A(.38));for(let ring=1;ring<=Math.min(cx,4);ring++)circ(c,0,0,R*(ring/(cx+1)));
+  circ(c,0,0,R*.25);
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'dnahelix',name:'DNA Helix Mandala',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  // n as continuous float — cos(n*a) with non-integer n creates beautiful organic morphs
+  const n=S.genEnabled?drift(t,12.3,ds*.3,3,10):(cx*3+3);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let strand=0;strand<2;strand++){
+    SC(c,A(strand===0?1:.6));
+    c.beginPath();
+    for(let i=0;i<=400;i++){const a=(i/400)*Math.PI*2;const phase=strand*Math.PI;const r=R*.42+R*.58*.5*(1+Math.cos(n*a+phase));i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+    c.closePath();c.stroke();
+  }
+  // Rungs — use integer rung count based on rounded n for loop stability
+  SC(c,A(.3));
+  const nInt=Math.round(n);
+  for(let i=0;i<nInt*2;i++){
+    const a=(i/(nInt*2))*Math.PI*2;
+    const r1=R*.42+R*.58*.5*(1+Math.cos(n*2*a));
+    const r2=R*.42+R*.58*.5*(1+Math.cos(n*2*a+Math.PI));
+    ln(c,Math.cos(a)*r1,Math.sin(a)*r1,Math.cos(a)*r2,Math.sin(a)*r2);
+  }
+  SC(c,A(.2));circ(c,0,0,R*.42);circ(c,0,0,R);
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'galaxywhirlpool',name:'Galaxy Whirlpool',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const arms=S.genEnabled?Math.max(2,Math.round(drift(t,13.4,ds*.4,2,6))):(cx+1);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let arm=0;arm<arms;arm++){
+    const offset=(arm/arms)*Math.PI*2;
+    // Logarithmic spiral arm
+    c.beginPath();
+    for(let i=0;i<=600;i++){const tt=(i/600)*Math.PI*5;const r=R*(tt/(Math.PI*5));const a=tt+offset;i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+    c.stroke();
+  }
+  SC(c,A(.22));for(let ring=1;ring<=cx;ring++)circ(c,0,0,R*(ring/(cx+1)));
+  c.restore();bindu(c,R,lv);
+}},
+
+{id:'plasmaring',name:'Plasma Ring',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const freq=S.genEnabled?drift(t,14.5,ds*.5,3,18):(cx*3+6);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let ring=1;ring<=cx+3;ring++){
+    const baseR=R*(ring/(cx+3));const amp=baseR*.055*(1+lv*.7);
+    c.beginPath();
+    for(let i=0;i<=480;i++){
+      const a=(i/480)*Math.PI*2;
+      // Two-frequency noise for organic feel
+      const noise=amp*(Math.sin(freq*a+S.t*1.2+ring*.8)*Math.cos(freq*.618*a-S.t*.7));
+      const r=Math.max(baseR*.5,baseR+noise);
+      i===0?c.moveTo(Math.cos(a)*r,Math.sin(a)*r):c.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+    }
+    c.closePath();c.stroke();
+  }
+  SC(c,A(.28));c.save();c.rotate(irot);
+  for(let s=0;s<Math.floor(freq*.5);s++){const a=(s/Math.floor(freq*.5))*Math.PI*2;ln(c,0,0,Math.cos(a)*R*.28,Math.sin(a)*R*.28);}
+  c.restore();c.restore();bindu(c,R,lv);
+}},
+
+{id:'starmandala',name:'Star Mandala',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  const nRaw=S.genEnabled?drift(t,15.6,ds*.4,4,10):6;
+  function drawStar(n,alpha){
+    SC(c,A(alpha));
+    for(let ring=1;ring<=cx+1;ring++){
+      const r=R*(ring/(cx+2));
+      c.save();c.rotate(ring%2===0?rot:irot);
+      circ(c,0,0,r);
+      nstar(c,n,r,r*.42,-Math.PI/n);
+      SC(c,A(alpha*.25));ngon(c,n,r,-Math.PI/n);SC(c,A(alpha));
+      c.restore();
+    }
+  }
+  SC(c);G(c,lv);
+  if(S.genEnabled&&nRaw!==Math.floor(nRaw)){
+    const lo=Math.floor(nRaw),hi=Math.ceil(nRaw),frac=nRaw-lo;
+    drawStar(lo,1-frac);drawStar(hi,frac);
+  }else{drawStar(Math.round(nRaw),1);}
+  bindu(c,R,lv);
+}},
+
+{id:'compassrose',name:'Compass Rose',
+draw(c,R,rot,irot,lv,cx,t,ds){
+  // pts must be integer — use slow drift but round. Change is subtle enough not to be jarring
+  // since compass rose uses slow drift speed
+  const ptsRaw=S.genEnabled?drift(t,16.7,ds*.25,4,24):(4+cx*2);// slower drift reduces jump frequency
+  const pts=Math.round(ptsRaw);
+  SC(c);G(c,lv);c.save();c.rotate(rot);
+  for(let p=0;p<pts;p++){
+    const a=(p/pts)*Math.PI*2;
+    const cardinal=p%Math.max(1,Math.round(pts/4))===0;
+    const halfPt=pts>=8&&p%Math.max(1,Math.round(pts/8))===0&&!cardinal;
+    const len=cardinal?R:halfPt?R*.65:R*.42;
+    const w=cardinal?R*.1:halfPt?R*.055:R*.028;
+    c.beginPath();c.moveTo(0,0);
+    c.lineTo(Math.cos(a-Math.PI*.5)*w,Math.sin(a-Math.PI*.5)*w);
+    c.lineTo(Math.cos(a)*len,Math.sin(a)*len);
+    c.lineTo(Math.cos(a+Math.PI*.5)*w,Math.sin(a+Math.PI*.5)*w);
+    c.closePath();c.stroke();
+  }
+  SC(c,A(.32));c.save();c.rotate(irot);
+  for(let ring=1;ring<=Math.min(cx,3);ring++)circ(c,0,0,R*(ring/(cx+1)));
+  c.restore();c.restore();bindu(c,R,lv);
+}},
+
+];// END SHAPES
+
+// ════════════════════════════════════════
+//  CANVAS
+// ════════════════════════════════════════
+const canvas=document.getElementById('previewCanvas');
+const ctx=canvas.getContext('2d');
+function getFullDims(ar){return ar==='16:9'?[1920,1080]:ar==='9:16'?[1080,1920]:[1080,1080];}
+function setCanvasSize(){
+  const outer=document.getElementById('canvasOuter');
+  const[fw,fh]=getFullDims(S.ar);
+  const sc=Math.min((outer.clientWidth-10)/fw,460/fh);
+  canvas.width=fw;canvas.height=fh;
+  canvas.style.width=Math.round(fw*sc)+'px';canvas.style.height=Math.round(fh*sc)+'px';
+}
+
+// ════════════════════════════════════════
+//  AUDIO
+// ════════════════════════════════════════
+document.getElementById('audioFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  document.getElementById('audioLabel').textContent=f.name;
+  const ac=new(window.AudioContext||window.webkitAudioContext)();
+  const buf=await ac.decodeAudioData(await f.arrayBuffer());
+  const tot=Math.round(buf.duration);
+  document.getElementById('durMins').value=Math.min(60,Math.floor(tot/60));
+  document.getElementById('durSecs').value=tot%60;
+  updateDuration();
+});
+
+// Background image — fixed: use FileReader for reliable cross-context loading
+document.getElementById('bgImageFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  document.getElementById('bgImgLabel').textContent=f.name;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{S.bgImage=img;S.bgImageEl=img;};
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+});
+
+let _sp=0;
+function getLevel(){if(!S.audioReactive)return 0.5;_sp+=0.018;return Math.min(1,0.42+0.32*Math.pow(Math.max(0,Math.sin(_sp)),2.8)+0.13*Math.sin(_sp*.17));}
+
+// ════════════════════════════════════════
+//  BACKGROUND
+// ════════════════════════════════════════
+const GRADS={
+  cosmos:['#010008','#0c0040','#060020'],forest:['#010a00','#061c06','#0b2a09'],
+  ocean:['#000c1a','#001830','#002040'],fire:['#100000','#2a0800','#180200'],
+  aurora:['#000a10','#001a14','#000c24'],void:['#000000','#040404','#020207']
+};
+
+let _zoomStartT=null;// tracks when zoom was enabled, so it always starts from 0
+function getBgZoomScale(t){
+  if(!S.bgZoomEnabled){_zoomStartT=null;return 1;}
+  if(_zoomStartT===null)_zoomStartT=t;// first frame zoom is enabled
+  const elapsed=t-_zoomStartT;
+  const phase=(elapsed%S.bgZoomCycle)/S.bgZoomCycle;
+  // 0→max→0: sin² gives clean 0 start, 0 end, peak in middle
+  const osc=Math.sin(phase*Math.PI);// 0→1→0 over one cycle
+  return 1+(osc*osc)*(S.bgZoomAmount-1);
+}
+
+function getPanOffset(t){
+  if(!S.bgPanEnabled)return{x:0,y:0};
+  const spd=S.bgPanSpeed*0.002;
+  const dir=S.bgPanDir;
+  if(dir==='right') return{x:t*spd%1,y:0};
+  if(dir==='left')  return{x:-(t*spd%1),y:0};
+  if(dir==='up')    return{x:0,y:-(t*spd%1)};
+  if(dir==='down')  return{x:0,y:t*spd%1};
+  if(dir==='diagonal') return{x:t*spd*.7%1,y:t*spd*.7%1};
+  if(dir==='drift') return{x:Math.sin(t*spd*.5)*.15,y:Math.cos(t*spd*.3)*.1};
+  return{x:0,y:0};
+}
+
+function drawBgLayer(c,cw,ch,zoomScale=1,panOff={x:0,y:0},rotAngle=0){
+  // Solid base — never visible if bg fills correctly, but safety net
+  c.fillStyle=S.bgType==='color'?S.bgColor:'#000000';
+  c.fillRect(0,0,cw,ch);
+
+  // MARGIN: extra buffer so rotation/pan can never expose edges.
+  // Important: MARGIN is factored into the base (zoomScale=1) state so
+  // enabling zoom/warp doesn't cause a sudden jump — it just adds on top.
+  // We always draw content at MARGIN scale minimum. Zoom adds to this smoothly.
+  const MARGIN=1.15;
+  const totalScale=zoomScale*MARGIN;
+
+  c.save();
+  c.translate(cw/2+panOff.x*cw,ch/2+panOff.y*ch);
+  if(rotAngle)c.rotate(rotAngle);
+  c.scale(totalScale,totalScale);
+  c.translate(-cw/2,-ch/2);
+
+  if(S.bgType==='gradient'){
+    const cols=GRADS[S.gradPreset]||GRADS.cosmos;
+    const maxR=Math.ceil(Math.hypot(cw,ch));
+    const g=c.createRadialGradient(cw/2,ch/2,0,cw/2,ch/2,maxR);
+    g.addColorStop(0,cols[1]);g.addColorStop(.5,cols[2]);g.addColorStop(1,cols[0]);
+    c.fillStyle=g;c.fillRect(0,0,cw,ch);
+    const n=c.createRadialGradient(cw*.38+Math.sin(S.t*.25)*cw*.06,ch*.42,0,cw*.38,ch*.42,maxR*.6);
+    n.addColorStop(0,'rgba(55,10,130,0.08)');n.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=n;c.fillRect(0,0,cw,ch);
+  }else if(S.bgType==='image'&&S.bgImageEl){
+    const iw=S.bgImageEl.width,ih=S.bgImageEl.height;
+    if(iw>0&&ih>0){
+      const sc=Math.max(cw/iw,ch/ih);
+      c.drawImage(S.bgImageEl,(cw-iw*sc)/2,(ch-ih*sc)/2,iw*sc,ih*sc);
+      c.fillStyle='rgba(0,0,0,0.28)';c.fillRect(0,0,cw,ch);
+    }
+  }
+  c.restore();
+}
+
+// Wave Warp — 3 modes. Always oscillates 0→max→0 so image returns to original each cycle.
+let _warpStartT=null;
+function applyWaveWarp(tc,cw,ch,t){
+  if(!S.bgWarpEnabled){_warpStartT=null;return;}
+  if(_warpStartT===null)_warpStartT=t;
+  const baseAmt=(S.bgWarpAmt/100);
+  const spd=(S.bgWarpSpeed/100)*0.4;
+  // Oscillation: sin² gives clean 0→1→0 each cycle, always returns to original
+  const cycleLen=6/Math.max(0.01,spd);// seconds per full cycle
+  const elapsed=t-_warpStartT;
+  const osc=Math.sin((elapsed/cycleLen)*Math.PI);// 0→1→0
+  const amt=baseAmt*osc;
+  if(amt<0.005)return;
+  const SAFE=1.08;
+  const strength=amt*amt;
+  const mode=S.warpMode||'drift';
+
+  // Copy source 1:1 — base never changes size
+  const src=document.createElement('canvas');src.width=cw;src.height=ch;
+  src.getContext('2d').drawImage(tc.canvas,0,0);
+  tc.clearRect(0,0,cw,ch);
+  tc.drawImage(src,0,0);
+
+  if(mode==='drift'){
+    // Drift: 4 offset copies at different sine phases — gentle organic swim
+    const passes=[{px:.04,py:.02,ph:0},{px:.02,py:.04,ph:1.57},{px:.03,py:.015,ph:3.14},{px:.015,py:.03,ph:4.71}];
+    passes.forEach(({px,py,ph})=>{
+      const dx=Math.sin(t*spd+ph)*px*cw*amt;
+      const dy=Math.cos(t*spd*.73+ph)*py*ch*amt;
+      tc.save();tc.globalAlpha=strength*.55;
+      tc.translate(cw/2+dx,ch/2+dy);tc.scale(SAFE,SAFE);tc.translate(-cw/2,-ch/2);
+      tc.drawImage(src,0,0);tc.restore();
+    });
+    // Pulse: single zooming copy that breathes in/out — creates depth pulse
+    const breathe=0.5+0.5*Math.sin(t*spd*1.5);
+    const pulseScale=1+amt*0.08*breathe;
+    const pulseAlpha=strength*breathe*0.7;
+    tc.save();tc.globalAlpha=pulseAlpha;
+    tc.translate(cw/2,ch/2);tc.scale(pulseScale,pulseScale);tc.translate(-cw/2,-ch/2);
+    tc.drawImage(src,0,0);tc.restore();
+    // Second inverted pulse offset by half period
+    const breathe2=0.5+0.5*Math.sin(t*spd*1.5+Math.PI);
+    const pulseScale2=1+amt*0.05*breathe2;
+    tc.save();tc.globalAlpha=strength*breathe2*0.4;
+    tc.translate(cw/2,ch/2);tc.scale(pulseScale2,pulseScale2);tc.translate(-cw/2,-ch/2);
+    tc.drawImage(src,0,0);tc.restore();
+
+  }else if(mode==='ripple'){
+    // Ripple: 6 copies at expanding radii creating concentric ring distortion
+    const RINGS=6;
+    for(let r=1;r<=RINGS;r++){
+      const phase=(r/RINGS)*Math.PI*2;
+      const radius=amt*0.025*r;
+      const dx=Math.sin(t*spd+phase)*radius*cw;
+      const dy=Math.cos(t*spd*.8+phase)*radius*ch;
+      const ringScale=SAFE+radius*0.2;
+      const alpha=strength*(1-r/RINGS)*0.5;
+      tc.save();tc.globalAlpha=alpha;
+      tc.translate(cw/2+dx,ch/2+dy);tc.scale(ringScale,ringScale);tc.translate(-cw/2,-ch/2);
+      tc.drawImage(src,0,0);tc.restore();
+    }
+  }
+  tc.globalAlpha=1;
+}
+
+// Kaleidoscope — 5 modes. Corner fix: draw a scaled-up (1.6×) version of same kaleidoscope
+// BEHIND the main pass as background layer — fills corners with more pattern, never black.
+// No zoom of original source image.
+function applyKaleidoscope(tc,cw,ch,t){
+  const slices=Math.max(2,S.kaleiSlices);
+  const kaleiRot=S.kaleiRotSpeed>0?t*(S.kaleiRotSpeed/100)*0.3:0;
+  const diag=Math.hypot(cw,ch);
+  const step=Math.PI*2/slices;
+  const mode=S.kaleiMode||'classic';
+
+  const t2=document.createElement('canvas');t2.width=cw;t2.height=ch;
+  t2.getContext('2d').drawImage(tc.canvas,0,0);
+
+  // Core draw function: one kaleidoscope pass, source = t2, centered at origin
+  function drawKalei(ctx,src,rot,flip,scaleX,scaleY,alpha){
+    ctx.save();ctx.globalAlpha=alpha??1;
+    ctx.translate(cw/2,ch/2);ctx.rotate(rot);
+    if(scaleX)ctx.scale(scaleX,scaleY??scaleX);
+    for(let i=0;i<slices;i++){
+      ctx.save();ctx.rotate(i*step);
+      if(flip?i%2===0:i%2===1)ctx.scale(1,-1);
+      ctx.beginPath();ctx.moveTo(0,0);
+      ctx.arc(0,0,diag/2+2,-step/2,step/2);
+      ctx.closePath();ctx.clip();
+      ctx.drawImage(src,-cw/2,-ch/2);
+      ctx.restore();
+    }
+    ctx.restore();ctx.globalAlpha=1;
+  }
+
+  // CORNER FILL — always draw a 1.6× scaled bg kaleidoscope first at offset rotation.
+  // This means the bg pattern covers the full canvas including corners,
+  // and the main pass (1:1, correct image) overlays cleanly in the center.
+  tc.fillStyle='#000';tc.fillRect(0,0,cw,ch);
+  // Background pass: scaled up 1.6× + rotated by half-step so it fills corners differently
+  drawKalei(tc,t2,kaleiRot+step/2,false,1.6,1.6,0.85);
+
+  if(mode==='classic'){
+    // Classic: main pass at 1:1, standard mirror alternation
+    drawKalei(tc,t2,kaleiRot,false,1,1,1);
+
+  }else if(mode==='tunnel'){
+    // Tunnel: 3 concentric passes at decreasing scales — depth illusion
+    drawKalei(tc,t2,kaleiRot,false,1,1,1);
+    drawKalei(tc,t2,kaleiRot+step*0.5,true,0.65,0.65,0.7);
+    drawKalei(tc,t2,kaleiRot+step,false,0.35,0.35,0.5);
+
+  }else if(mode==='crystal'){
+    // Crystal: two overlapping slice counts blended
+    drawKalei(tc,t2,kaleiRot,false,1,1,1);
+    // Half slice count, opposite flip, 35% blend
+    const halfStep=Math.PI*2/Math.max(2,Math.floor(slices/2));
+    tc.save();tc.globalAlpha=0.35;
+    tc.translate(cw/2,ch/2);tc.rotate(kaleiRot+Math.PI/slices);
+    const halfSlices=Math.max(2,Math.floor(slices/2));
+    for(let i=0;i<halfSlices;i++){
+      tc.save();tc.rotate(i*halfStep);
+      if(i%2===0)tc.scale(-1,1);
+      tc.beginPath();tc.moveTo(0,0);tc.arc(0,0,diag/2+2,-halfStep/2,halfStep/2);tc.closePath();tc.clip();
+      tc.drawImage(t2,-cw/2,-ch/2);tc.restore();
+    }
+    tc.restore();tc.globalAlpha=1;
+
+  }else if(mode==='fractal'){
+    // Fractal: 4 passes at 1×, 0.7×, 0.45×, 0.25× — self-similar recursive look
+    drawKalei(tc,t2,kaleiRot,false,1,1,1);
+    drawKalei(tc,t2,kaleiRot+step*0.33,true,0.7,0.7,0.6);
+    drawKalei(tc,t2,kaleiRot+step*0.66,false,0.45,0.45,0.45);
+    drawKalei(tc,t2,kaleiRot+step,true,0.25,0.25,0.3);
+
+  }else if(mode==='mandala'){
+    // Mandala: main pass + counter-rotating pass blended — creates interlocking geometry
+    drawKalei(tc,t2,kaleiRot,false,1,1,1);
+    drawKalei(tc,t2,-kaleiRot,true,0.85,0.85,0.45);// counter-rotate
+    drawKalei(tc,t2,kaleiRot*1.5+Math.PI/slices,false,0.55,0.55,0.3);
+  }
+}
+
+// Mirror — animated split point oscillates between 0 and max when mirrorAnimSpeed > 0
+function applyMirror(tc,cw,ch,t){
+  const axis=S.mirrorAxis;
+  const t2=document.createElement('canvas');t2.width=cw;t2.height=ch;
+  t2.getContext('2d').drawImage(tc.canvas||tc,0,0);
+
+  // Animated split: mirrorAnimSpeed>0 makes the split point oscillate 0→1→0
+  // At 0: split at center (classic mirror). At max: split sweeps across the full frame
+  const animAmt=S.mirrorAnimSpeed>0
+    ?0.5+0.5*Math.sin(t*(S.mirrorAnimSpeed/100)*1.5)// 0→1 oscillation
+    :0.5;// static center
+
+  if(axis==='rotate'){
+    const angle=t*(S.mirrorRotSpeed/100)*0.5;
+    tc.save();tc.translate(cw/2,ch/2);tc.rotate(angle);
+    const halfH=Math.ceil(Math.hypot(cw,ch)/2)+1;
+    tc.save();tc.beginPath();tc.rect(-cw*2,-halfH,cw*4,halfH);tc.clip();
+    tc.drawImage(t2,-cw/2,-ch/2);tc.restore();
+    tc.save();tc.scale(1,-1);tc.beginPath();tc.rect(-cw*2,0,cw*4,halfH);tc.clip();
+    tc.drawImage(t2,-cw/2,-ch/2);tc.restore();
+    tc.restore();
+  }else if(axis==='h'){
+    // split at animAmt fraction of height
+    const splitY=Math.round(ch*animAmt);
+    tc.drawImage(t2,0,0,cw,splitY,0,0,cw,splitY);
+    tc.save();tc.translate(0,splitY*2);tc.scale(1,-1);
+    tc.drawImage(t2,0,0,cw,splitY,0,0,cw,splitY);
+    tc.restore();
+  }else if(axis==='v'){
+    const splitX=Math.round(cw*animAmt);
+    tc.drawImage(t2,0,0,splitX,ch,0,0,splitX,ch);
+    tc.save();tc.translate(splitX*2,0);tc.scale(-1,1);
+    tc.drawImage(t2,0,0,splitX,ch,0,0,splitX,ch);
+    tc.restore();
+  }else if(axis==='both'){
+    const hw=Math.round(cw*animAmt),hh=Math.round(ch*animAmt);
+    tc.drawImage(t2,0,0,hw,hh,0,0,hw,hh);
+    tc.save();tc.translate(hw*2,0);tc.scale(-1,1);tc.drawImage(t2,0,0,hw,hh,0,0,hw,hh);tc.restore();
+    tc.save();tc.translate(0,hh*2);tc.scale(1,-1);tc.drawImage(t2,0,0,hw,hh,0,0,hw,hh);tc.restore();
+    tc.save();tc.translate(hw*2,hh*2);tc.scale(-1,-1);tc.drawImage(t2,0,0,hw,hh,0,0,hw,hh);tc.restore();
+  }
+}
+
+function applyBgFX(mainCtx,cw,ch,t){
+  const zoomScale=getBgZoomScale(t);
+  const panOff=getPanOffset(t);
+  const rotAngle=S.bgRotEnabled?t*(S.bgRotSpeed/100)*0.015:0;
+
+  // Draw base background to temp canvas
+  const tmp=document.createElement('canvas');tmp.width=cw;tmp.height=ch;
+  const tc=tmp.getContext('2d');
+  drawBgLayer(tc,cw,ch,zoomScale,panOff,rotAngle);
+
+  // Wave warp (pixel displacement — done directly on tc)
+  if(S.bgWarpEnabled)applyWaveWarp(tc,cw,ch,t);
+
+  // Kaleidoscope (must be done before mirror)
+  if(S.fxKalei)applyKaleidoscope(tc,cw,ch,t);
+
+  // Mirror
+  if(S.fxMirror)applyMirror(tc,cw,ch,t);
+
+  // Color shift — animated hue overlay
+  if(S.fxColorshift){
+    const hue=(t*(S.colorshiftSpeed/100)*40)%360;
+    tc.save();tc.globalAlpha=S.colorshiftAmt/100;
+    tc.fillStyle=`hsl(${hue},${S.colorshiftSat}%,50%)`;
+    tc.globalCompositeOperation='color';
+    tc.fillRect(0,0,cw,ch);
+    tc.globalCompositeOperation='source-over';tc.restore();
+  }
+
+  // Vignette with optional pulse
+  if(S.fxVignette){
+    const pulseAmt=S.vignettePulse>0?0.2*Math.sin(t*(S.vignettePulse/100)*2):0;
+    const strength=Math.max(0.1,Math.min(1,(S.vignetteAmt/100)*(1+pulseAmt)));
+    const maxR=Math.hypot(cw,ch)*.65;
+    const vg=tc.createRadialGradient(cw/2,ch/2,Math.min(cw,ch)*.18,cw/2,ch/2,maxR);
+    vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,`rgba(0,0,0,${strength*.92})`);
+    tc.fillStyle=vg;tc.fillRect(0,0,cw,ch);
+  }
+
+  // Radial Blur — 3 modes, always oscillates 0→max→0
+  if(S.fxRadialblur){
+    // Base oscillation: always pulses in/out so image returns to original
+    // animSpeed controls how fast the cycle runs (0 = very slow, 100 = fast)
+    const cycleSpd=Math.max(0.01,(S.radialblurAnimSpeed/100)*1.5+0.08);// min slow cycle even at 0
+    const blurOsc=Math.max(0,Math.sin(t*cycleSpd));// 0→1→0→-1→0... take only positive half
+    const blurStrength=(S.radialblurAmt/100)*blurOsc*blurOsc;// quadratic for smooth ramp
+    const rMode=S.radialMode||'zoom';
+
+    if(blurStrength>0.005){
+      const LAYERS=8;
+      const t2=document.createElement('canvas');t2.width=cw;t2.height=ch;
+      t2.getContext('2d').drawImage(tmp,0,0);
+
+      if(rMode==='zoom'){
+        // Zoom: layers scale outward from center — classic radial zoom blur
+        const maxScale=1+blurStrength*0.12;
+        for(let i=1;i<=LAYERS;i++){
+          const frac=i/LAYERS;
+          const sc=1+frac*(maxScale-1);
+          const alpha=blurStrength*0.08*(1-frac*0.5);
+          tc.save();tc.globalAlpha=alpha;
+          tc.translate(cw/2,ch/2);tc.scale(sc,sc);tc.translate(-cw/2,-ch/2);
+          tc.drawImage(t2,0,0);tc.restore();
+        }
+
+      }else if(rMode==='spin'){
+        // Spin: all layers rotate same direction — pure rotational motion blur
+        // Use more layers and larger angle so effect is clearly visible
+        const SPIN_LAYERS=12;
+        const maxAngle=blurStrength*0.25;// up to ~14° at full strength
+        for(let i=1;i<=SPIN_LAYERS;i++){
+          const frac=i/SPIN_LAYERS;
+          const angle=frac*maxAngle;
+          const alpha=blurStrength*0.055*(1-frac*0.6);
+          // CW layers
+          tc.save();tc.globalAlpha=alpha;
+          tc.translate(cw/2,ch/2);tc.rotate(angle);tc.translate(-cw/2,-ch/2);
+          tc.drawImage(t2,0,0);tc.restore();
+          // CCW layers (both directions = symmetric spin blur like a turntable)
+          tc.save();tc.globalAlpha=alpha;
+          tc.translate(cw/2,ch/2);tc.rotate(-angle);tc.translate(-cw/2,-ch/2);
+          tc.drawImage(t2,0,0);tc.restore();
+        }
+
+      }else if(rMode==='burst'){
+        // Burst: combines zoom + slight rotation = explosion/implosion feel
+        const maxScale=1+blurStrength*0.10;
+        const maxAngle=blurStrength*0.04;
+        for(let i=1;i<=LAYERS;i++){
+          const frac=i/LAYERS;
+          const sc=1+frac*(maxScale-1);
+          const angle=frac*maxAngle;
+          const alpha=blurStrength*0.09*(1-frac*0.45);
+          tc.save();tc.globalAlpha=alpha;
+          tc.translate(cw/2,ch/2);tc.rotate(angle);tc.scale(sc,sc);tc.translate(-cw/2,-ch/2);
+          tc.drawImage(t2,0,0);tc.restore();
+          // Mirror layer — opposite rotation
+          tc.save();tc.globalAlpha=alpha*0.5;
+          tc.translate(cw/2,ch/2);tc.rotate(-angle);tc.scale(sc,sc);tc.translate(-cw/2,-ch/2);
+          tc.drawImage(t2,0,0);tc.restore();
+        }
+      }
+    }
+  }
+
+  mainCtx.clearRect(0,0,cw,ch);mainCtx.drawImage(tmp,0,0);
+}
+
+// ════════════════════════════════════════
+//  RENDER ENGINE
+//  - rot: primary rotation (always accumulates)
+//  - irot: secondary (=rot if unified, counter-rotates if not)
+//  - morph alpha blends two shapes
+//  - depth pulse adds subtle scale breathing
+// ════════════════════════════════════════
+function renderFrame(c,cw,ch,t,rot,irot,lv){
+  S.t=t;
+  applyBgFX(c,cw,ch,t);
+
+  const cx=cw/2,cy=ch/2;
+  const baseR=Math.min(cw,ch)*(S.geoSize/100)*.46;
+  // Depth pulse: gentle scale breathing synced to audio level
+  const pulseFreq=S.depthPulseSpeed/100*2.5;// range ~0.025Hz (glacial) to ~0.625Hz (fast)
+  const pulse=S.depthPulse?(1+lv*.04*Math.sin(t*pulseFreq)):1;
+  const R=baseR*pulse;
+
+  const ds=S.driftSpeed;
+  const shape=SHAPES[S.shapeIdx]||SHAPES[0];
+
+  c.save();c.translate(cx,cy);c.globalAlpha=S.geoOpacity/100;c.lineWidth=LW();NG(c);
+
+  if(!S.hideGeometry){
+    if(S.morphEnabled){
+      const morphShape=SHAPES[Math.min(S.morphTarget,SHAPES.length-1)];
+      const cycleT=(t%(S.morphDur*2));
+      const morphAlpha=cycleT<S.morphDur?cycleT/S.morphDur:2-cycleT/S.morphDur;
+      const clampedAlpha=Math.max(0,Math.min(1,morphAlpha));
+      c.globalAlpha=(S.geoOpacity/100)*(1-clampedAlpha*.85);
+      shape.draw(c,R,rot,irot,lv,S.complexity,t,ds);
+      c.globalAlpha=(S.geoOpacity/100)*(clampedAlpha*.85);
+      NG(c);c.lineWidth=LW();
+      morphShape.draw(c,R,rot,irot,lv,S.complexity,t,ds);
+      c.globalAlpha=S.geoOpacity/100;
+    }else{
+      shape.draw(c,R,rot,irot,lv,S.complexity,t,ds);
+    }
+  }
+
+  c.restore();
+
+  // Reactive outer pulse ring
+  if(!S.hideGeometry&&lv>.65){
+    const rgb=hexRgb(S.geoColor);
+    c.save();c.globalAlpha=(lv-.65)*.35;
+    c.strokeStyle=`rgba(${rgb},0.75)`;c.lineWidth=LW()*1.2;
+    c.shadowColor=S.geoColor;c.shadowBlur=14;
+    c.beginPath();c.arc(cx,cy,R*(1.05+lv*.12),0,Math.PI*2);c.stroke();
+    c.restore();
+  }
+}
+
+// ════════════════════════════════════════
+//  PREVIEW LOOP
+// ════════════════════════════════════════
+let prevT=0,prevLast=null,prevRot=0,prevIrot=0;
+function previewLoop(ts){
+  if(!prevLast)prevLast=ts;
+  const dt=Math.min((ts-prevLast)/1000,.05);prevLast=ts;prevT+=dt;_sp+=dt*1.2;
+  const lv=getLevel();
+  const spd=(S.rotSpeed/100)*.6*(1+lv*.18);
+  prevRot+=dt*spd;
+  if(S.spinUnified)prevIrot=prevRot;else prevIrot-=dt*spd*.65;
+  renderFrame(ctx,canvas.width,canvas.height,prevT,prevRot,prevIrot,lv);
+  requestAnimationFrame(previewLoop);
+}
+requestAnimationFrame(previewLoop);
+
+// ════════════════════════════════════════
+//  EXPORT
+// ════════════════════════════════════════
+let ffReady=false,ff=null;
+async function loadFF(){
+  if(ffReady)return;
+  setProg(2,'Loading FFmpeg…');
+  // 0.11 UMD — no workers, no SharedArrayBuffer, works on GitHub Pages as-is
+  await new Promise((res,rej)=>{
+    const urls=[
+      'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
+      'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
+    ];
+    let i=0;
+    function tryNext(){
+      if(i>=urls.length){rej(new Error('FFmpeg failed to load from all CDNs'));return;}
+      const s=document.createElement('script');s.src=urls[i++];
+      s.onload=res;s.onerror=()=>{s.remove();tryNext();};
+      document.head.appendChild(s);
+    }
+    tryNext();
+  });
+  if(typeof createFFmpeg!=='function')throw new Error('createFFmpeg not found.');
+  ff=createFFmpeg({
+    log:false,
+    corePath:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+  });
+  ff.setProgress(({ratio})=>setProg(72+Math.round(Math.max(0,ratio)*24),`Encoding… ${Math.round(Math.max(0,ratio)*100)}%`));
+  await ff.load();
+  ff._isNew=false;
+  ffReady=true;
+}
+function setProg(pct,msg){document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLbl').textContent=msg;}
+
+document.getElementById('exportBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('exportBtn');btn.disabled=true;
+  document.getElementById('progWrap').classList.add('show');
+  document.getElementById('statusDot').className='sdot working';
+  document.getElementById('statusText').textContent='Exporting…';
+  try{
+    setProg(2,'Loading FFmpeg (~25MB, one time)…');await loadFF();
+    const fps=S.fps,totalSec=Math.min(3600,S.durSecs),totalFrames=Math.round(fps*totalSec);
+    const[fw,fh]=getFullDims(S.ar);
+    const oc=document.createElement('canvas');oc.width=fw;oc.height=fh;const oc2=oc.getContext('2d');
+    _sp=0;let rot=0,irot=0;
+    _warpStartT=null;_zoomStartT=null;
+    for(let fi=0;fi<totalFrames;fi++){
+      const t=fi/fps,dt=1/fps;_sp+=dt*1.2;
+      const lv=getLevel();const spd=(S.rotSpeed/100)*.6*(1+lv*.18);
+      rot+=dt*spd;
+      if(S.spinUnified)irot=rot;else irot-=dt*spd*.65;
+      renderFrame(oc2,fw,fh,t,rot,irot,lv);
+      const blob=await new Promise(r=>oc.toBlob(r,'image/png'));
+      ff.FS('writeFile',`frame${String(fi).padStart(6,'0')}.png`,new Uint8Array(await blob.arrayBuffer()));
+      if(fi%fps===0||fi===totalFrames-1){setProg(4+Math.round((fi/totalFrames)*68),`Rendering… ${fi+1}/${totalFrames} frames`);await new Promise(r=>setTimeout(r,0));}
+    }
+    setProg(72,'Encoding MP4…');
+    await ff.run('-framerate',String(fps),'-i','frame%06d.png','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart','output.mp4');
+    setProg(98,'Downloading…');
+    const outData=ff.FS('readFile','output.mp4');
+    const url=URL.createObjectURL(new Blob([outData.buffer],{type:'video/mp4'}));
+    const a=document.createElement('a');a.href=url;a.download=`aural-alchemy-${S.ar.replace(':','-')}-${Date.now()}.mp4`;a.click();URL.revokeObjectURL(url);
+    for(let fi=0;fi<totalFrames;fi++)try{ff.FS('unlink',`frame${String(fi).padStart(6,'0')}.png`);}catch(e){}
+    try{ff.FS('unlink','output.mp4');}catch(e){}
+    setProg(100,'✓ MP4 exported!');
+    document.getElementById('statusDot').className='sdot live';document.getElementById('statusText').textContent='Export complete!';
+    setTimeout(()=>{document.getElementById('progWrap').classList.remove('show');setProg(0,'');},4000);
+  }catch(err){
+    const msg=err instanceof Error?err.message:(err?.message||String(err)||'Export failed — check browser console');
+    console.error('Export error:',err);
+    document.getElementById('progLbl').textContent='✗ '+msg;
+    document.getElementById('statusDot').className='sdot';
+    document.getElementById('statusText').textContent='Export failed';
+  }
+  btn.disabled=false;
+});
+
+// ════════════════════════════════════════
+//  UI BINDINGS
+// ════════════════════════════════════════
+function buildDropdown(){
+  const sel=document.getElementById('shapeSelect');
+  const mt=document.getElementById('morphTarget');
+  sel.innerHTML='';mt.innerHTML='';
+  SHAPES.forEach((sh,i)=>{
+    const o=document.createElement('option');o.value=i;o.textContent=sh.name;if(i===S.shapeIdx)o.selected=true;sel.appendChild(o);
+    const o2=document.createElement('option');o2.value=i;o2.textContent=sh.name;if(i===S.morphTarget)o2.selected=true;mt.appendChild(o2);
+  });
+  document.getElementById('shapeBadge').textContent=SHAPES[S.shapeIdx]?.name||'';
+}
+function updateBadge(){document.getElementById('shapeBadge').textContent=SHAPES[S.shapeIdx]?.name||'';}
+document.getElementById('shapeSelect').addEventListener('change',e=>{S.shapeIdx=+e.target.value;updateBadge();});
+document.getElementById('prevShape').addEventListener('click',()=>{S.shapeIdx=(S.shapeIdx-1+SHAPES.length)%SHAPES.length;document.getElementById('shapeSelect').value=S.shapeIdx;updateBadge();});
+document.getElementById('nextShape').addEventListener('click',()=>{S.shapeIdx=(S.shapeIdx+1)%SHAPES.length;document.getElementById('shapeSelect').value=S.shapeIdx;updateBadge();});
+document.getElementById('morphTarget').addEventListener('change',e=>S.morphTarget=+e.target.value);
+
+function acc(hId,bId,aId){document.getElementById(hId).addEventListener('click',()=>{const b=document.getElementById(bId),a=document.getElementById(aId);const o=b.classList.toggle('open');a.classList.toggle('open',o);});}
+acc('geoAccHd','geoAccBd','geoAccAr');acc('bgAccHd','bgAccBd','bgAccAr');acc('morphAccHd','morphAccBd','morphAccAr');
+
+document.getElementById('arBtns').addEventListener('click',e=>{const b=e.target.closest('[data-ar]');if(!b)return;S.ar=b.dataset.ar;document.querySelectorAll('#arBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');setCanvasSize();});
+document.getElementById('fpsBtns').addEventListener('click',e=>{const b=e.target.closest('[data-fps]');if(!b)return;S.fps=+b.dataset.fps;document.querySelectorAll('#fpsBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');});
+document.getElementById('driftBtns').addEventListener('click',e=>{const b=e.target.closest('[data-drift]');if(!b)return;S.driftSpeed=+b.dataset.drift;document.querySelectorAll('#driftBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');});
+
+function updateDuration(){const m=Math.min(60,+document.getElementById('durMins').value||0);document.getElementById('durMins').value=m;S.durSecs=m*60+(+document.getElementById('durSecs').value||0);}
+document.getElementById('durMins').addEventListener('input',updateDuration);
+document.getElementById('durSecs').addEventListener('input',updateDuration);
+updateDuration();
+
+document.getElementById('geoColors').addEventListener('click',e=>{const sw=e.target.closest('.sw');if(!sw)return;document.querySelectorAll('#geoColors .sw').forEach(x=>x.classList.remove('active'));sw.classList.add('active');S.geoColor=sw.dataset.c;});
+document.getElementById('geoColorPick').addEventListener('input',e=>{S.geoColor=e.target.value;document.querySelectorAll('#geoColors .sw').forEach(x=>x.classList.remove('active'));});
+
+document.getElementById('bgTypeBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-bgt]');if(!b)return;S.bgType=b.dataset.bgt;
+  document.querySelectorAll('#bgTypeBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  document.getElementById('bgColorWrap').style.display=S.bgType==='color'?'':'none';
+  document.getElementById('bgGradWrap').style.display=S.bgType==='gradient'?'':'none';
+  document.getElementById('bgImageWrap').style.display=S.bgType==='image'?'':'none';
+});
+document.getElementById('bgColors').addEventListener('click',e=>{const sw=e.target.closest('.sw');if(!sw)return;document.querySelectorAll('#bgColors .sw').forEach(x=>x.classList.remove('active'));sw.classList.add('active');S.bgColor=sw.dataset.c;});
+document.getElementById('bgColorPick').addEventListener('input',e=>S.bgColor=e.target.value);
+document.getElementById('gradPreset').addEventListener('change',e=>S.gradPreset=e.target.value);
+
+
+document.getElementById('audioReactive').addEventListener('change',e=>S.audioReactive=e.target.checked);
+document.getElementById('spinUnified').addEventListener('change',e=>S.spinUnified=e.target.checked);
+document.getElementById('uniformOpacity').addEventListener('change',e=>S.uniformOpacity=e.target.checked);
+document.getElementById('showBindu').addEventListener('change',e=>S.showBindu=e.target.checked);
+document.getElementById('depthPulse').addEventListener('change',e=>{
+  S.depthPulse=e.target.checked;
+  document.getElementById('depthPulseSpeedWrap').style.display=e.target.checked?'':'none';
+});
+document.getElementById('genEnabled').addEventListener('change',e=>S.genEnabled=e.target.checked);
+document.getElementById('morphEnabled').addEventListener('change',e=>S.morphEnabled=e.target.checked);
+document.getElementById('hideGeometry').addEventListener('change',e=>S.hideGeometry=e.target.checked);
+
+// BG FX toggles
+document.getElementById('bgZoomEnabled').addEventListener('change',e=>S.bgZoomEnabled=e.target.checked);
+document.getElementById('bgRotEnabled').addEventListener('change',e=>S.bgRotEnabled=e.target.checked);
+document.getElementById('bgWarpEnabled').addEventListener('change',e=>S.bgWarpEnabled=e.target.checked);
+document.getElementById('fxKalei').addEventListener('change',e=>S.fxKalei=e.target.checked);
+document.getElementById('fxMirror').addEventListener('change',e=>S.fxMirror=e.target.checked);
+document.getElementById('fxColorshift').addEventListener('change',e=>S.fxColorshift=e.target.checked);
+document.getElementById('fxRadialblur').addEventListener('change',e=>S.fxRadialblur=e.target.checked);
+
+// Warp mode
+document.getElementById('warpModeBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-wm]');if(!b)return;
+  S.warpMode=b.dataset.wm;
+  document.querySelectorAll('#warpModeBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+});
+
+// Kaleidoscope mode
+document.getElementById('kaleiModeBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-km]');if(!b)return;
+  S.kaleiMode=b.dataset.km;
+  document.querySelectorAll('#kaleiModeBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+});
+
+// Radial blur mode
+document.getElementById('radialModeBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-rm]');if(!b)return;
+  S.radialMode=b.dataset.rm;
+  document.querySelectorAll('#radialModeBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+});
+
+// Mirror axis
+document.getElementById('mirrorAxisBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-axis]');if(!b)return;
+  S.mirrorAxis=b.dataset.axis;
+  document.querySelectorAll('#mirrorAxisBtns .btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  document.getElementById('mirrorRotWrap').style.display=b.dataset.axis==='rotate'?'':'none';
+});
+
+function bindSl(id,valId,setter,fmt){
+  const el=document.getElementById(id),vl=document.getElementById(valId);
+  el.addEventListener('input',()=>{const v=+el.value;setter(v);if(vl)vl.textContent=fmt?fmt(v):v;});
+}
+bindSl('geoSize','geoSizeVal',v=>S.geoSize=v,v=>v+'%');
+bindSl('lineThick','lineThickVal',v=>S.lineThick=v/10,v=>(v/10).toFixed(1));
+bindSl('glowAmt','glowAmtVal',v=>S.glowAmt=v);
+bindSl('geoOpacity','geoOpacityVal',v=>S.geoOpacity=v,v=>v+'%');
+bindSl('rotSpeed','rotSpeedVal',v=>S.rotSpeed=v);
+bindSl('complexity','complexityVal',v=>S.complexity=v);
+bindSl('morphDur','morphDurVal',v=>S.morphDur=v,v=>v+'s');
+bindSl('depthPulseSpeed','depthPulseSpeedVal',v=>{S.depthPulseSpeed=v;},v=>{
+  if(v<=15)return'glacial';if(v<=30)return'slow';if(v<=55)return'medium';if(v<=75)return'fast';return'throb';
+});
+// BG animation sliders
+bindSl('bgZoomAmount','bgZoomAmountVal',v=>S.bgZoomAmount=v/100,v=>(v/100).toFixed(2)+'×');
+bindSl('bgZoomCycle','bgZoomCycleVal',v=>{S.bgZoomCycle=v;},v=>{
+  if(v<60)return v+'s';const m=Math.floor(v/60),s=v%60;return s?`${m}m ${s}s`:`${m}m`;
+});
+bindSl('bgRotSpeed','bgRotSpeedVal',v=>S.bgRotSpeed=v);
+bindSl('bgWarpAmt','bgWarpAmtVal',v=>S.bgWarpAmt=v);
+bindSl('bgWarpSpeed','bgWarpSpeedVal',v=>S.bgWarpSpeed=v);
+bindSl('kaleiSlices','kaleiSlicesVal',v=>S.kaleiSlices=v);
+bindSl('kaleiRotSpeed','kaleiRotSpeedVal',v=>S.kaleiRotSpeed=v);
+bindSl('mirrorRotSpeed','mirrorRotSpeedVal',v=>S.mirrorRotSpeed=v);
+bindSl('colorshiftSpeed','colorshiftSpeedVal',v=>S.colorshiftSpeed=v);
+bindSl('colorshiftAmt','colorshiftAmtVal',v=>S.colorshiftAmt=v,v=>v+'%');
+bindSl('colorshiftSat','colorshiftSatVal',v=>S.colorshiftSat=v,v=>v+'%');
+bindSl('radialblurAmt','radialblurAmtVal',v=>S.radialblurAmt=v);
+bindSl('radialblurAnimSpeed','radialblurAnimSpeedVal',v=>S.radialblurAnimSpeed=v);
+
+// ════════════════════════════════════════
+//  TEMPLATES — 10 quick-start presets
+//  Each sets shape, bg, all fx params, generative, morph
+//  Geometry toggle is independent and doesn't get overwritten
+// ════════════════════════════════════════
+// ════════════════════════════════════════
+//  TEMPLATES — two groups, 10 each
+// ════════════════════════════════════════
+const TEMPLATES_GEO=[
+  {name:'Deep Cosmos',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='metatron');S.geoColor='#2dd4bf';S.complexity=3;
+    S.rotSpeed=15;S.spinUnified=true;S.depthPulse=true;S.depthPulseSpeed=12;S.showBindu=true;
+    S.bgType='gradient';S.gradPreset='cosmos';
+    S.bgZoomEnabled=true;S.bgZoomAmount=1.25;S.bgZoomCycle=720;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=8;S.colorshiftAmt=12;S.colorshiftSat=60;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Sacred Fire',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='sriyantra');S.geoColor='#d4a843';S.complexity=4;
+    S.rotSpeed=10;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='gradient';S.gradPreset='fire';
+    S.bgZoomEnabled=false;S.bgRotEnabled=true;S.bgRotSpeed=8;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=15;S.colorshiftAmt=18;S.colorshiftSat=80;
+    S.fxRadialblur=false;S.genEnabled=true;S.driftSpeed=0.12;S.morphEnabled=false;
+  }},
+  {name:'Ocean Drift',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='fibonacci');S.geoColor='#60a5fa';S.complexity=3;
+    S.rotSpeed=12;S.spinUnified=false;S.depthPulse=true;S.depthPulseSpeed=8;S.showBindu=false;
+    S.bgType='gradient';S.gradPreset='ocean';
+    S.bgZoomEnabled=true;S.bgZoomAmount=1.18;S.bgZoomCycle=900;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=10;S.colorshiftAmt=10;S.colorshiftSat=70;
+    S.fxRadialblur=false;S.genEnabled=true;S.driftSpeed=0.12;S.morphEnabled=false;
+  }},
+  {name:'Kaleidoscope',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='floweroflife');S.geoColor='#a78bfa';S.complexity=3;
+    S.rotSpeed=22;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='gradient';S.gradPreset='cosmos';
+    S.bgZoomEnabled=false;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=true;S.kaleiSlices=8;S.kaleiRotSpeed=12;S.fxMirror=false;
+    S.fxColorshift=true;S.colorshiftSpeed=20;S.colorshiftAmt=20;S.colorshiftSat=75;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Aurora Dreams',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='starmandala');S.geoColor='#2dd4bf';S.complexity=3;
+    S.rotSpeed=18;S.spinUnified=true;S.depthPulse=true;S.depthPulseSpeed=15;S.showBindu=false;
+    S.bgType='gradient';S.gradPreset='aurora';
+    S.bgZoomEnabled=true;S.bgZoomAmount=1.2;S.bgZoomCycle=600;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=12;S.colorshiftAmt=15;S.colorshiftSat=65;
+    S.fxRadialblur=false;S.genEnabled=true;S.driftSpeed=0.12;S.morphEnabled=false;
+  }},
+  {name:'Void Portal',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='torusknot');S.geoColor='#f472b6';S.complexity=4;
+    S.rotSpeed=25;S.spinUnified=false;S.depthPulse=false;S.showBindu=false;
+    S.bgType='gradient';S.gradPreset='void';
+    S.bgZoomEnabled=false;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=false;
+    S.fxRadialblur=true;S.radialblurAmt=50;S.radialblurAnimSpeed=35;
+    S.genEnabled=true;S.driftSpeed=0.35;S.morphEnabled=false;
+  }},
+  {name:'Mirror World',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='merkaba');S.geoColor='#4ade80';S.complexity=3;
+    S.rotSpeed=14;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='gradient';S.gradPreset='forest';
+    S.bgZoomEnabled=true;S.bgZoomAmount=1.15;S.bgZoomCycle=480;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=true;S.mirrorAxis='both';
+    S.fxColorshift=true;S.colorshiftSpeed=8;S.colorshiftAmt=10;S.colorshiftSat=55;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Generative Flow',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='spirograph');S.geoColor='#fb923c';S.complexity=3;
+    S.rotSpeed=20;S.spinUnified=true;S.depthPulse=true;S.depthPulseSpeed=20;S.showBindu=false;
+    S.bgType='gradient';S.gradPreset='cosmos';
+    S.bgZoomEnabled=true;S.bgZoomAmount=1.3;S.bgZoomCycle=600;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=25;S.colorshiftAmt=20;S.colorshiftSat=70;
+    S.fxRadialblur=false;S.genEnabled=true;S.driftSpeed=0.35;S.morphEnabled=false;
+  }},
+  {name:'Shape Morph',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='floweroflife');S.geoColor='#2dd4bf';S.complexity=3;
+    S.rotSpeed=15;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='gradient';S.gradPreset='cosmos';
+    S.bgZoomEnabled=true;S.bgZoomAmount=1.2;S.bgZoomCycle=720;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=10;S.colorshiftAmt=12;S.colorshiftSat=60;
+    S.fxRadialblur=false;S.genEnabled=true;S.driftSpeed=0.12;
+    S.morphEnabled=true;S.morphTarget=SHAPES.findIndex(s=>s.id==='metatron');S.morphDur=120;
+  }},
+  {name:'Lissajous Drift',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='lissajous');S.geoColor='#c084fc';S.complexity=3;
+    S.rotSpeed=12;S.spinUnified=false;S.depthPulse=true;S.depthPulseSpeed=18;S.showBindu=false;
+    S.bgType='gradient';S.gradPreset='cosmos';
+    S.bgZoomEnabled=false;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=14;S.colorshiftAmt=16;S.colorshiftSat=72;
+    S.fxRadialblur=true;S.radialblurAmt=30;S.radialblurAnimSpeed=20;
+    S.genEnabled=true;S.driftSpeed=0.35;S.morphEnabled=false;
+  }},
+];
+
+const TEMPLATES_IMG=[
+  {name:'Living Mandala',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='floweroflife');S.geoColor='#2dd4bf';S.complexity=2;
+    S.rotSpeed=8;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.15;S.bgZoomCycle=900;
+    S.bgRotEnabled=false;S.bgWarpEnabled=true;S.bgWarpAmt=20;S.bgWarpSpeed=10;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=6;S.colorshiftAmt=8;S.colorshiftSat=50;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Slow Zoom Sacred',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='seedoflife');S.geoColor='#d4a843';S.complexity=2;
+    S.rotSpeed=6;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.3;S.bgZoomCycle=1200;
+    S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=false;S.fxRadialblur=false;
+    S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'BG Only Warp',apply(){
+    S.shapeIdx=0;S.hideGeometry=true;S.showBindu=false;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.2;S.bgZoomCycle=600;
+    S.bgRotEnabled=false;S.bgWarpEnabled=true;S.bgWarpAmt=30;S.bgWarpSpeed=15;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=8;S.colorshiftAmt=12;S.colorshiftSat=60;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Kaleidoscope Image',apply(){
+    S.shapeIdx=0;S.hideGeometry=true;S.showBindu=false;
+    S.bgType='image';S.bgZoomEnabled=false;S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=true;S.kaleiSlices=8;S.kaleiRotSpeed=10;S.fxMirror=false;
+    S.fxColorshift=true;S.colorshiftSpeed=12;S.colorshiftAmt=15;S.colorshiftSat=65;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Slow Rotate BG',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='metatron');S.geoColor='#2dd4bf';S.complexity=3;
+    S.rotSpeed=10;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;
+    S.bgType='image';S.bgZoomEnabled=false;S.bgRotEnabled=true;S.bgRotSpeed=5;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=false;S.fxRadialblur=false;
+    S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Mirror Reflect',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='sriyantra');S.geoColor='#d4a843';S.complexity=3;
+    S.rotSpeed=8;S.spinUnified=true;S.depthPulse=false;S.showBindu=false;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.1;S.bgZoomCycle=1800;
+    S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=true;S.mirrorAxis='h';
+    S.fxColorshift=false;S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Dream Warp',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='starmandala');S.geoColor='#a78bfa';S.complexity=2;
+    S.rotSpeed=12;S.spinUnified=true;S.depthPulse=true;S.depthPulseSpeed=12;S.showBindu=false;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.25;S.bgZoomCycle=720;
+    S.bgRotEnabled=false;S.bgWarpEnabled=true;S.bgWarpAmt=25;S.bgWarpSpeed=12;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=true;S.colorshiftSpeed=8;S.colorshiftAmt=10;S.colorshiftSat=55;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Colour Grade',apply(){
+    S.shapeIdx=0;S.hideGeometry=true;S.showBindu=false;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.08;S.bgZoomCycle=1800;
+    S.bgRotEnabled=false;S.bgWarpEnabled=false;
+    S.fxKalei=false;S.fxMirror=false;
+    S.fxColorshift=true;S.colorshiftSpeed=4;S.colorshiftAmt=20;S.colorshiftSat=80;
+    S.fxRadialblur=false;S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Radial Burst',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='sunburst');S.geoColor='#fb923c';S.complexity=3;
+    S.rotSpeed=20;S.spinUnified=true;S.depthPulse=true;S.depthPulseSpeed=25;S.showBindu=true;
+    S.bgType='image';S.bgZoomEnabled=false;S.bgRotEnabled=false;S.bgWarpEnabled=true;S.bgWarpAmt=15;S.bgWarpSpeed=8;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=false;
+    S.fxRadialblur=true;S.radialblurAmt=40;S.radialblurAnimSpeed=30;
+    S.genEnabled=false;S.morphEnabled=false;
+  }},
+  {name:'Subtle Presence',apply(){
+    S.shapeIdx=SHAPES.findIndex(s=>s.id==='seedoflife');S.geoColor='#ffffff';S.complexity=1;
+    S.rotSpeed=4;S.spinUnified=true;S.depthPulse=false;S.showBindu=true;S.geoOpacity=40;
+    S.bgType='image';S.bgZoomEnabled=true;S.bgZoomAmount=1.12;S.bgZoomCycle=1200;
+    S.bgRotEnabled=false;S.bgWarpEnabled=true;S.bgWarpAmt=10;S.bgWarpSpeed=6;
+    S.fxKalei=false;S.fxMirror=false;S.fxColorshift=false;S.fxRadialblur=false;
+    S.genEnabled=false;S.morphEnabled=false;
+  }},
+];
+
+function buildTemplates(){
+  const geoSel=document.getElementById('tplGeometry');
+  const imgSel=document.getElementById('tplImage');
+  TEMPLATES_GEO.forEach((tpl,i)=>{
+    const o=document.createElement('option');o.value='geo_'+i;o.textContent=tpl.name;geoSel.appendChild(o);
+  });
+  TEMPLATES_IMG.forEach((tpl,i)=>{
+    const o=document.createElement('option');o.value='img_'+i;o.textContent=tpl.name;imgSel.appendChild(o);
+  });
+}
+
+function applyTemplate(group,val){
+  if(!val)return;
+  const idx=parseInt(val.split('_')[1]);
+  const tpl=group==='geo'?TEMPLATES_GEO[idx]:TEMPLATES_IMG[idx];
+  if(!tpl)return;
+  // Reset hideGeometry unless template explicitly sets it
+  S.hideGeometry=false;
+  tpl.apply();
+  syncAllUI();
+  // Reset the other dropdown
+  if(group==='geo')document.getElementById('tplImage').value='';
+  else document.getElementById('tplGeometry').value='';
+}
+
+function syncAllUI(){
+  // Shape
+  const ss=document.getElementById('shapeSelect');if(ss)ss.value=S.shapeIdx;
+  const sb=document.getElementById('shapeBadge');if(sb)sb.textContent=SHAPES[S.shapeIdx]?.name||'';
+  // BG type buttons
+  document.querySelectorAll('#bgTypeBtns .btn').forEach(b=>b.classList.toggle('active',b.dataset.bgt===S.bgType));
+  const bcw=document.getElementById('bgColorWrap');if(bcw)bcw.style.display=S.bgType==='color'?'':'none';
+  const bgw=document.getElementById('bgGradWrap');if(bgw)bgw.style.display=S.bgType==='gradient'?'':'none';
+  const biw=document.getElementById('bgImageWrap');if(biw)biw.style.display=S.bgType==='image'?'':'none';
+  const gp=document.getElementById('gradPreset');if(gp)gp.value=S.gradPreset;
+  // Toggles
+  const toggles={spinUnified:S.spinUnified,uniformOpacity:S.uniformOpacity,depthPulse:S.depthPulse,
+    showBindu:S.showBindu,genEnabled:S.genEnabled,morphEnabled:S.morphEnabled,
+    bgZoomEnabled:S.bgZoomEnabled,bgRotEnabled:S.bgRotEnabled,bgWarpEnabled:S.bgWarpEnabled,
+    fxKalei:S.fxKalei,fxMirror:S.fxMirror,fxColorshift:S.fxColorshift,fxRadialblur:S.fxRadialblur,
+    hideGeometry:S.hideGeometry};
+  Object.entries(toggles).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.checked=val;});
+  // depthPulseSpeed visibility
+  const dpw=document.getElementById('depthPulseSpeedWrap');if(dpw)dpw.style.display=S.depthPulse?'':'none';
+  // mirrorRotWrap
+  const mrw=document.getElementById('mirrorRotWrap');if(mrw)mrw.style.display=S.mirrorAxis==='rotate'?'':'none';
+  // Mirror axis buttons
+  document.querySelectorAll('#mirrorAxisBtns .btn').forEach(b=>b.classList.toggle('active',b.dataset.axis===S.mirrorAxis));
+  document.querySelectorAll('#kaleiModeBtns .btn').forEach(b=>b.classList.toggle('active',b.dataset.km===(S.kaleiMode||'classic')));
+  document.querySelectorAll('#warpModeBtns .btn').forEach(b=>b.classList.toggle('active',b.dataset.wm===(S.warpMode||'drift')));
+  document.querySelectorAll('#radialModeBtns .btn').forEach(b=>b.classList.toggle('active',b.dataset.rm===(S.radialMode||'zoom')));
+  // Morph target
+  const mt=document.getElementById('morphTarget');if(mt)mt.value=S.morphTarget;
+  // Drift speed buttons
+  document.querySelectorAll('#driftBtns .btn').forEach(b=>b.classList.toggle('active',Math.abs(+b.dataset.drift-S.driftSpeed)<0.01));
+  // Geo color swatches
+  document.querySelectorAll('#geoColors .sw').forEach(sw=>sw.classList.toggle('active',sw.dataset.c===S.geoColor));
+  // All sliders
+  const sliders=[
+    ['geoSize',S.geoSize],['lineThick',S.lineThick*10],['glowAmt',S.glowAmt],
+    ['geoOpacity',S.geoOpacity],['rotSpeed',S.rotSpeed],['complexity',S.complexity],
+    ['depthPulseSpeed',S.depthPulseSpeed],['morphDur',S.morphDur],
+    ['bgZoomAmount',Math.round(S.bgZoomAmount*100)],['bgZoomCycle',S.bgZoomCycle],
+    ['bgRotSpeed',S.bgRotSpeed],['bgWarpAmt',S.bgWarpAmt],['bgWarpSpeed',S.bgWarpSpeed],
+    ['kaleiSlices',S.kaleiSlices],['kaleiRotSpeed',S.kaleiRotSpeed],
+    ['mirrorRotSpeed',S.mirrorRotSpeed],
+    ['colorshiftSpeed',S.colorshiftSpeed],['colorshiftAmt',S.colorshiftAmt],['colorshiftSat',S.colorshiftSat],
+    ['radialblurAmt',S.radialblurAmt],['radialblurAnimSpeed',S.radialblurAnimSpeed],
+  ];
+  sliders.forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val;});
+  // Update all displayed values by triggering input event
+  sliders.forEach(([id])=>{const el=document.getElementById(id);if(el)el.dispatchEvent(new Event('input'));});
+}
+
+function resetAll(){
+  // Reset state to defaults
+  Object.assign(S,{
+    ar:'16:9',fps:24,durSecs:60,shapeIdx:0,
+    geoColor:'#4dd9c0',geoSize:68,lineThick:.6,glowAmt:60,geoOpacity:90,
+    rotSpeed:20,spinUnified:true,uniformOpacity:false,depthPulse:false,depthPulseSpeed:18,complexity:3,showBindu:true,hideGeometry:false,
+    bgType:'gradient',bgColor:'#000000',gradPreset:'cosmos',bgImage:null,bgImageEl:null,
+    bgZoomEnabled:false,bgZoomAmount:1.30,bgZoomCycle:600,
+    bgPanEnabled:false,bgPanDir:'right',bgPanSpeed:20,
+    bgRotEnabled:false,bgRotSpeed:10,
+    bgWarpEnabled:false,bgWarpAmt:20,bgWarpSpeed:15,
+    fxKalei:false,kaleiSlices:8,kaleiRotSpeed:0,
+    fxMirror:false,mirrorAxis:'h',mirrorRotSpeed:15,mirrorAnimSpeed:0,
+    fxColorshift:false,colorshiftSpeed:20,colorshiftAmt:15,colorshiftSat:70,
+    fxRadialblur:false,radialblurAmt:40,radialblurAnimSpeed:0,
+    fxVignette:false,vignetteAmt:70,vignettePulse:0,fxScanlines:false,
+    genEnabled:false,driftSpeed:0.12,
+    morphEnabled:false,morphTarget:1,morphDur:60,
+    audioReactive:false,t:0,
+  });
+  // Reset dropdowns
+  document.getElementById('tplGeometry').value='';
+  document.getElementById('tplImage').value='';
+  syncAllUI();
+  buildDropdown();
+}
+
+// Init
+buildDropdown();buildTemplates();setCanvasSize();window.addEventListener('resize',setCanvasSize);
+document.getElementById('statusDot').className='sdot live';
+</script>
+</body>
+</html>
