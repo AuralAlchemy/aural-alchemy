@@ -141,11 +141,11 @@
 <div class="card">
   <span class="card-title">01 · Theme</span>
   <div class="themes">
-    <button class="theme-btn active" data-query="nature forest green">🌿<br>Nature</button>
-    <button class="theme-btn" data-query="galaxy stars nebula space">🌌<br>Galaxy</button>
-    <button class="theme-btn" data-query="ocean waves water">🌊<br>Ocean</button>
-    <button class="theme-btn" data-query="rain storm clouds">🌧<br>Rain</button>
-    <button class="theme-btn" data-query="fire flame burning">🔥<br>Fire</button>
+    <button class="theme-btn active" data-query="nature forest aerial slow">🌿<br>Nature</button>
+    <button class="theme-btn" data-query="galaxy stars space slow motion">🌌<br>Galaxy</button>
+    <button class="theme-btn" data-query="ocean waves slow motion aerial">🌊<br>Ocean</button>
+    <button class="theme-btn" data-query="rain slow motion dark moody">🌧<br>Rain</button>
+    <button class="theme-btn" data-query="fire flame slow motion dark">🔥<br>Fire</button>
   </div>
 </div>
 
@@ -187,8 +187,9 @@
 <div class="log" id="log"></div>
 
 <script>
-const PROXY = 'https://white-cloud-27a9.nanomarche.workers.dev';
-const CF_MS = 1800; // crossfade duration ms
+const PROXY   = 'https://white-cloud-27a9.nanomarche.workers.dev';
+const CF_MS   = 3000; // 3s crossfade
+const PREROLL = 5;    // seconds before end to start standby playing (frames look similar)
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let query      = 'nature forest green';
@@ -244,15 +245,15 @@ async function fetchClip(q) {
   const data = await res.json();
   if (!data.videos?.length) throw new Error('no results');
 
-  // Pick clip: prefer duration 15-45s (good loop length), prefer HD
+  // Pick clip: prefer 20-60s duration (more time before loop), prefer HD, avoid tiny files
   const scored = data.videos.map(v => {
     const files = v.video_files || [];
-    // prefer 1280 width, avoid huge 4K files (slow to load)
     const file = files.find(f => f.width >= 1280 && f.width <= 1920)
                || files.find(f => f.width >= 960)
                || files[0];
     if (!file) return null;
-    const durScore = (v.duration >= 15 && v.duration <= 45) ? 2 : 1;
+    // Longer clips = less frequent loops = easier to hide seam
+    const durScore = v.duration >= 30 ? 3 : v.duration >= 20 ? 2 : 1;
     const resScore = file.width >= 1280 ? 1 : 0;
     return { url: file.link, duration: v.duration, w: file.width, h: file.height, score: durScore + resScore };
   }).filter(Boolean);
@@ -321,9 +322,27 @@ async function startSession() {
 // ── Crossfade scheduling ──────────────────────────────────────────────────────
 function scheduleCF() {
   if (!running) return;
-  // Fire crossfade CF_MS before the clip ends
-  const triggerIn = Math.max((clipDur * 1000) - CF_MS - 100, 200);
-  cfTimer = setTimeout(doCrossfade, triggerIn);
+  // Step 1: pre-roll standby PREROLL seconds before clip ends
+  // so it's already playing at a visually similar position when fade starts
+  const prerollIn = Math.max((clipDur * 1000) - (PREROLL * 1000) - CF_MS, 200);
+  cfTimer = setTimeout(prerollStandby, prerollIn);
+}
+
+function prerollStandby() {
+  if (!running) return;
+  // Start standby from the same relative position as outgoing
+  // so both videos are showing similar frames during the blend
+  const outPos = activeVid.currentTime;
+  // Start incoming slightly behind so it'll be at ~same position when fade completes
+  const incomingStart = Math.max(0, outPos - CF_MS/1000 * 0.5);
+  standbyVid.currentTime = incomingStart;
+  standbyVid.style.opacity = '0';
+  standbyVid.style.zIndex = '2';
+  standbyVid.play();
+  lg(`pre-rolling standby at ${incomingStart.toFixed(1)}s`, 'lt');
+
+  // Now trigger the actual fade
+  setTimeout(doCrossfade, 200);
 }
 
 function doCrossfade() {
@@ -336,37 +355,29 @@ function doCrossfade() {
   const incoming = standbyVid;
   const outgoing = activeVid;
 
-  // Start incoming from beginning
-  incoming.currentTime = 0;
-  incoming.play();
-
-  // Crossfade: incoming fades in on top, outgoing stays fully visible underneath
-  // We use the same proven technique: outgoing keeps opacity 1, incoming goes 0→1
-  incoming.style.transition = 'none';
-  incoming.style.opacity = '0';
   incoming.style.zIndex = '2';
   outgoing.style.zIndex = '1';
 
-  // Force reflow then start transition
-  incoming.getBoundingClientRect();
-  incoming.style.transition = `opacity ${CF_MS}ms ease`;
+  // Fade incoming in over CF_MS — outgoing stays fully opaque underneath
+  incoming.style.transition = 'none';
+  incoming.style.opacity = '0';
+  incoming.getBoundingClientRect(); // force reflow
+  incoming.style.transition = `opacity ${CF_MS}ms ease-in-out`;
   incoming.style.opacity = '1';
 
   setTimeout(() => {
-    // Crossfade done — outgoing becomes standby, reset it
+    // Done — reset outgoing to start, make it standby
     outgoing.pause();
     outgoing.currentTime = 0;
     outgoing.style.transition = 'none';
     outgoing.style.opacity = '0';
     outgoing.style.zIndex = '1';
-    incoming.style.zIndex = '2';
 
-    // Swap roles
     activeVid  = incoming;
     standbyVid = outgoing;
 
     scheduleCF();
-  }, CF_MS + 150);
+  }, CF_MS + 200);
 }
 
 // ── Seek ──────────────────────────────────────────────────────────────────────
