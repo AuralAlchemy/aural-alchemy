@@ -295,28 +295,38 @@ input[type=range].handle { accent-color: var(--gold); }
       <small id="regionLabel">IN: 0.0s · OUT: —</small>
     </div>
 
-    <!-- Full video scrubber -->
-    <div class="scrub-wrap" id="scrubWrap">
-      <div class="scrub-fill" id="scrubFill"></div>
-      <div class="loop-region" id="loopRegion"></div>
-      <div class="scrub-head" id="scrubHead"></div>
-    </div>
-    <div class="scrub-labels">
-      <span>0:00</span><span id="scrubMid">—</span><span id="scrubEnd">—</span>
+    <!-- Preview video — always loaded, scrubable independently -->
+    <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;border:1px solid var(--border);">
+      <video id="previewVid" playsinline muted
+        style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <div style="position:absolute;bottom:8px;right:10px;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.6);pointer-events:none;" id="previewPos">0.0s</div>
     </div>
 
-    <!-- IN / OUT sliders -->
-    <div class="handle-row">
-      <div class="handle-input">
-        <label>▶ Loop IN — <span id="inVal">0.0s</span></label>
-        <input type="range" class="handle" id="inSlider" min="0" max="100" step="0.1" value="0"
-          oninput="onRegionChange()">
+    <!-- Timeline bar — click or drag anywhere to scrub -->
+    <div style="display:flex;flex-direction:column;gap:5px;">
+      <div class="scrub-wrap" id="scrubWrap" style="cursor:col-resize;">
+        <div class="scrub-fill" id="scrubFill"></div>
+        <div class="loop-region" id="loopRegion"></div>
+        <!-- IN marker -->
+        <div id="markerIn" style="position:absolute;top:0;height:100%;width:4px;background:var(--cyan);cursor:ew-resize;z-index:5;transform:translateX(-2px);">
+          <div style="position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--cyan);white-space:nowrap;">IN</div>
+        </div>
+        <!-- OUT marker -->
+        <div id="markerOut" style="position:absolute;top:0;height:100%;width:4px;background:var(--gold);cursor:ew-resize;z-index:5;transform:translateX(-2px);">
+          <div style="position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--gold);white-space:nowrap;">OUT</div>
+        </div>
+        <!-- Playhead -->
+        <div class="scrub-head" id="scrubHead" style="pointer-events:none;z-index:4;"></div>
       </div>
-      <div class="handle-input">
-        <label>■ Loop OUT — <span id="outVal">—</span></label>
-        <input type="range" class="handle" id="outSlider" min="0" max="100" step="0.1" value="100"
-          oninput="onRegionChange()">
+      <div class="scrub-labels" style="margin-top:18px;">
+        <span>0:00</span><span id="scrubMid">—</span><span id="scrubEnd">—</span>
       </div>
+    </div>
+
+    <div style="display:flex;gap:16px;font-family:'Share Tech Mono',monospace;font-size:0.68rem;">
+      <span style="color:var(--cyan);">▶ IN: <span id="inVal">0.0s</span></span>
+      <span style="color:var(--gold);">■ OUT: <span id="outVal">—</span></span>
+      <span style="color:var(--dim);" id="regionDur">—</span>
     </div>
   </div>
 </div>
@@ -618,52 +628,116 @@ async function tryAnother() {
 }
 
 // ── Loop editor ───────────────────────────────────────────────────────────────
+const previewVid = document.getElementById('previewVid');
+
 function setupLoopEditor(clip) {
   const dur = clip.duration;
   loopIn  = 0;
   loopOut = dur;
 
-  const inS  = document.getElementById('inSlider');
-  const outS = document.getElementById('outSlider');
-  inS.max = dur;  inS.value = 0;
-  outS.max = dur; outS.value = dur;
+  // Load preview video
+  previewVid.src = clip.url;
+  previewVid.load();
+  previewVid.currentTime = 0;
 
   document.getElementById('scrubEnd').textContent = fmtS(dur);
   document.getElementById('scrubMid').textContent = fmtS(dur / 2);
   document.getElementById('inVal').textContent    = '0.0s';
   document.getElementById('outVal').textContent   = fmtS(dur);
+  document.getElementById('regionDur').textContent = `${fmtS(dur)} region`;
   document.getElementById('regionLabel').textContent = `IN: 0.0s · OUT: ${fmtS(dur)}`;
+
+  // Position markers
+  document.getElementById('markerIn').style.left  = '0%';
+  document.getElementById('markerOut').style.left = '100%';
   updateRegionUI();
+
+  // Update preview position display as it plays
+  previewVid.addEventListener('timeupdate', () => {
+    if (!currentClip) return;
+    const pos = previewVid.currentTime;
+    document.getElementById('previewPos').textContent = fmtS(pos);
+    updateScrubHead(pos, currentClip.duration);
+  });
 }
 
-function onRegionChange() {
+function updateRegionUI() {
   if (!currentClip) return;
-  const inS  = document.getElementById('inSlider');
-  const outS = document.getElementById('outSlider');
-  let newIn  = parseFloat(inS.value);
-  let newOut = parseFloat(outS.value);
-  const MIN_GAP = 2;
+  const dur    = currentClip.duration;
+  const inPct  = (loopIn / dur) * 100;
+  const outPct = (loopOut / dur) * 100;
+  document.getElementById('loopRegion').style.left  = inPct + '%';
+  document.getElementById('loopRegion').style.width = (outPct - inPct) + '%';
+  document.getElementById('markerIn').style.left    = inPct + '%';
+  document.getElementById('markerOut').style.left   = outPct + '%';
+  document.getElementById('inVal').textContent      = fmtS(loopIn);
+  document.getElementById('outVal').textContent     = fmtS(loopOut);
+  document.getElementById('regionDur').textContent  = fmtS(loopOut - loopIn) + ' region';
+  document.getElementById('regionLabel').textContent = `IN: ${fmtS(loopIn)} · OUT: ${fmtS(loopOut)}`;
+}
 
-  if (newIn >= newOut - MIN_GAP) {
-    if (document.activeElement === inS) { newIn = newOut - MIN_GAP; inS.value = newIn; }
-    else                                { newOut = newIn + MIN_GAP; outS.value = newOut; }
+function updateScrubHead(pos, dur) {
+  const pct = Math.min(pos / dur * 100, 100);
+  document.getElementById('scrubHead').style.left  = pct + '%';
+  document.getElementById('scrubFill').style.width = pct + '%';
+}
+
+// ── Scrubber drag system ──────────────────────────────────────────────────────
+// Three draggable targets: scrubWrap (playhead), markerIn, markerOut
+(function() {
+  const wrap      = document.getElementById('scrubWrap');
+  const markerIn  = document.getElementById('markerIn');
+  const markerOut = document.getElementById('markerOut');
+  let dragMode = null; // 'head' | 'in' | 'out'
+
+  function getPct(e) {
+    const r  = wrap.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    return Math.max(0, Math.min(1, (cx - r.left) / r.width));
   }
 
-  loopIn  = newIn;
-  loopOut = newOut;
-  document.getElementById('inVal').textContent  = fmtS(loopIn);
-  document.getElementById('outVal').textContent = fmtS(loopOut);
-  document.getElementById('regionLabel').textContent = `IN: ${fmtS(loopIn)} · OUT: ${fmtS(loopOut)} · ${fmtS(loopOut - loopIn)} region`;
-  updateRegionUI();
+  function applyDrag(e) {
+    if (!dragMode || !currentClip) return;
+    const dur  = currentClip.duration;
+    const pos  = getPct(e) * dur;
+    const MIN  = 2; // min gap seconds
 
-  // Apply immediately to active video + reschedule
-  if (running) {
-    clearTimeout(cfTimer);
-    if (loopMode === 'crossfade' && activeVid) {
-      if (activeVid.currentTime < loopIn || activeVid.currentTime > loopOut) {
-        activeVid.currentTime = loopIn;
+    if (dragMode === 'head') {
+      // Scrub the preview video
+      previewVid.currentTime = pos;
+      updateScrubHead(pos, dur);
+      document.getElementById('previewPos').textContent = fmtS(pos);
+      // Also seek active playback video if running
+      const vid = loopMode === 'crossfade' ? activeVid : pendVid;
+      if (vid && running) {
+        vid.currentTime = pos;
+        if (loopMode === 'crossfade') { clearTimeout(cfTimer); scheduleCF(); }
+        else { pendPos = pos; }
       }
+
+    } else if (dragMode === 'in') {
+      loopIn = Math.min(pos, loopOut - MIN);
+      loopIn = Math.max(0, loopIn);
+      updateRegionUI();
+      previewVid.currentTime = loopIn;
+      applyRegionToPlayback();
+
+    } else if (dragMode === 'out') {
+      loopOut = Math.max(pos, loopIn + MIN);
+      loopOut = Math.min(dur, loopOut);
+      updateRegionUI();
+      previewVid.currentTime = loopOut;
+      applyRegionToPlayback();
+    }
+  }
+
+  function applyRegionToPlayback() {
+    if (!running) return;
+    if (loopMode === 'crossfade' && activeVid) {
+      if (activeVid.currentTime < loopIn || activeVid.currentTime > loopOut)
+        activeVid.currentTime = loopIn;
       if (activeVid.paused) activeVid.play();
+      clearTimeout(cfTimer);
       scheduleCF();
     }
     if (loopMode === 'pendulum' && pendVid) {
@@ -674,58 +748,25 @@ function onRegionChange() {
       }
     }
   }
-}
 
-function updateRegionUI() {
-  if (!currentClip) return;
-  const dur    = currentClip.duration;
-  const inPct  = (loopIn  / dur) * 100;
-  const outPct = ((loopOut || dur) / dur) * 100;
-  const region = document.getElementById('loopRegion');
-  region.style.left  = inPct + '%';
-  region.style.width = (outPct - inPct) + '%';
-}
+  // Mousedown on markers
+  markerIn.addEventListener('mousedown',  e => { e.stopPropagation(); dragMode = 'in'; });
+  markerOut.addEventListener('mousedown', e => { e.stopPropagation(); dragMode = 'out'; });
+  markerIn.addEventListener('touchstart',  e => { e.stopPropagation(); dragMode = 'in'; }, { passive: true });
+  markerOut.addEventListener('touchstart', e => { e.stopPropagation(); dragMode = 'out'; }, { passive: true });
 
-function updateScrubHead(pos, dur) {
-  const pct = Math.min(pos / dur * 100, 100);
-  document.getElementById('scrubHead').style.left  = pct + '%';
-  document.getElementById('scrubFill').style.width = pct + '%';
-}
+  // Click/drag on the bar itself = move playhead
+  wrap.addEventListener('mousedown',  e => { if (!dragMode) dragMode = 'head'; applyDrag(e); });
+  wrap.addEventListener('touchstart', e => { if (!dragMode) dragMode = 'head'; applyDrag(e); }, { passive: true });
 
-// Scrubber: click or drag to seek — works even when not running (preview scrub)
-(function() {
-  const wrap = document.getElementById('scrubWrap');
-  let dragging = false;
-
-  function seekScrub(e) {
-    if (!currentClip) return;
-    const r    = wrap.getBoundingClientRect();
-    const cx   = e.touches ? e.touches[0].clientX : e.clientX;
-    const frac = Math.max(0, Math.min(1, (cx - r.left) / r.width));
-    const pos  = frac * currentClip.duration;
-
-    updateScrubHead(pos, currentClip.duration);
-
-    // Seek whichever video is active
-    const vid = loopMode === 'crossfade' ? activeVid : pendVid;
-    if (vid) {
-      vid.currentTime = pos;
-      if (loopMode === 'crossfade') {
-        clearTimeout(cfTimer);
-        if (running) scheduleCF();
-      } else if (loopMode === 'pendulum') {
-        pendPos = pos;
-      }
-    }
-  }
-
-  wrap.addEventListener('mousedown',  e => { dragging = true; seekScrub(e); });
-  window.addEventListener('mousemove', e => { if (dragging) seekScrub(e); });
-  window.addEventListener('mouseup',   () => { dragging = false; });
-  wrap.addEventListener('touchstart',  e => { dragging = true; seekScrub(e); }, { passive: true });
-  window.addEventListener('touchmove', e => { if (dragging) seekScrub(e); }, { passive: true });
-  window.addEventListener('touchend',  () => { dragging = false; });
+  window.addEventListener('mousemove',  e => { if (dragMode) applyDrag(e); });
+  window.addEventListener('touchmove',  e => { if (dragMode) applyDrag(e); }, { passive: true });
+  window.addEventListener('mouseup',    () => { dragMode = null; });
+  window.addEventListener('touchend',   () => { dragMode = null; });
 })();
+
+// Remove old onRegionChange (now handled above)
+function onRegionChange() {} // kept as no-op in case called
 
 // ── CROSSFADE ENGINE ──────────────────────────────────────────────────────────
 async function startCrossfade(clip) {
