@@ -43,6 +43,18 @@
   .theme-btn:hover { border-color: var(--cyan); color: var(--text); }
   .theme-btn.active { border-color: var(--cyan); background: rgba(77,217,192,0.07); color: var(--cyan); }
   .theme-icon { font-size: 1.2rem; }
+
+  /* Mode toggle */
+  .mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mode-btn {
+    padding: 10px 8px; border: 1px solid var(--border); border-radius: 8px;
+    background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.06em; transition: all 0.18s; text-align: center;
+  }
+  .mode-btn:hover { border-color: var(--gold); color: var(--text); }
+  .mode-btn.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
   .dur-chips { display: flex; gap: 8px; flex-wrap: wrap; }
   .dur-chip {
     padding: 7px 14px; border: 1px solid var(--border); border-radius: 20px;
@@ -63,8 +75,6 @@
   .btn-start:disabled { opacity: 0.35; cursor: not-allowed; }
   .btn-stop { background: rgba(201,168,76,0.08); border-color: var(--gold); color: var(--gold); display: none; }
   .btn-stop:hover { background: rgba(201,168,76,0.18); }
-
-  /* Player */
   .preview-wrap { width: 100%; max-width: 560px; display: none; flex-direction: column; gap: 10px; }
   .preview-wrap.visible { display: flex; }
   .stage {
@@ -72,29 +82,16 @@
     border-radius: 10px; overflow: hidden; background: #000;
     border: 1px solid var(--border);
   }
-  /* Two video elements stacked — crossfade via opacity */
-  .stage video {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; opacity: 0;
-  }
-  .stage video.active { opacity: 1; }
-  /* Crossfade handled by CSS transition on the incoming video */
-  .stage video.fading-in {
-    opacity: 1;
-    transition: opacity 1.8s ease;
-  }
-  .stage video.fading-out {
-    opacity: 0;
-    transition: opacity 1.8s ease;
-  }
+  #display { width: 100%; height: 100%; display: block; }
+  /* hidden video for frame source */
+  #srcVid { display: none; }
   .hud {
     position: absolute; z-index: 4;
     background: rgba(8,12,24,0.82); border: 1px solid var(--border);
-    border-radius: 4px; padding: 3px 9px;
+    border-radius: 4px; padding: 3px 9px; pointer-events: none;
     font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.09em;
-    pointer-events: none;
   }
-  .hud-tl { top:10px; left:12px; color:var(--gold); border-color:rgba(201,168,76,0.3); opacity:0; transition:opacity 0.2s; }
+  .hud-tl { top:10px; left:12px; color:var(--gold); border-color:rgba(201,168,76,0.3); }
   .hud-tr { top:10px; right:12px; color:var(--cyan); }
   .hud-bl { bottom:10px; left:12px; color:var(--dim); font-size:0.58rem; }
   .hud-br { bottom:10px; right:12px; color:var(--cyan); }
@@ -112,7 +109,7 @@
   }
   .progress-track:hover .pg-thumb { opacity:1; }
   .info-row { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.67rem; color:var(--dim); }
-  .ok { color:var(--cyan); }
+  .ok{color:var(--cyan);} .warn{color:var(--gold);}
   .log {
     width:100%; max-width:560px; background:rgba(0,0,0,0.28);
     border:1px solid var(--border); border-radius:8px;
@@ -135,22 +132,27 @@
     <polygon points="50,4 6.7,73 93.3,73" stroke="url(#g)" stroke-width="1.4" fill="none"/>
   </svg>
   <h1>LOOP VALIDATOR</h1>
-  <p class="sub">aural alchemy · real pexels footage · seamless loop</p>
+  <p class="sub">aural alchemy · seamless loop poc</p>
 </header>
 
 <div class="card">
   <span class="card-title">01 · Theme</span>
   <div class="themes">
-    <button class="theme-btn active" data-query="nature forest aerial slow">🌿<br>Nature</button>
-    <button class="theme-btn" data-query="galaxy stars space slow motion">🌌<br>Galaxy</button>
-    <button class="theme-btn" data-query="ocean waves slow motion aerial">🌊<br>Ocean</button>
-    <button class="theme-btn" data-query="rain slow motion dark moody">🌧<br>Rain</button>
-    <button class="theme-btn" data-query="fire flame slow motion dark">🔥<br>Fire</button>
+    <button class="theme-btn active" data-query="nature forest aerial drone">🌿<br>Nature</button>
+    <button class="theme-btn" data-query="galaxy stars space nebula">🌌<br>Galaxy</button>
+    <button class="theme-btn" data-query="ocean waves aerial slow">🌊<br>Ocean</button>
+    <button class="theme-btn" data-query="rain slow motion dark">🌧<br>Rain</button>
+    <button class="theme-btn" data-query="fire flame slow motion">🔥<br>Fire</button>
   </div>
 </div>
 
 <div class="card">
-  <span class="card-title">02 · Target Duration</span>
+  <span class="card-title">02 · Loop Mode</span>
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="crossfade">↺ Crossfade loop<br><small style="opacity:0.6">restarts from beginning</small></button>
+    <button class="mode-btn" data-mode="pendulum">⇄ Pendulum / reverse<br><small style="opacity:0.6">forward → reverse → forward</small></button>
+  </div>
+
   <div class="dur-chips">
     <button class="dur-chip active" data-secs="30">30s</button>
     <button class="dur-chip" data-secs="60">1 min</button>
@@ -159,6 +161,7 @@
     <button class="dur-chip" data-secs="1800">30 min</button>
     <button class="dur-chip" data-secs="3600">1 hr</button>
   </div>
+
   <div class="row2">
     <button class="btn btn-start" id="btnStart" onclick="startSession()">▶ START</button>
     <button class="btn btn-stop"  id="btnStop"  onclick="stopSession()">■ STOP</button>
@@ -166,10 +169,11 @@
 </div>
 
 <div class="preview-wrap" id="preview">
-  <div class="stage" id="stage">
-    <video id="vA" playsinline muted></video>
-    <video id="vB" playsinline muted></video>
-    <div class="hud hud-tl" id="hudCf">✦ LOOP</div>
+  <div class="stage">
+    <!-- Single hidden video as frame source; canvas renders it -->
+    <video id="srcVid" playsinline muted crossorigin="anonymous"></video>
+    <canvas id="display"></canvas>
+    <div class="hud hud-tl" id="hudDir">▶ FWD</div>
     <div class="hud hud-tr" id="hudLoop">LOOP 1</div>
     <div class="hud hud-bl" id="hudClip"></div>
     <div class="hud hud-br" id="hudTime">0:00</div>
@@ -187,27 +191,35 @@
 <div class="log" id="log"></div>
 
 <script>
-const PROXY   = 'https://white-cloud-27a9.nanomarche.workers.dev';
-const CF_MS   = 3000; // 3s crossfade
-const PREROLL = 5;    // seconds before end to start standby playing (frames look similar)
+const PROXY  = 'https://white-cloud-27a9.nanomarche.workers.dev';
+const CF_MS  = 2500;   // crossfade mode: fade duration
+const SLOW   = 0.6;    // playback speed — 0.6x feels slow-mo but still has visible motion
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let query      = 'nature forest green';
+let query      = 'nature forest aerial drone';
+let loopMode   = 'crossfade'; // 'crossfade' | 'pendulum'
 let targetSecs = 30;
 let running    = false;
 let loopN      = 0;
 let elapsed    = 0;
 let sessionStart = 0;
 let tickTimer  = null;
-let cfTimer    = null;
-let clipUrl    = null;
+let animId     = null;
 let clipDur    = 0;
 
-let vA, vB;
-let activeVid  = null; // currently fully visible video
-let standbyVid = null; // preloaded, waiting
+// Pendulum state
+let pendPos    = 0;     // current position in clip (seconds)
+let pendDir    = 1;     // 1 = forward, -1 = reverse
+let lastFrame  = 0;     // performance.now() of last rAF
 
-// ── UI bindings ───────────────────────────────────────────────────────────────
+// Crossfade state (uses two <video> elements)
+let vA, vB, activeVid, standbyVid, cfTimer;
+
+const canvas  = document.getElementById('display');
+const ctx     = canvas.getContext('2d');
+const srcVid  = document.getElementById('srcVid');
+
+// ── UI ────────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
   b.classList.add('active'); query = b.dataset.query;
@@ -215,6 +227,10 @@ document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click',
 document.querySelectorAll('.dur-chip').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.dur-chip').forEach(x => x.classList.remove('active'));
   b.classList.add('active'); targetSecs = parseInt(b.dataset.secs);
+}));
+document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); loopMode = b.dataset.mode;
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -227,17 +243,12 @@ function lg(msg, cls='lt') {
   el.appendChild(d); el.scrollTop = el.scrollHeight;
 }
 function setProgress(frac) {
-  const pct = Math.min(frac*100, 100)+'%';
+  const pct = Math.min(frac*100,100)+'%';
   document.getElementById('pgFill').style.width = pct;
   document.getElementById('pgThumb').style.left = pct;
 }
-function flashHud() {
-  const el = document.getElementById('hudCf');
-  el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0'; }, CF_MS + 300);
-}
 
-// ── Fetch best clip from Pexels via worker ────────────────────────────────────
+// ── Fetch best clip ───────────────────────────────────────────────────────────
 async function fetchClip(q) {
   lg(`fetching: "${q}"...`);
   const res = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape`);
@@ -245,15 +256,15 @@ async function fetchClip(q) {
   const data = await res.json();
   if (!data.videos?.length) throw new Error('no results');
 
-  // Pick clip: prefer 20-60s duration (more time before loop), prefer HD, avoid tiny files
   const scored = data.videos.map(v => {
     const files = v.video_files || [];
     const file = files.find(f => f.width >= 1280 && f.width <= 1920)
                || files.find(f => f.width >= 960)
                || files[0];
     if (!file) return null;
-    // Longer clips = less frequent loops = easier to hide seam
-    const durScore = v.duration >= 30 ? 3 : v.duration >= 20 ? 2 : 1;
+    // Sweet spot: 10-30s clips tend to have clear visible motion
+    const durScore = (v.duration >= 10 && v.duration <= 30) ? 3
+                   : (v.duration > 30 && v.duration <= 60)  ? 2 : 1;
     const resScore = file.width >= 1280 ? 1 : 0;
     return { url: file.link, duration: v.duration, w: file.width, h: file.height, score: durScore + resScore };
   }).filter(Boolean);
@@ -262,7 +273,7 @@ async function fetchClip(q) {
   return scored[0];
 }
 
-// ── Main start ────────────────────────────────────────────────────────────────
+// ── START ─────────────────────────────────────────────────────────────────────
 async function startSession() {
   document.getElementById('btnStart').disabled = true;
   document.getElementById('btnStop').style.display = 'block';
@@ -271,159 +282,266 @@ async function startSession() {
   running = true; loopN = 1; elapsed = 0;
   setProgress(0);
 
-  vA = document.getElementById('vA');
-  vB = document.getElementById('vB');
-
-  // Reset both
-  [vA,vB].forEach(v => {
-    v.className = ''; v.removeAttribute('src'); v.load();
-  });
-
+  let clip;
   try {
-    const clip = await fetchClip(query);
-    clipUrl = clip.url;
-    clipDur = clip.duration;
+    clip = await fetchClip(query);
     lg(`got clip · ${clip.duration}s · ${clip.w}×${clip.h}`, 'lc');
-    lg(`~${Math.ceil(targetSecs/clipDur)} loops to fill ${fmt(targetSecs)}`);
-    document.getElementById('hudClip').textContent = `${clip.duration}s clip`;
+    document.getElementById('hudClip').textContent = `${clip.duration}s · ${loopMode}`;
     document.getElementById('infoR').textContent = `${clip.duration}s clip · ${fmt(targetSecs)} target`;
   } catch(e) {
     lg(`error: ${e.message}`, 'lg');
     stopSession(); return;
   }
 
-  // Load into vA, play it
-  vA.src = clipUrl;
-  vB.src = clipUrl;
-  vB.load(); // preload standby
+  if (loopMode === 'pendulum') {
+    startPendulum(clip);
+  } else {
+    startCrossfade(clip);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// PENDULUM MODE
+// Real fix: play forward at slow playbackRate using native video playback.
+// For the reverse pass: we use requestVideoFrameCallback to draw frames to canvas,
+// and manually seek backward each frame — but only if the browser can keep up.
+// Fallback: just slow forward loop with crossfade if seeking is too slow.
+// ════════════════════════════════════════════════════════════════════════════════
+async function startPendulum(clip) {
+  canvas.width  = 960;
+  canvas.height = Math.round(960 * clip.h / clip.w);
+  canvas.style.display = 'block';
+
+  srcVid.src = clip.url;
+  srcVid.load();
+
+  await new Promise((res, rej) => {
+    srcVid.oncanplay = res;
+    srcVid.onerror   = () => rej(new Error('video load failed'));
+  });
+
+  clipDur   = srcVid.duration && isFinite(srcVid.duration) ? srcVid.duration : clip.duration;
+  pendPos   = 0;
+  pendDir   = 1;
+  lastFrame = performance.now();
+
+  lg(`pendulum ready · ${clipDur.toFixed(1)}s · ${SLOW}x speed`, 'lc');
+  lg(`each pass ~${(clipDur/SLOW).toFixed(0)}s`, 'lt');
+
+  // Use slow forward playback via playbackRate — this is smooth and native
+  srcVid.playbackRate = SLOW;
+  srcVid.currentTime  = 0;
+  srcVid.play();
+
+  document.getElementById('hudDir').textContent  = '▶ FWD';
+  document.getElementById('hudLoop').textContent = '▶';
+
+  sessionStart = performance.now();
+  startTick();
+
+  // Use requestVideoFrameCallback if available (Chrome) for per-frame canvas draw
+  // Fallback to rAF
+  if (srcVid.requestVideoFrameCallback) {
+    lg('using requestVideoFrameCallback (smooth)', 'lt');
+    function onFrame(now, meta) {
+      if (!running) return;
+      ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
+
+      // Check if we've hit the end — then reverse
+      if (srcVid.currentTime >= clipDur - 0.15) {
+        handleReverse();
+      } else if (srcVid.currentTime <= 0.05 && pendDir === -1) {
+        handleForward();
+      }
+      srcVid.requestVideoFrameCallback(onFrame);
+    }
+    srcVid.requestVideoFrameCallback(onFrame);
+  } else {
+    // rAF fallback — draw whatever frame the video is on
+    lg('using rAF fallback', 'lt');
+    function rafDraw() {
+      if (!running) return;
+      ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
+      if (srcVid.currentTime >= clipDur - 0.2) handleReverse();
+      animId = requestAnimationFrame(rafDraw);
+    }
+    animId = requestAnimationFrame(rafDraw);
+  }
+}
+
+// For reverse: we seek manually backward each rAF — works on shorter clips
+// For long clips browser decode is too slow, so we just loop with crossfade
+let reverseAnimId = null;
+
+function handleReverse() {
+  pendDir = -1; loopN++;
+  document.getElementById('hudDir').textContent  = '◀ REV';
+  document.getElementById('hudLoop').textContent = `◀ ×${loopN}`;
+  lg(`↩ reversing at ${srcVid.currentTime.toFixed(1)}s`, 'lc');
+
+  srcVid.pause();
+  // Seek backward manually — step size tuned for smooth playback
+  const STEP = SLOW * (1/30); // ~one frame worth at SLOW speed
+  let pos = srcVid.currentTime;
+
+  cancelAnimationFrame(reverseAnimId);
+  function reverseStep(now) {
+    if (!running) return;
+    pos = Math.max(0, pos - STEP * 1.5); // slightly faster steps to catch up
+    srcVid.currentTime = pos;
+
+    const drawAndContinue = () => {
+      ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
+      if (pos <= 0.05) {
+        handleForward();
+      } else {
+        reverseAnimId = requestAnimationFrame(reverseStep);
+      }
+    };
+
+    // Wait for seek to complete before drawing
+    if (Math.abs(srcVid.currentTime - pos) < 0.5) {
+      drawAndContinue();
+    } else {
+      srcVid.onseeked = () => { srcVid.onseeked = null; drawAndContinue(); };
+    }
+  }
+  reverseAnimId = requestAnimationFrame(reverseStep);
+}
+
+function handleForward() {
+  pendDir = 1; loopN++;
+  document.getElementById('hudDir').textContent  = '▶ FWD';
+  document.getElementById('hudLoop').textContent = `▶ ×${loopN}`;
+  lg(`↪ forward · ${fmt(elapsed)}`, 'lc');
+  cancelAnimationFrame(reverseAnimId);
+  srcVid.currentTime = 0;
+  srcVid.play();
+}
+
+// Draw video frame to canvas on seeked (used as fallback)
+srcVid.addEventListener('seeked', () => {
+  if (!running || loopMode !== 'pendulum' || pendDir === 1) return;
+  ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
+});
+
+// ════════════════════════════════════════════════════════════════════════════════
+// CROSSFADE MODE — dual video with pre-roll
+// ════════════════════════════════════════════════════════════════════════════════
+async function startCrossfade(clip) {
+  canvas.style.display = 'none'; // not used in crossfade mode
+
+  // Dynamically create two video elements inside the stage
+  const stage = document.querySelector('.stage');
+  // Remove old ones if any
+  stage.querySelectorAll('video.cf-vid').forEach(v => v.remove());
+
+  vA = makeVid(); vB = makeVid();
+  stage.insertBefore(vA, stage.firstChild);
+  stage.insertBefore(vB, stage.firstChild);
+
+  function makeVid() {
+    const v = document.createElement('video');
+    v.className = 'cf-vid';
+    v.setAttribute('playsinline',''); v.muted = true;
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;';
+    return v;
+  }
+
+  clipDur = clip.duration;
+  const url = clip.url;
+
+  vA.src = url; vB.src = url;
+  vB.load();
 
   await new Promise((res, rej) => {
     vA.oncanplay = res;
-    vA.onerror = () => rej(new Error('video load failed'));
+    vA.onerror   = () => rej(new Error('video load failed'));
     vA.load();
   });
 
-  // Use actual duration from video element if available
   if (vA.duration && isFinite(vA.duration)) clipDur = vA.duration;
 
-  vA.currentTime = 0;
-  vA.play();
-  vA.classList.add('active');
-  activeVid  = vA;
-  standbyVid = vB;
+  vA.currentTime = 0; vA.play();
+  vA.style.opacity = '1'; vA.style.zIndex = '2';
+  activeVid = vA; standbyVid = vB;
 
   document.getElementById('hudLoop').textContent = 'LOOP 1';
+  document.getElementById('hudDir').textContent  = '↺ CF';
   sessionStart = performance.now();
 
   startTick();
   scheduleCF();
 }
 
-// ── Crossfade scheduling ──────────────────────────────────────────────────────
 function scheduleCF() {
   if (!running) return;
-  // Step 1: pre-roll standby PREROLL seconds before clip ends
-  // so it's already playing at a visually similar position when fade starts
-  const prerollIn = Math.max((clipDur * 1000) - (PREROLL * 1000) - CF_MS, 200);
-  cfTimer = setTimeout(prerollStandby, prerollIn);
+  const prerollMs = 5000;
+  const triggerIn = Math.max(clipDur * 1000 - prerollMs - CF_MS, 200);
+  cfTimer = setTimeout(prerollAndFade, triggerIn);
 }
 
-function prerollStandby() {
+function prerollAndFade() {
   if (!running) return;
-  // Start standby from the same relative position as outgoing
-  // so both videos are showing similar frames during the blend
-  const outPos = activeVid.currentTime;
-  // Start incoming slightly behind so it'll be at ~same position when fade completes
-  const incomingStart = Math.max(0, outPos - CF_MS/1000 * 0.5);
-  standbyVid.currentTime = incomingStart;
+  // Start standby at same position as outgoing so frames match during blend
+  const matchPos = Math.max(0, activeVid.currentTime - (CF_MS / 1000) * 0.3);
+  standbyVid.currentTime = matchPos;
   standbyVid.style.opacity = '0';
-  standbyVid.style.zIndex = '2';
+  standbyVid.style.zIndex  = '3';
   standbyVid.play();
-  lg(`pre-rolling standby at ${incomingStart.toFixed(1)}s`, 'lt');
-
-  // Now trigger the actual fade
-  setTimeout(doCrossfade, 200);
-}
-
-function doCrossfade() {
-  if (!running) return;
-  loopN++;
-  document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
-  flashHud();
-  lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
-
-  const incoming = standbyVid;
-  const outgoing = activeVid;
-
-  incoming.style.zIndex = '2';
-  outgoing.style.zIndex = '1';
-
-  // Fade incoming in over CF_MS — outgoing stays fully opaque underneath
-  incoming.style.transition = 'none';
-  incoming.style.opacity = '0';
-  incoming.getBoundingClientRect(); // force reflow
-  incoming.style.transition = `opacity ${CF_MS}ms ease-in-out`;
-  incoming.style.opacity = '1';
 
   setTimeout(() => {
-    // Done — reset outgoing to start, make it standby
-    outgoing.pause();
-    outgoing.currentTime = 0;
-    outgoing.style.transition = 'none';
-    outgoing.style.opacity = '0';
-    outgoing.style.zIndex = '1';
+    loopN++;
+    document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
+    lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
 
-    activeVid  = incoming;
-    standbyVid = outgoing;
+    standbyVid.style.transition = `opacity ${CF_MS}ms ease-in-out`;
+    standbyVid.style.opacity    = '1';
 
-    scheduleCF();
-  }, CF_MS + 200);
+    const out = activeVid, inn = standbyVid;
+    setTimeout(() => {
+      out.pause(); out.currentTime = 0;
+      out.style.transition = 'none'; out.style.opacity = '0'; out.style.zIndex = '2';
+      inn.style.zIndex = '2';
+      activeVid = inn; standbyVid = out;
+      scheduleCF();
+    }, CF_MS + 100);
+  }, 300);
 }
 
 // ── Seek ──────────────────────────────────────────────────────────────────────
 function seekTo(frac) {
   if (!running || !clipDur) return;
   const seekSecs = Math.max(0, Math.min(frac * targetSecs, targetSecs - 0.1));
-  sessionStart = performance.now() - seekSecs * 1000;
-  elapsed = seekSecs;
-
-  // Figure out scene offset within current loop
-  const sceneOffset = seekSecs % clipDur;
-  loopN = Math.floor(seekSecs / clipDur) + 1;
-  document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
-
-  // Reset active video to scene offset
-  activeVid.currentTime = sceneOffset;
-  if (activeVid.paused) activeVid.play();
-
-  // Reset standby
-  standbyVid.currentTime = 0;
-  standbyVid.style.opacity = '0';
-
-  clearTimeout(cfTimer);
-  // Reschedule: trigger CF_MS before end of current loop cycle
-  const remaining = (clipDur - sceneOffset) * 1000 - CF_MS - 100;
-  cfTimer = setTimeout(doCrossfade, Math.max(remaining, 200));
-
+  sessionStart   = performance.now() - seekSecs * 1000;
+  elapsed        = seekSecs;
   setProgress(frac);
-  lg(`⏩ ${fmt(seekSecs)} · loop ${loopN}`, 'lg');
+
+  if (loopMode === 'pendulum') {
+    // Map session time to pendulum position
+    const totalTravel = clipDur / SLOW;
+    const cycleT      = seekSecs % (totalTravel * 2);
+    pendPos = cycleT < totalTravel ? cycleT * SLOW : clipDur - (cycleT - totalTravel) * SLOW;
+    pendPos = Math.max(0, Math.min(clipDur, pendPos));
+    pendDir = cycleT < totalTravel ? 1 : -1;
+  } else {
+    const sceneOffset = seekSecs % clipDur;
+    if (activeVid) { activeVid.currentTime = sceneOffset; if (activeVid.paused) activeVid.play(); }
+    clearTimeout(cfTimer); scheduleCF();
+  }
+  lg(`⏩ ${fmt(seekSecs)}`, 'lg');
 }
 
-// Progress bar click/drag
 (function() {
   const track = document.getElementById('pgTrack');
   let drag = false;
-  const frac = e => {
-    const r = track.getBoundingClientRect();
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    return Math.max(0, Math.min(1, (x - r.left) / r.width));
-  };
-  track.addEventListener('mousedown', e => { if (running) { drag=true; seekTo(frac(e)); } });
-  window.addEventListener('mousemove', e => { if (drag) seekTo(frac(e)); });
-  window.addEventListener('mouseup', () => { drag=false; });
-  track.addEventListener('touchstart', e => { if (running) { drag=true; seekTo(frac(e)); } }, {passive:true});
-  window.addEventListener('touchmove', e => { if (drag) seekTo(frac(e)); }, {passive:true});
-  window.addEventListener('touchend', () => { drag=false; });
+  const frac = e => { const r=track.getBoundingClientRect(), x=e.touches?e.touches[0].clientX:e.clientX; return Math.max(0,Math.min(1,(x-r.left)/r.width)); };
+  track.addEventListener('mousedown', e => { if(running){drag=true;seekTo(frac(e));} });
+  window.addEventListener('mousemove', e => { if(drag)seekTo(frac(e)); });
+  window.addEventListener('mouseup', ()=>{ drag=false; });
+  track.addEventListener('touchstart', e=>{if(running){drag=true;seekTo(frac(e));}},{passive:true});
+  window.addEventListener('touchmove', e=>{if(drag)seekTo(frac(e));},{passive:true});
+  window.addEventListener('touchend', ()=>{drag=false;});
 })();
 
 // ── Tick ──────────────────────────────────────────────────────────────────────
@@ -435,18 +553,21 @@ function startTick() {
     setProgress(elapsed / targetSecs);
     document.getElementById('hudTime').textContent = fmt(elapsed);
     document.getElementById('infoL').innerHTML = `<span class="ok">${fmt(elapsed)}</span> / ${fmt(targetSecs)}`;
-    if (elapsed >= targetSecs) { lg('target reached · done', 'lc'); stopSession(); }
+    if (elapsed >= targetSecs) { lg('target reached', 'lc'); stopSession(); }
   }, 400);
 }
 
 // ── Stop ──────────────────────────────────────────────────────────────────────
 function stopSession() {
   running = false;
-  clearTimeout(cfTimer); clearInterval(tickTimer);
-  [vA,vB].forEach(v => { v.pause(); });
+  cancelAnimationFrame(animId);
+  clearTimeout(cfTimer);
+  clearInterval(tickTimer);
+  srcVid.pause();
+  if (vA) vA.pause(); if (vB) vB.pause();
   document.getElementById('btnStart').disabled = false;
   document.getElementById('btnStop').style.display = 'none';
-  lg(`stopped · ${fmt(elapsed)} · ${loopN} loop(s)`, 'lg');
+  lg(`stopped · ${fmt(elapsed)} · ${loopN} bounce(s)`, 'lg');
 }
 </script>
 </body>
