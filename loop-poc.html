@@ -6,125 +6,199 @@
 <title>Loop PoC · Aural Alchemy</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@300;400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #080c18; --cyan: #4dd9c0; --gold: #c9a84c;
-    --text: #c8d0e0; --dim: #5a6278;
-    --glass: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
-  }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: 'Jost', sans-serif; font-weight: 300;
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; padding: 36px 20px 60px; gap: 24px;
-  }
-  header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .logo { width: 46px; height: 46px; }
-  h1 {
-    font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 400;
-    letter-spacing: 0.25em;
-    background: linear-gradient(90deg, var(--cyan), var(--gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .sub { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--dim); letter-spacing: 0.1em; }
-  .card {
-    background: var(--glass); border: 1px solid var(--border);
-    border-radius: 12px; padding: 22px 26px; width: 100%; max-width: 560px;
-    display: flex; flex-direction: column; gap: 16px;
-  }
-  .card-title { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em; color: var(--gold); }
-  .themes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
-  .theme-btn {
-    background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
-    padding: 9px 4px; cursor: pointer; display: flex; flex-direction: column;
-    align-items: center; gap: 4px; transition: all 0.18s; color: var(--dim);
-    font-family: 'Jost', sans-serif; font-size: 0.66rem; letter-spacing: 0.04em;
-  }
-  .theme-btn:hover { border-color: var(--cyan); color: var(--text); }
-  .theme-btn.active { border-color: var(--cyan); background: rgba(77,217,192,0.07); color: var(--cyan); }
-  .theme-icon { font-size: 1.2rem; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080c18; --cyan: #4dd9c0; --gold: #c9a84c;
+  --text: #c8d0e0; --dim: #5a6278;
+  --glass: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+}
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Jost', sans-serif; font-weight: 300;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; padding: 36px 20px 80px; gap: 20px;
+}
+header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.logo { width: 42px; height: 42px; }
+h1 {
+  font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 400; letter-spacing: 0.25em;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sub { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--dim); letter-spacing: 0.1em; }
+.card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 24px; width: 100%; max-width: 620px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.card-title { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); }
 
-  /* Mode toggle */
-  .mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .mode-btn {
-    padding: 10px 8px; border: 1px solid var(--border); border-radius: 8px;
-    background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-    letter-spacing: 0.06em; transition: all 0.18s; text-align: center;
-  }
-  .mode-btn:hover { border-color: var(--gold); color: var(--text); }
-  .mode-btn.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+/* Theme grid */
+.theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.theme-btn {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 3px; cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; transition: all 0.18s; color: var(--dim);
+  font-family: 'Jost', sans-serif; font-size: 0.62rem;
+}
+.theme-btn:hover { border-color: var(--cyan); color: var(--text); }
+.theme-btn.active { border-color: var(--cyan); background: rgba(77,217,192,0.07); color: var(--cyan); }
+.theme-icon { font-size: 1.1rem; }
 
-  .dur-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .dur-chip {
-    padding: 7px 14px; border: 1px solid var(--border); border-radius: 20px;
-    background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
-    letter-spacing: 0.06em; transition: all 0.18s;
-  }
-  .dur-chip:hover { border-color: var(--gold); color: var(--text); }
-  .dur-chip.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .btn {
-    padding: 12px; border-radius: 8px; cursor: pointer;
-    font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.18em;
-    text-transform: uppercase; transition: all 0.2s; border: 1px solid;
-  }
-  .btn-start { background: linear-gradient(135deg, rgba(77,217,192,0.15), rgba(201,168,76,0.08)); border-color: var(--cyan); color: var(--cyan); }
-  .btn-start:hover { background: rgba(77,217,192,0.22); }
-  .btn-start:disabled { opacity: 0.35; cursor: not-allowed; }
-  .btn-stop { background: rgba(201,168,76,0.08); border-color: var(--gold); color: var(--gold); display: none; }
-  .btn-stop:hover { background: rgba(201,168,76,0.18); }
-  .preview-wrap { width: 100%; max-width: 560px; display: none; flex-direction: column; gap: 10px; }
-  .preview-wrap.visible { display: flex; }
-  .stage {
-    position: relative; width: 100%; aspect-ratio: 16/9;
-    border-radius: 10px; overflow: hidden; background: #000;
-    border: 1px solid var(--border);
-  }
-  #display { width: 100%; height: 100%; display: block; }
-  /* hidden video for frame source */
-  #srcVid { display: none; }
-  .hud {
-    position: absolute; z-index: 4;
-    background: rgba(8,12,24,0.82); border: 1px solid var(--border);
-    border-radius: 4px; padding: 3px 9px; pointer-events: none;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.09em;
-  }
-  .hud-tl { top:10px; left:12px; color:var(--gold); border-color:rgba(201,168,76,0.3); }
-  .hud-tr { top:10px; right:12px; color:var(--cyan); }
-  .hud-bl { bottom:10px; left:12px; color:var(--dim); font-size:0.58rem; }
-  .hud-br { bottom:10px; right:12px; color:var(--cyan); }
-  .progress-track {
-    width: 100%; height: 6px; background: var(--border); border-radius: 3px;
-    position: relative; cursor: pointer; transition: height 0.15s;
-  }
-  .progress-track:hover { height: 9px; }
-  .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--gold)); border-radius:3px; pointer-events:none; }
-  .pg-thumb {
-    position:absolute; top:50%; left:0%; transform:translate(-50%,-50%);
-    width:14px; height:14px; border-radius:50%;
-    background:#fff; border:2px solid var(--cyan);
-    pointer-events:none; opacity:0; transition:opacity 0.15s;
-  }
-  .progress-track:hover .pg-thumb { opacity:1; }
-  .info-row { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.67rem; color:var(--dim); }
-  .ok{color:var(--cyan);} .warn{color:var(--gold);}
-  .log {
-    width:100%; max-width:560px; background:rgba(0,0,0,0.28);
-    border:1px solid var(--border); border-radius:8px;
-    padding:12px 15px; font-family:'Share Tech Mono',monospace;
-    font-size:0.66rem; color:var(--dim); line-height:1.75;
-    max-height:140px; overflow-y:auto; display:none;
-  }
-  .log.on { display:block; }
-  .lc{color:var(--cyan);} .lg{color:var(--gold);} .lt{color:var(--text);}
+/* Sub-theme dropdown */
+.sub-row { display: flex; gap: 10px; align-items: center; }
+.sub-row label { font-size: 0.7rem; color: var(--dim); white-space: nowrap; font-family: 'Share Tech Mono', monospace; }
+select {
+  flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 10px; color: var(--text);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; outline: none;
+  cursor: pointer; transition: border-color 0.2s;
+}
+select:focus { border-color: var(--cyan); }
+select option { background: #0d1224; }
+
+/* Mode toggle */
+.mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mode-btn {
+  padding: 9px 6px; border: 1px solid var(--border); border-radius: 8px;
+  background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.04em; transition: all 0.18s; text-align: center; line-height: 1.5;
+}
+.mode-btn:hover { border-color: var(--gold); color: var(--text); }
+.mode-btn.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+/* Duration chips */
+.dur-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.dur-chip {
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 20px;
+  background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; transition: all 0.18s;
+}
+.dur-chip:hover { border-color: var(--gold); color: var(--text); }
+.dur-chip.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+/* Slider row */
+.slider-row { display: flex; flex-direction: column; gap: 5px; }
+.slider-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+.slider-label span:last-child { color: var(--cyan); }
+input[type=range] { width: 100%; accent-color: var(--cyan); cursor: pointer; height: 4px; }
+.slider-ticks { display: flex; justify-content: space-between; font-size: 0.58rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; margin-top: 2px; }
+
+/* Buttons */
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn {
+  padding: 11px; border-radius: 8px; cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.16em;
+  text-transform: uppercase; transition: all 0.2s; border: 1px solid;
+}
+.btn-start { background: linear-gradient(135deg, rgba(77,217,192,0.15), rgba(201,168,76,0.08)); border-color: var(--cyan); color: var(--cyan); }
+.btn-start:hover:not(:disabled) { background: rgba(77,217,192,0.22); }
+.btn-start:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-stop { background: rgba(201,168,76,0.08); border-color: var(--gold); color: var(--gold); display: none; }
+.btn-stop:hover { background: rgba(201,168,76,0.18); }
+.btn-try {
+  border-color: var(--dim); color: var(--dim); background: transparent;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+}
+.btn-try:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* Preview */
+.preview-wrap { width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 10px; }
+.stage {
+  position: relative; width: 100%; aspect-ratio: 16/9;
+  border-radius: 10px; overflow: hidden; background: #111;
+  border: 1px solid var(--border);
+}
+.stage video.cf-vid {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: none;
+}
+.hud {
+  position: absolute; z-index: 10;
+  background: rgba(8,12,24,0.85); border: 1px solid var(--border);
+  border-radius: 4px; padding: 3px 8px; pointer-events: none;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em;
+}
+.hud-tl { top:10px; left:10px; color:var(--gold); }
+.hud-tr { top:10px; right:10px; color:var(--cyan); }
+.hud-br { bottom:10px; right:10px; color:var(--cyan); }
+.hud-bl { bottom:10px; left:10px; color:var(--dim); font-size:0.56rem; }
+
+/* Session progress bar */
+.progress-track {
+  width: 100%; height: 5px; background: var(--border); border-radius: 3px;
+  position: relative; cursor: pointer;
+}
+.progress-track:hover { height: 8px; }
+.progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--gold)); border-radius:3px; pointer-events:none; }
+.pg-thumb {
+  position:absolute; top:50%; left:0%; transform:translate(-50%,-50%);
+  width:13px; height:13px; border-radius:50%;
+  background:#fff; border:2px solid var(--cyan);
+  pointer-events:none; opacity:0; transition:opacity 0.15s;
+}
+.progress-track:hover .pg-thumb { opacity:1; }
+
+/* Loop region editor */
+.loop-editor { display: flex; flex-direction: column; gap: 8px; }
+.loop-editor-title {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.15em; color: var(--gold);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.loop-editor-title small { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--dim); letter-spacing: 0.06em; }
+
+/* Full video scrubber */
+.scrub-wrap {
+  position: relative; width: 100%; height: 52px;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 7px;
+  overflow: hidden; cursor: crosshair;
+}
+.scrub-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: linear-gradient(90deg, rgba(77,217,192,0.15), rgba(201,168,76,0.1));
+  pointer-events: none;
+}
+/* Loop region highlight */
+.loop-region {
+  position: absolute; top: 0; height: 100%;
+  background: rgba(201,168,76,0.18); border-left: 2px solid var(--gold); border-right: 2px solid var(--gold);
+  pointer-events: none;
+}
+/* Playhead */
+.scrub-head {
+  position: absolute; top: 0; height: 100%; width: 2px;
+  background: var(--cyan); pointer-events: none;
+}
+.scrub-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--dim);
+}
+/* In/out handles */
+.handle-row { display: flex; gap: 10px; align-items: center; }
+.handle-input {
+  flex: 1; display: flex; flex-direction: column; gap: 4px;
+}
+.handle-input label { font-size: 0.65rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+input[type=range].handle { accent-color: var(--gold); }
+
+.info-row { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--dim); }
+.ok{color:var(--cyan);}
+
+.log {
+  width:100%; max-width:620px; background:rgba(0,0,0,0.25);
+  border:1px solid var(--border); border-radius:8px;
+  padding:10px 14px; font-family:'Share Tech Mono',monospace;
+  font-size:0.64rem; color:var(--dim); line-height:1.7;
+  max-height:110px; overflow-y:auto;
+}
+.lc{color:var(--cyan);} .lg{color:var(--gold);} .lt{color:var(--text);}
 </style>
 </head>
 <body>
 
 <header>
-  <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg class="logo" viewBox="0 0 100 100" fill="none">
     <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4dd9c0"/><stop offset="100%" stop-color="#c9a84c"/>
     </linearGradient></defs>
@@ -135,48 +209,51 @@
   <p class="sub">aural alchemy · seamless loop poc</p>
 </header>
 
+<!-- THEME -->
 <div class="card">
   <span class="card-title">01 · Theme</span>
-  <div class="themes">
-    <button class="theme-btn active"
-      data-cf="waterfall close up static mist"
-      data-pend="forest path drone flythrough slow">🌿<br>Nature</button>
-    <button class="theme-btn"
-      data-cf="stars night sky milky way static"
-      data-pend="star timelapse sky rotation long exposure">🌌<br>Galaxy</button>
-    <button class="theme-btn"
-      data-cf="calm ocean shore waves breaking static"
-      data-pend="aerial coastline drone ocean sunset">🌊<br>Ocean</button>
-    <button class="theme-btn"
-      data-cf="rain drops window glass close up"
-      data-pend="sunset timelapse clouds moving sky">🌧<br>Rain</button>
-    <button class="theme-btn"
-      data-cf="fire flame candle close up static"
-      data-pend="lava flow slow motion volcanic">🔥<br>Fire</button>
+  <div class="theme-grid" id="themeGrid">
+    <button class="theme-btn active" data-theme="nature"><span class="theme-icon">🌿</span>Nature</button>
+    <button class="theme-btn" data-theme="water"><span class="theme-icon">💧</span>Water</button>
+    <button class="theme-btn" data-theme="sky"><span class="theme-icon">🌌</span>Sky</button>
+    <button class="theme-btn" data-theme="fire"><span class="theme-icon">🔥</span>Fire</button>
+    <button class="theme-btn" data-theme="weather"><span class="theme-icon">🌧</span>Weather</button>
+    <button class="theme-btn" data-theme="light"><span class="theme-icon">✨</span>Light</button>
+    <button class="theme-btn" data-theme="earth"><span class="theme-icon">🏔</span>Earth</button>
+    <button class="theme-btn" data-theme="abstract"><span class="theme-icon">🔮</span>Abstract</button>
+    <button class="theme-btn" data-theme="urban"><span class="theme-icon">🌆</span>Urban</button>
+    <button class="theme-btn" data-theme="cosmos"><span class="theme-icon">🪐</span>Cosmos</span></button>
+  </div>
+  <div class="sub-row">
+    <label>Subtype ·</label>
+    <select id="subSelect"></select>
   </div>
 </div>
 
+<!-- MODE + SETTINGS -->
 <div class="card">
-  <span class="card-title">02 · Loop Mode</span>
+  <span class="card-title">02 · Mode · Settings</span>
+
   <div class="mode-toggle">
-    <button class="mode-btn active" data-mode="crossfade">↺ Crossfade loop<br><small style="opacity:0.6">restarts from beginning</small></button>
-    <button class="mode-btn" data-mode="pendulum">⇄ Pendulum / reverse<br><small style="opacity:0.6">forward → reverse → forward</small></button>
+    <button class="mode-btn active" data-mode="crossfade">↺ Crossfade<br><small style="opacity:0.55;font-size:0.6rem">static shots · ambient</small></button>
+    <button class="mode-btn" data-mode="pendulum">⇄ Pendulum<br><small style="opacity:0.55;font-size:0.6rem">motion shots · slow-mo reverse</small></button>
   </div>
 
-  <div>
-    <label style="font-size:0.75rem;letter-spacing:0.07em;color:var(--dim);display:flex;justify-content:space-between;margin-bottom:8px;">
-      <span>Playback speed</span>
-      <span id="speedVal" style="color:var(--cyan);font-family:'Share Tech Mono',monospace;">0.5x</span>
-    </label>
+  <div class="slider-row">
+    <div class="slider-label"><span>Playback speed</span><span id="speedVal">0.50x</span></div>
     <input type="range" id="speedSlider" min="0.1" max="1.0" step="0.05" value="0.5"
-      style="width:100%;accent-color:var(--cyan);cursor:pointer;"
       oninput="document.getElementById('speedVal').textContent=parseFloat(this.value).toFixed(2)+'x'">
-    <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--dim);margin-top:4px;">
-      <span>0.1x ultra slow</span><span>0.5x cinematic</span><span>1.0x normal</span>
-    </div>
+    <div class="slider-ticks"><span>0.1x</span><span>0.5x cinematic</span><span>1.0x</span></div>
   </div>
 
-  <div class="dur-chips">
+  <div class="slider-row" id="cfRow">
+    <div class="slider-label"><span>Crossfade duration</span><span id="cfVal">4.0s</span></div>
+    <input type="range" id="cfSlider" min="1" max="12" step="0.5" value="4"
+      oninput="document.getElementById('cfVal').textContent=parseFloat(this.value).toFixed(1)+'s'">
+    <div class="slider-ticks"><span>1s</span><span>4s smooth</span><span>8s</span><span>12s ultra</span></div>
+  </div>
+
+  <div class="dur-chips" id="durChips">
     <button class="dur-chip active" data-secs="30">30s</button>
     <button class="dur-chip" data-secs="60">1 min</button>
     <button class="dur-chip" data-secs="180">3 min</button>
@@ -185,26 +262,23 @@
     <button class="dur-chip" data-secs="3600">1 hr</button>
   </div>
 
-  <div class="row2">
+  <div class="btn-row">
     <button class="btn btn-start" id="btnStart" onclick="startSession()">▶ START</button>
     <button class="btn btn-stop"  id="btnStop"  onclick="stopSession()">■ STOP</button>
   </div>
-  <button class="btn" id="btnTry" onclick="tryAnother()"
-    style="display:none;border-color:var(--dim);color:var(--dim);padding:10px;">
-    ↻ TRY ANOTHER CLIP
-  </button>
+  <button class="btn btn-try" id="btnTry" onclick="tryAnother()">↻ TRY ANOTHER CLIP</button>
 </div>
 
-<div class="preview-wrap" id="preview">
-  <div class="stage">
-    <!-- Single hidden video as frame source; canvas renders it -->
-    <video id="srcVid" playsinline muted crossorigin="anonymous"></video>
-    <canvas id="display"></canvas>
-    <div class="hud hud-tl" id="hudDir">▶ FWD</div>
-    <div class="hud hud-tr" id="hudLoop">LOOP 1</div>
-    <div class="hud hud-bl" id="hudClip"></div>
+<!-- PREVIEW + LOOP EDITOR -->
+<div class="preview-wrap" id="preview" style="display:none;">
+  <div class="stage" id="stage">
+    <div class="hud hud-tl" id="hudMode">—</div>
+    <div class="hud hud-tr" id="hudLoop">—</div>
+    <div class="hud hud-bl" id="hudClip">—</div>
     <div class="hud hud-br" id="hudTime">0:00</div>
   </div>
+
+  <!-- Session progress -->
   <div class="progress-track" id="pgTrack">
     <div class="progress-fill" id="pgFill"></div>
     <div class="pg-thumb" id="pgThumb"></div>
@@ -213,79 +287,240 @@
     <span id="infoL">—</span>
     <span id="infoR">—</span>
   </div>
+
+  <!-- Loop region editor -->
+  <div class="card" style="margin-top:4px;">
+    <div class="loop-editor-title">
+      Loop Region Editor
+      <small id="regionLabel">IN: 0.0s · OUT: —</small>
+    </div>
+
+    <!-- Full video scrubber -->
+    <div class="scrub-wrap" id="scrubWrap">
+      <div class="scrub-fill" id="scrubFill"></div>
+      <div class="loop-region" id="loopRegion"></div>
+      <div class="scrub-head" id="scrubHead"></div>
+    </div>
+    <div class="scrub-labels">
+      <span>0:00</span><span id="scrubMid">—</span><span id="scrubEnd">—</span>
+    </div>
+
+    <!-- IN / OUT sliders -->
+    <div class="handle-row">
+      <div class="handle-input">
+        <label>▶ Loop IN — <span id="inVal">0.0s</span></label>
+        <input type="range" class="handle" id="inSlider" min="0" max="100" step="0.1" value="0"
+          oninput="onRegionChange()">
+      </div>
+      <div class="handle-input">
+        <label>■ Loop OUT — <span id="outVal">—</span></label>
+        <input type="range" class="handle" id="outSlider" min="0" max="100" step="0.1" value="100"
+          oninput="onRegionChange()">
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="log" id="log"></div>
 
 <script>
-const PROXY   = 'https://white-cloud-27a9.nanomarche.workers.dev';
-const CF_MS   = 4000;  // 4s crossfade
-let   SPEED   = 0.5;   // controlled by slider
+// ── Theme / subtype data ──────────────────────────────────────────────────────
+const THEMES = {
+  nature: {
+    label: 'Nature',
+    subs: {
+      'Forest stream': { cf:'calm forest stream flowing close up', pend:'forest path drone flythrough slow motion' },
+      'Waterfall':     { cf:'waterfall close up mist static',       pend:'waterfall aerial drone above' },
+      'Meadow':        { cf:'meadow grass breeze static close',      pend:'meadow aerial drone golden hour' },
+      'Jungle':        { cf:'jungle leaves rain close up static',    pend:'jungle canopy drone flythrough' },
+      'Fog & mist':    { cf:'forest fog mist morning atmospheric',   pend:'misty forest road slow drive' },
+    }
+  },
+  water: {
+    label: 'Water',
+    subs: {
+      'Ocean shore':   { cf:'ocean waves breaking shore static',     pend:'aerial coastline ocean drone slow' },
+      'Deep ocean':    { cf:'underwater deep ocean particles',       pend:'underwater ocean swim slow motion' },
+      'Rain on glass': { cf:'rain drops window glass close up',      pend:'rain storm street city slow motion' },
+      'River':         { cf:'river flowing close up static rocks',   pend:'river aerial drone flythrough canyon' },
+      'Lake':          { cf:'calm lake surface reflection still',    pend:'lake aerial sunrise drone pan' },
+    }
+  },
+  sky: {
+    label: 'Sky',
+    subs: {
+      'Sunset':        { cf:'sunset sky static golden warm',         pend:'sunset timelapse clouds moving horizon' },
+      'Sunrise':       { cf:'sunrise sky pink orange static',        pend:'sunrise timelapse golden hour mountains' },
+      'Clouds':        { cf:'clouds blue sky static fluffy',         pend:'clouds timelapse fast moving dramatic' },
+      'Storm sky':     { cf:'dramatic storm sky dark clouds static', pend:'storm clouds timelapse lightning' },
+      'Aurora':        { cf:'aurora borealis static night sky',      pend:'aurora timelapse northern lights moving' },
+    }
+  },
+  fire: {
+    label: 'Fire',
+    subs: {
+      'Candle':        { cf:'candle flame close up static dark',     pend:'candle light bokeh slow motion' },
+      'Bonfire':       { cf:'bonfire flames close up night',         pend:'bonfire embers slow motion rising' },
+      'Fireplace':     { cf:'fireplace flames crackling close',      pend:'fireplace glow warm slow motion' },
+      'Lava':          { cf:'lava close up texture glowing static',  pend:'lava flow slow motion volcanic' },
+      'Ember & sparks':{ cf:'embers glowing close dark static',      pend:'sparks flying slow motion fire' },
+    }
+  },
+  weather: {
+    label: 'Weather',
+    subs: {
+      'Rain':          { cf:'rain drops puddle close up static',     pend:'rain storm city street slow motion' },
+      'Snow':          { cf:'snow falling close up static bokeh',    pend:'snow falling slow motion forest' },
+      'Thunder':       { cf:'dark storm clouds rain atmospheric',    pend:'lightning storm timelapse dramatic' },
+      'Wind':          { cf:'wind grass field moving close static',  pend:'wind storm trees moving aerial' },
+      'Fog':           { cf:'thick fog atmospheric static moody',    pend:'fog rolling valley timelapse morning' },
+    }
+  },
+  light: {
+    label: 'Light',
+    subs: {
+      'Bokeh':         { cf:'bokeh lights blurry abstract static',   pend:'bokeh lights slow motion glowing' },
+      'Golden hour':   { cf:'golden hour light rays dust static',    pend:'golden hour sunset drone aerial pan' },
+      'Light rays':    { cf:'light rays forest beams dust static',   pend:'light rays water slow motion godray' },
+      'Neon':          { cf:'neon lights city blur abstract',        pend:'neon city rain reflection slow motion' },
+      'Stars':         { cf:'stars night sky milky way static',      pend:'star trail timelapse sky rotation' },
+    }
+  },
+  earth: {
+    label: 'Earth',
+    subs: {
+      'Mountains':     { cf:'mountain landscape still static',       pend:'mountain aerial drone flyover slow' },
+      'Desert':        { cf:'desert sand dunes wind static',         pend:'desert aerial drone sand dunes pan' },
+      'Cliffs':        { cf:'cliff rocks ocean static dramatic',     pend:'cliff aerial drone coastline flyover' },
+      'Volcanic':      { cf:'volcanic rock texture lava static',     pend:'volcano aerial drone smoke crater' },
+      'Cave':          { cf:'cave rock texture dark moody static',   pend:'cave water drip slow motion dark' },
+    }
+  },
+  abstract: {
+    label: 'Abstract',
+    subs: {
+      'Particles':     { cf:'particles dust floating dark abstract', pend:'particles flow slow motion abstract' },
+      'Ink in water':  { cf:'ink water diffusion close abstract',    pend:'ink water slow motion diffusion drop' },
+      'Smoke':         { cf:'smoke wisps dark background abstract',  pend:'smoke slow motion dark dramatic' },
+      'Liquid':        { cf:'liquid abstract color swirl static',    pend:'liquid paint pour slow motion abstract' },
+      'Fractal':       { cf:'abstract fractal glow dark background', pend:'abstract light tunnel zoom slow' },
+    }
+  },
+  urban: {
+    label: 'Urban',
+    subs: {
+      'City night':    { cf:'city lights night static bokeh',        pend:'city aerial drone night flyover' },
+      'Rain city':     { cf:'rain city street reflection static',    pend:'rain city slow motion neon reflection' },
+      'Traffic':       { cf:'traffic light trails long exposure',    pend:'traffic timelapse city intersection' },
+      'Architecture':  { cf:'building facade abstract geometry',     pend:'architecture drone aerial urban fly' },
+      'Subway':        { cf:'subway tunnel light abstract static',   pend:'subway train slow motion light trail' },
+    }
+  },
+  cosmos: {
+    label: 'Cosmos',
+    subs: {
+      'Milky Way':     { cf:'milky way galaxy static night sky',     pend:'milky way timelapse rotation star trail' },
+      'Nebula':        { cf:'nebula space abstract color deep',      pend:'space nebula zoom slow fly through' },
+      'Moon':          { cf:'moon close up static craters night',    pend:'moon timelapse rising clouds slow' },
+      'Planets':       { cf:'planet space abstract static dark',     pend:'planet rotation slow space zoom' },
+      'Solar':         { cf:'sun solar flare abstract static',       pend:'solar eclipse timelapse slow motion' },
+    }
+  },
+};
+
+const PROXY = 'https://white-cloud-27a9.nanomarche.workers.dev';
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let queryCF   = 'waterfall close up static mist';
-let queryPend = 'forest path drone flythrough slow';
-let loopMode  = 'crossfade';
-let targetSecs = 30;
-let running    = false;
-let loopN      = 0;
-let elapsed    = 0;
+let currentTheme = 'nature';
+let currentSub   = null; // set on load
+let loopMode     = 'crossfade';
+let targetSecs   = 30;
+let SPEED        = 0.5;
+let CF_MS        = 4000;
+
+let clipPool     = [];
+let clipIndex    = 0;
+let currentClip  = null; // locked in — tryAnother changes this, restart does NOT
+
+let running      = false;
+let loopN        = 0;
+let elapsed      = 0;
 let sessionStart = 0;
-let tickTimer  = null;
-let animId     = null;
-let clipDur    = 0;
+let tickTimer    = null;
+let cfTimer      = null;
+let animId       = null;
 
-// Pendulum state
-let pendPos    = 0;     // current position in clip (seconds)
-let pendDir    = 1;     // 1 = forward, -1 = reverse
-let lastFrame  = 0;     // performance.now() of last rAF
+// Loop region (seconds within clip)
+let loopIn  = 0;
+let loopOut = null; // null = full clip
 
-// Crossfade state (uses two <video> elements)
-let vA, vB, activeVid, standbyVid, cfTimer;
+let vA, vB, activeVid, standbyVid;
 
-const canvas  = document.getElementById('display');
-const ctx     = canvas.getContext('2d');
-const srcVid  = document.getElementById('srcVid');
+// ── Build subtype dropdown ────────────────────────────────────────────────────
+function buildSubSelect(theme) {
+  const sel = document.getElementById('subSelect');
+  sel.innerHTML = '';
+  const subs = THEMES[theme].subs;
+  Object.keys(subs).forEach((k, i) => {
+    const opt = document.createElement('option');
+    opt.value = k; opt.textContent = k;
+    sel.appendChild(opt);
+  });
+  currentSub = Object.keys(subs)[0];
+}
 
-// ── UI ────────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
   b.classList.add('active');
-  queryCF   = b.dataset.cf;
-  queryPend = b.dataset.pend;
+  currentTheme = b.dataset.theme;
+  buildSubSelect(currentTheme);
 }));
+
+document.getElementById('subSelect').addEventListener('change', e => {
+  currentSub = e.target.value;
+});
+
+document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); loopMode = b.dataset.mode;
+  document.getElementById('cfRow').style.display = loopMode === 'crossfade' ? '' : 'none';
+}));
+
 document.querySelectorAll('.dur-chip').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.dur-chip').forEach(x => x.classList.remove('active'));
   b.classList.add('active'); targetSecs = parseInt(b.dataset.secs);
 }));
-document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
-  b.classList.add('active'); loopMode = b.dataset.mode;
-}));
+
+// Init
+buildSubSelect('nature');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+const fmtS = s => s.toFixed(1) + 's';
+
 function lg(msg, cls='lt') {
   const el = document.getElementById('log');
-  el.classList.add('on');
   const d = document.createElement('div');
-  d.className = cls; d.textContent = '› '+msg;
+  d.className = cls; d.textContent = '› ' + msg;
   el.appendChild(d); el.scrollTop = el.scrollHeight;
 }
+
 function setProgress(frac) {
-  const pct = Math.min(frac*100,100)+'%';
+  const pct = Math.min(frac * 100, 100) + '%';
   document.getElementById('pgFill').style.width = pct;
   document.getElementById('pgThumb').style.left = pct;
 }
 
-// ── Clip pool — keeps fetched results so "try another" doesn't re-hit API ────
-let clipPool  = [];   // all candidates from last fetch
-let clipIndex = 0;    // which one we're currently on
+function getQuery() {
+  const subs = THEMES[currentTheme].subs;
+  const sub  = subs[currentSub] || subs[Object.keys(subs)[0]];
+  return loopMode === 'pendulum' ? sub.pend : sub.cf;
+}
 
-async function fetchClipPool(q) {
-  // Random page 1-5 so repeat users get different results each time
-  const page = Math.floor(Math.random() * 5) + 1;
-  lg(`fetching page ${page} for "${q}"...`);
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+async function fetchPool(q) {
+  const page = Math.floor(Math.random() * 8) + 1;
+  lg(`fetching p${page}: "${q}"...`);
   const res = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape&page=${page}`);
   if (!res.ok) throw new Error(`worker ${res.status}`);
   const data = await res.json();
@@ -293,211 +528,179 @@ async function fetchClipPool(q) {
 
   const scored = data.videos.map(v => {
     const files = v.video_files || [];
-    const file = files.find(f => f.width >= 1280 && f.width <= 1920)
-               || files.find(f => f.width >= 960)
-               || files[0];
+    const file  = files.find(f => f.width >= 1280 && f.width <= 1920)
+                || files.find(f => f.width >= 960) || files[0];
     if (!file) return null;
-    const durScore = (v.duration >= 20 && v.duration <= 40) ? 4
-                   : (v.duration > 40 && v.duration <= 60)  ? 2
-                   : (v.duration >= 10)                     ? 1 : 0;
-    const resScore = file.width >= 1280 ? 1 : 0;
-    return { url: file.link, duration: v.duration, w: file.width, h: file.height, score: durScore + resScore };
+    const dur = v.duration;
+    const ds  = (dur >= 20 && dur <= 45) ? 4 : (dur > 45 && dur <= 90) ? 2 : dur >= 10 ? 1 : 0;
+    const rs  = file.width >= 1280 ? 1 : 0;
+    return { url: file.link, duration: dur, w: file.width, h: file.height, score: ds + rs };
   }).filter(Boolean);
 
-  // Shuffle within same score tier so order varies each run
-  scored.sort((a,b) => b.score - a.score + (Math.random() - 0.5) * 0.5);
-
+  // Shuffle within tiers for variety
+  scored.sort((a, b) => b.score - a.score + (Math.random() - 0.5) * 0.4);
   clipPool  = scored;
   clipIndex = 0;
-  lg(`got ${scored.length} candidates`, 'lt');
-  return clipPool[0];
-}
-
-function nextClip() {
-  clipIndex = (clipIndex + 1) % clipPool.length;
-  return clipPool[clipIndex];
+  lg(`${scored.length} clips found`, 'lt');
+  return scored[0];
 }
 
 // ── START ─────────────────────────────────────────────────────────────────────
-async function startSession(clip = null) {
+async function startSession(clip) {
+  // If no clip passed, fetch new pool. If clip passed, use it (tryAnother or restart).
+  SPEED  = parseFloat(document.getElementById('speedSlider').value);
+  CF_MS  = parseFloat(document.getElementById('cfSlider').value) * 1000;
+
+  stopCleanup(); // stop any running session without resetting currentClip
+
+  running = true; loopN = 1; elapsed = 0;
   document.getElementById('btnStart').disabled = true;
   document.getElementById('btnStop').style.display = 'block';
-  document.getElementById('btnTry').style.display = 'none';
-  document.getElementById('preview').classList.add('visible');
+  document.getElementById('preview').style.display = 'flex';
   document.getElementById('log').innerHTML = '';
-  running = true; loopN = 1; elapsed = 0;
-  setProgress(0);
 
   if (!clip) {
-    const q = loopMode === 'pendulum' ? queryPend : queryCF;
+    // First start — fetch
     try {
-      clip = await fetchClipPool(q);
+      clip = await fetchPool(getQuery());
     } catch(e) {
       lg(`error: ${e.message}`, 'lg');
-      stopSession(); return;
+      stopCleanup(); return;
     }
+    currentClip = clip;
   }
 
-  SPEED = parseFloat(document.getElementById('speedSlider').value);
-  lg(`clip ${clip.duration}s · ${clip.w}×${clip.h} · speed ${SPEED}x · mode ${loopMode}`, 'lc');
+  lg(`clip ${clip.duration}s · ${clip.w}×${clip.h} · ${SPEED}x · ${loopMode}`, 'lc');
   document.getElementById('hudClip').textContent = `${clip.duration}s`;
-  document.getElementById('infoR').textContent = `${clip.duration}s · ${SPEED}x · ${fmt(targetSecs)} target`;
+  document.getElementById('infoR').textContent   = `${clip.duration}s · ${SPEED}x · ${fmt(targetSecs)}`;
 
-  if (loopMode === 'pendulum') {
-    startPendulum(clip);
-  } else {
+  setupLoopEditor(clip);
+  setProgress(0);
+  sessionStart = performance.now();
+
+  if (loopMode === 'crossfade') {
     startCrossfade(clip);
+  } else {
+    startPendulum(clip);
   }
+}
+
+// Restart with SAME clip
+function restartSession() {
+  if (currentClip) startSession(currentClip);
 }
 
 async function tryAnother() {
-  stopSession();
-  await new Promise(r => setTimeout(r, 300));
-  const q = loopMode === 'pendulum' ? queryPend : queryCF;
-  const clip = clipPool.length > 1 ? nextClip() : await fetchClipPool(q);
-  lg(`trying clip ${clipIndex + 1}/${clipPool.length}`, 'lt');
+  const q = getQuery();
+  stopCleanup();
+  await new Promise(r => setTimeout(r, 100));
+  let clip;
+  if (clipPool.length > 1) {
+    clipIndex = (clipIndex + 1) % clipPool.length;
+    clip = clipPool[clipIndex];
+    lg(`clip ${clipIndex + 1}/${clipPool.length}`, 'lt');
+  } else {
+    clip = await fetchPool(q).catch(e => { lg(e.message,'lg'); return null; });
+    if (!clip) return;
+  }
+  currentClip = clip;
   startSession(clip);
 }
 
-// ════════════════════════════════════════════════════════════════════════════════
-// PENDULUM MODE
-// Real fix: play forward at slow playbackRate using native video playback.
-// For the reverse pass: we use requestVideoFrameCallback to draw frames to canvas,
-// and manually seek backward each frame — but only if the browser can keep up.
-// Fallback: just slow forward loop with crossfade if seeking is too slow.
-// ════════════════════════════════════════════════════════════════════════════════
-async function startPendulum(clip) {
-  canvas.width  = 960;
-  canvas.height = Math.round(960 * clip.h / clip.w);
-  canvas.style.display = 'block';
+// ── Loop editor ───────────────────────────────────────────────────────────────
+function setupLoopEditor(clip) {
+  const dur = clip.duration;
+  loopIn  = 0;
+  loopOut = dur;
 
-  srcVid.src = clip.url;
-  srcVid.load();
+  // Set slider ranges to clip duration
+  document.getElementById('inSlider').max  = dur;
+  document.getElementById('inSlider').value = 0;
+  document.getElementById('outSlider').max  = dur;
+  document.getElementById('outSlider').value = dur;
 
-  await new Promise((res, rej) => {
-    srcVid.oncanplay = res;
-    srcVid.onerror   = () => rej(new Error('video load failed'));
-  });
+  document.getElementById('scrubEnd').textContent = fmtS(dur);
+  document.getElementById('scrubMid').textContent = fmtS(dur / 2);
+  document.getElementById('inVal').textContent    = '0.0s';
+  document.getElementById('outVal').textContent   = fmtS(dur);
+  document.getElementById('regionLabel').textContent = `IN: 0.0s · OUT: ${fmtS(dur)}`;
 
-  clipDur   = srcVid.duration && isFinite(srcVid.duration) ? srcVid.duration : clip.duration;
-  pendPos   = 0;
-  pendDir   = 1;
-  lastFrame = performance.now();
-
-  lg(`pendulum ready · ${clipDur.toFixed(1)}s · ${SLOW}x speed`, 'lc');
-  lg(`each pass ~${(clipDur/SLOW).toFixed(0)}s`, 'lt');
-
-  // Use slow forward playback via playbackRate — this is smooth and native
-  srcVid.playbackRate = SLOW;
-  srcVid.currentTime  = 0;
-  srcVid.play();
-
-  document.getElementById('hudDir').textContent  = '▶ FWD';
-  document.getElementById('hudLoop').textContent = '▶';
-
-  sessionStart = performance.now();
-  startTick();
-
-  // Use requestVideoFrameCallback if available (Chrome) for per-frame canvas draw
-  // Fallback to rAF
-  if (srcVid.requestVideoFrameCallback) {
-    lg('using requestVideoFrameCallback (smooth)', 'lt');
-    function onFrame(now, meta) {
-      if (!running) return;
-      ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
-
-      // Check if we've hit the end — then reverse
-      if (srcVid.currentTime >= clipDur - 0.15) {
-        handleReverse();
-      } else if (srcVid.currentTime <= 0.05 && pendDir === -1) {
-        handleForward();
-      }
-      srcVid.requestVideoFrameCallback(onFrame);
-    }
-    srcVid.requestVideoFrameCallback(onFrame);
-  } else {
-    // rAF fallback — draw whatever frame the video is on
-    lg('using rAF fallback', 'lt');
-    function rafDraw() {
-      if (!running) return;
-      ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
-      if (srcVid.currentTime >= clipDur - 0.2) handleReverse();
-      animId = requestAnimationFrame(rafDraw);
-    }
-    animId = requestAnimationFrame(rafDraw);
-  }
+  updateRegionUI();
 }
 
-// For reverse: we seek manually backward each rAF — works on shorter clips
-// For long clips browser decode is too slow, so we just loop with crossfade
-let reverseAnimId = null;
+function onRegionChange() {
+  const inS  = document.getElementById('inSlider');
+  const outS = document.getElementById('outSlider');
+  const dur  = currentClip ? currentClip.duration : 100;
 
-function handleReverse() {
-  pendDir = -1; loopN++;
-  document.getElementById('hudDir').textContent  = '◀ REV';
-  document.getElementById('hudLoop').textContent = `◀ ×${loopN}`;
-  lg(`↩ reversing at ${srcVid.currentTime.toFixed(1)}s`, 'lc');
+  let newIn  = parseFloat(inS.value);
+  let newOut = parseFloat(outS.value);
 
-  srcVid.pause();
-  // Seek backward manually — step size tuned for smooth playback
-  const STEP = SLOW * (1/30); // ~one frame worth at SLOW speed
-  let pos = srcVid.currentTime;
-
-  cancelAnimationFrame(reverseAnimId);
-  function reverseStep(now) {
-    if (!running) return;
-    pos = Math.max(0, pos - STEP * 1.5); // slightly faster steps to catch up
-    srcVid.currentTime = pos;
-
-    const drawAndContinue = () => {
-      ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
-      if (pos <= 0.05) {
-        handleForward();
-      } else {
-        reverseAnimId = requestAnimationFrame(reverseStep);
-      }
-    };
-
-    // Wait for seek to complete before drawing
-    if (Math.abs(srcVid.currentTime - pos) < 0.5) {
-      drawAndContinue();
+  // Enforce min gap of 2s
+  if (newIn >= newOut - 2) {
+    if (document.activeElement === inS) {
+      newIn = newOut - 2;
+      inS.value = newIn;
     } else {
-      srcVid.onseeked = () => { srcVid.onseeked = null; drawAndContinue(); };
+      newOut = newIn + 2;
+      outS.value = newOut;
     }
   }
-  reverseAnimId = requestAnimationFrame(reverseStep);
+
+  loopIn  = newIn;
+  loopOut = newOut;
+
+  document.getElementById('inVal').textContent  = fmtS(loopIn);
+  document.getElementById('outVal').textContent = fmtS(loopOut);
+  document.getElementById('regionLabel').textContent = `IN: ${fmtS(loopIn)} · OUT: ${fmtS(loopOut)} · ${fmtS(loopOut-loopIn)} region`;
+
+  updateRegionUI();
+
+  // Restart loop from new in point — cleanly kill old timers first
+  if (running && loopMode === 'crossfade') {
+    clearTimeout(cfTimer);
+    // Seek active to loopIn, reschedule
+    if (activeVid) {
+      activeVid.currentTime = loopIn;
+      if (activeVid.paused) activeVid.play();
+    }
+    scheduleCF();
+  }
 }
 
-function handleForward() {
-  pendDir = 1; loopN++;
-  document.getElementById('hudDir').textContent  = '▶ FWD';
-  document.getElementById('hudLoop').textContent = `▶ ×${loopN}`;
-  lg(`↪ forward · ${fmt(elapsed)}`, 'lc');
-  cancelAnimationFrame(reverseAnimId);
-  srcVid.currentTime = 0;
-  srcVid.play();
+function updateRegionUI() {
+  if (!currentClip) return;
+  const dur  = currentClip.duration;
+  const inPct  = (loopIn  / dur) * 100;
+  const outPct = (loopOut / dur) * 100;
+  const region = document.getElementById('loopRegion');
+  region.style.left  = inPct + '%';
+  region.style.width = (outPct - inPct) + '%';
 }
 
-// Draw video frame to canvas on seeked (used as fallback)
-srcVid.addEventListener('seeked', () => {
-  if (!running || loopMode !== 'pendulum' || pendDir === 1) return;
-  ctx.drawImage(srcVid, 0, 0, canvas.width, canvas.height);
+// Update scrubber playhead
+function updateScrubHead(pos, dur) {
+  const pct = Math.min(pos / dur * 100, 100);
+  document.getElementById('scrubHead').style.left  = pct + '%';
+  document.getElementById('scrubFill').style.width = pct + '%';
+}
+
+// Click on scrubber to seek video
+document.getElementById('scrubWrap').addEventListener('click', e => {
+  if (!currentClip || !running) return;
+  const r    = e.currentTarget.getBoundingClientRect();
+  const frac = (e.clientX - r.left) / r.width;
+  const pos  = frac * currentClip.duration;
+  if (activeVid) {
+    activeVid.currentTime = pos;
+    clearTimeout(cfTimer);
+    scheduleCF();
+  }
 });
 
-// ════════════════════════════════════════════════════════════════════════════════
-// CROSSFADE MODE
-// Both videos play the same clip at SPEED (slow-mo).
-// Timeline per loop:
-//   0 ─────────────────── (clipDur*1000/SPEED - CF_MS) ── CF_MS ── done
-//   active plays slow                                    crossfade  standby becomes active
-//                                                                   standby resets to 0
-// Key: standby starts from currentTime=0 ALWAYS.
-// Both are playing slow-mo so the clip feels long (20s clip = 40s at 0.5x).
-// ════════════════════════════════════════════════════════════════════════════════
+// ── CROSSFADE ENGINE ──────────────────────────────────────────────────────────
 async function startCrossfade(clip) {
-  canvas.style.display = 'none';
-
-  const stage = document.querySelector('.stage');
+  const stage = document.getElementById('stage');
   stage.querySelectorAll('video.cf-vid').forEach(v => v.remove());
 
   vA = makeVid(); vB = makeVid();
@@ -512,43 +715,37 @@ async function startCrossfade(clip) {
     return v;
   }
 
-  const url = clip.url;
-  vA.src = url; vB.src = url;
+  vA.src = clip.url; vB.src = clip.url;
 
-  // Wait for both to be ready
   await Promise.all([
-    new Promise((res,rej) => { vA.oncanplaythrough=res; vA.onerror=rej; vA.load(); }),
-    new Promise((res,rej) => { vB.oncanplaythrough=res; vB.onerror=rej; vB.load(); }),
+    new Promise(r => { vA.oncanplaythrough = r; vA.load(); }),
+    new Promise(r => { vB.oncanplaythrough = r; vB.load(); }),
   ]);
 
-  clipDur = (vA.duration && isFinite(vA.duration)) ? vA.duration : clip.duration;
-  // Effective clip duration at slow speed
-  const effectiveDur = clipDur / SPEED;
-  lg(`clip ${clipDur.toFixed(1)}s · at ${SPEED}x = ${effectiveDur.toFixed(0)}s effective · cf ${CF_MS/1000}s`, 'lc');
-
-  if (effectiveDur < CF_MS/1000 * 2) {
-    lg('clip too short for smooth crossfade at this speed — fetching might give better results', 'lg');
+  if (vA.duration && isFinite(vA.duration)) {
+    // Update loopOut if it was set to clip.duration estimate
+    if (loopOut >= clip.duration - 0.5) {
+      loopOut = vA.duration;
+      document.getElementById('outSlider').max   = vA.duration;
+      document.getElementById('outSlider').value = vA.duration;
+      document.getElementById('outVal').textContent = fmtS(vA.duration);
+    }
+    document.getElementById('inSlider').max  = vA.duration;
+    document.getElementById('outSlider').max = vA.duration;
+    updateRegionUI();
   }
 
-  // Start vA playing slow
   vA.playbackRate = SPEED;
-  vA.currentTime  = 0;
+  vA.currentTime  = loopIn;
   vA.play();
-  vA.style.opacity = '1';
-  vA.style.zIndex  = '2';
-
-  // Preload vB at start, not playing yet
+  vA.style.opacity = '1'; vA.style.zIndex = '2';
   vB.playbackRate = SPEED;
-  vB.currentTime  = 0;
+  vB.currentTime  = loopIn;
   vB.style.zIndex = '1';
 
-  activeVid  = vA;
-  standbyVid = vB;
-
+  activeVid = vA; standbyVid = vB;
+  document.getElementById('hudMode').textContent = `↺ CF ${(CF_MS/1000).toFixed(0)}s`;
   document.getElementById('hudLoop').textContent = 'LOOP 1';
-  document.getElementById('hudDir').textContent  = `${SPEED}x`;
-  document.getElementById('hudClip').textContent = `${clipDur.toFixed(0)}s → ${effectiveDur.toFixed(0)}s`;
-  sessionStart = performance.now();
 
   startTick();
   scheduleCF();
@@ -557,91 +754,121 @@ async function startCrossfade(clip) {
 function scheduleCF() {
   if (!running) return;
   clearTimeout(cfTimer);
-
-  // How long until we should START the crossfade:
-  // We want to crossfade CF_MS before the active video naturally ends at SPEED.
-  // Active video's remaining real time = (clipDur - activeVid.currentTime) / SPEED * 1000
-  // We start CF that many ms before the end, minus CF_MS.
-  const remaining = ((clipDur - (activeVid ? activeVid.currentTime : 0)) / SPEED * 1000) - CF_MS;
-  const delay = Math.max(remaining, 500);
-
-  lg(`next loop in ${(delay/1000).toFixed(1)}s`, 'lt');
+  const effectiveOut = loopOut || (currentClip ? currentClip.duration : 30);
+  const curTime      = activeVid ? activeVid.currentTime : loopIn;
+  const remaining    = ((effectiveOut - curTime) / SPEED * 1000) - CF_MS;
+  const delay        = Math.max(remaining, 300);
   cfTimer = setTimeout(doCF, delay);
 }
 
 function doCF() {
   if (!running) return;
-
   loopN++;
   document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
   lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
 
-  const out = activeVid;
-  const inn = standbyVid;
-
-  // Standby starts from 0, playing at SPEED — fresh loop
-  inn.currentTime  = 0;
+  const out = activeVid, inn = standbyVid;
+  inn.currentTime  = loopIn;
   inn.playbackRate = SPEED;
   inn.play();
-  inn.style.zIndex    = '3'; // on top
+  inn.style.zIndex    = '3';
   inn.style.transition = 'none';
   inn.style.opacity    = '0';
-
-  // Force reflow then fade in
   inn.getBoundingClientRect();
   inn.style.transition = `opacity ${CF_MS}ms ease-in-out`;
   inn.style.opacity    = '1';
 
-  // After fade completes: outgoing stops, becomes standby
   setTimeout(() => {
-    out.pause();
-    out.currentTime  = 0;
-    out.style.transition = 'none';
-    out.style.opacity    = '0';
-    out.style.zIndex     = '2';
-    inn.style.zIndex     = '2';
-
-    activeVid  = inn;
-    standbyVid = out;
-
-    scheduleCF(); // schedule next loop from current position
-  }, CF_MS + 200);
+    out.pause(); out.currentTime = loopIn;
+    out.style.transition = 'none'; out.style.opacity = '0'; out.style.zIndex = '2';
+    inn.style.zIndex = '2';
+    activeVid = inn; standbyVid = out;
+    scheduleCF();
+  }, CF_MS + 150);
 }
 
-// ── Seek ──────────────────────────────────────────────────────────────────────
-function seekTo(frac) {
-  if (!running || !clipDur) return;
-  const seekSecs = Math.max(0, Math.min(frac * targetSecs, targetSecs - 0.1));
-  sessionStart   = performance.now() - seekSecs * 1000;
-  elapsed        = seekSecs;
-  setProgress(frac);
+// ── PENDULUM ENGINE ───────────────────────────────────────────────────────────
+let pendVid, pendPos, pendDir, pendRafId, lastPendT;
 
-  if (loopMode === 'pendulum') {
-    // Map session time to pendulum position
-    const totalTravel = clipDur / SLOW;
-    const cycleT      = seekSecs % (totalTravel * 2);
-    pendPos = cycleT < totalTravel ? cycleT * SLOW : clipDur - (cycleT - totalTravel) * SLOW;
-    pendPos = Math.max(0, Math.min(clipDur, pendPos));
-    pendDir = cycleT < totalTravel ? 1 : -1;
-  } else {
-    const sceneOffset = seekSecs % clipDur;
-    if (activeVid) { activeVid.currentTime = sceneOffset; if (activeVid.paused) activeVid.play(); }
-    clearTimeout(cfTimer); scheduleCF();
+async function startPendulum(clip) {
+  const stage = document.getElementById('stage');
+  stage.querySelectorAll('video.cf-vid').forEach(v => v.remove());
+
+  pendVid = makeVid2();
+  stage.insertBefore(pendVid, stage.firstChild);
+
+  function makeVid2() {
+    const v = document.createElement('video');
+    v.className = 'cf-vid';
+    v.setAttribute('playsinline',''); v.muted = true;
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;';
+    return v;
   }
-  lg(`⏩ ${fmt(seekSecs)}`, 'lg');
+
+  pendVid.src = clip.url;
+  await new Promise(r => { pendVid.oncanplaythrough = r; pendVid.load(); });
+
+  if (pendVid.duration && isFinite(pendVid.duration) && loopOut >= clip.duration - 0.5) {
+    loopOut = pendVid.duration;
+    document.getElementById('outSlider').max   = pendVid.duration;
+    document.getElementById('outSlider').value = pendVid.duration;
+    document.getElementById('outVal').textContent = fmtS(pendVid.duration);
+    updateRegionUI();
+  }
+
+  pendPos  = loopIn;
+  pendDir  = 1;
+  lastPendT = performance.now();
+
+  pendVid.playbackRate = SPEED;
+  pendVid.currentTime  = loopIn;
+  pendVid.play();
+
+  document.getElementById('hudMode').textContent = `⇄ PEND ${SPEED}x`;
+  document.getElementById('hudLoop').textContent = '▶ FWD';
+
+  startTick();
+  pendFrame(performance.now());
 }
 
-(function() {
-  const track = document.getElementById('pgTrack');
-  let drag = false;
-  const frac = e => { const r=track.getBoundingClientRect(), x=e.touches?e.touches[0].clientX:e.clientX; return Math.max(0,Math.min(1,(x-r.left)/r.width)); };
-  track.addEventListener('mousedown', e => { if(running){drag=true;seekTo(frac(e));} });
-  window.addEventListener('mousemove', e => { if(drag)seekTo(frac(e)); });
-  window.addEventListener('mouseup', ()=>{ drag=false; });
-  track.addEventListener('touchstart', e=>{if(running){drag=true;seekTo(frac(e));}},{passive:true});
-  window.addEventListener('touchmove', e=>{if(drag)seekTo(frac(e));},{passive:true});
-  window.addEventListener('touchend', ()=>{drag=false;});
-})();
+function pendFrame(now) {
+  if (!running) return;
+  const dt = (now - lastPendT) / 1000;
+  lastPendT = now;
+
+  const effectiveOut = loopOut || (currentClip ? currentClip.duration : 30);
+
+  if (pendDir === 1) {
+    // Playing forward natively — just watch currentTime
+    pendPos = pendVid.currentTime;
+    if (pendPos >= effectiveOut - 0.1) {
+      // Flip to reverse
+      pendDir = -1;
+      pendPos = effectiveOut;
+      pendVid.pause();
+      loopN++;
+      document.getElementById('hudLoop').textContent = `◀ REV ×${loopN}`;
+      lg(`↩ rev · ${fmt(elapsed)}`, 'lc');
+    }
+  } else {
+    // Reverse: manually step backward
+    pendPos = Math.max(loopIn, pendPos - SPEED * dt);
+    pendVid.currentTime = pendPos;
+    if (pendPos <= loopIn + 0.05) {
+      // Flip to forward
+      pendDir = 1;
+      pendPos = loopIn;
+      pendVid.currentTime = loopIn;
+      pendVid.play();
+      loopN++;
+      document.getElementById('hudLoop').textContent = `▶ FWD ×${loopN}`;
+      lg(`↪ fwd · ${fmt(elapsed)}`, 'lc');
+    }
+  }
+
+  updateScrubHead(pendPos, currentClip ? currentClip.duration : 30);
+  pendRafId = requestAnimationFrame(pendFrame);
+}
 
 // ── Tick ──────────────────────────────────────────────────────────────────────
 function startTick() {
@@ -652,24 +879,48 @@ function startTick() {
     setProgress(elapsed / targetSecs);
     document.getElementById('hudTime').textContent = fmt(elapsed);
     document.getElementById('infoL').innerHTML = `<span class="ok">${fmt(elapsed)}</span> / ${fmt(targetSecs)}`;
-    if (elapsed >= targetSecs) { lg('target reached', 'lc'); stopSession(); }
+
+    // Update scrubhead for crossfade mode
+    if (loopMode === 'crossfade' && activeVid && currentClip) {
+      updateScrubHead(activeVid.currentTime, currentClip.duration);
+    }
+
+    if (elapsed >= targetSecs) { lg('done ✓', 'lc'); stopCleanup(); }
   }, 400);
 }
 
 // ── Stop ──────────────────────────────────────────────────────────────────────
-function stopSession() {
+function stopCleanup() {
   running = false;
-  cancelAnimationFrame(animId);
-  if (typeof reverseAnimId !== 'undefined') cancelAnimationFrame(reverseAnimId);
   clearTimeout(cfTimer);
   clearInterval(tickTimer);
-  srcVid.pause();
-  if (vA) vA.pause(); if (vB) vB.pause();
+  cancelAnimationFrame(pendRafId);
+  if (vA) { vA.pause(); } if (vB) { vB.pause(); }
+  if (pendVid) pendVid.pause();
   document.getElementById('btnStart').disabled = false;
   document.getElementById('btnStop').style.display = 'none';
-  if (clipPool.length > 0) document.getElementById('btnTry').style.display = 'block';
+}
+
+function stopSession() {
+  stopCleanup();
   lg(`stopped · ${fmt(elapsed)} · ${loopN} loop(s)`, 'lg');
 }
+
+// ── Session progress seek ─────────────────────────────────────────────────────
+(function() {
+  const track = document.getElementById('pgTrack');
+  let drag = false;
+  const frac = e => { const r=track.getBoundingClientRect(), x=e.touches?e.touches[0].clientX:e.clientX; return Math.max(0,Math.min(1,(x-r.left)/r.width)); };
+  track.addEventListener('mousedown', e => { if(running){drag=true;} });
+  window.addEventListener('mousemove', e => {
+    if (!drag || !running) return;
+    const f = frac(e);
+    sessionStart = performance.now() - f * targetSecs * 1000;
+    elapsed = f * targetSecs;
+    setProgress(f);
+  });
+  window.addEventListener('mouseup', () => { drag=false; });
+})();
 </script>
 </body>
 </html>
