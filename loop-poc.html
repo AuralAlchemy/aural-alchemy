@@ -138,11 +138,21 @@
 <div class="card">
   <span class="card-title">01 · Theme</span>
   <div class="themes">
-    <button class="theme-btn active" data-query="nature forest aerial drone">🌿<br>Nature</button>
-    <button class="theme-btn" data-query="galaxy stars space nebula">🌌<br>Galaxy</button>
-    <button class="theme-btn" data-query="ocean waves aerial slow">🌊<br>Ocean</button>
-    <button class="theme-btn" data-query="rain slow motion dark">🌧<br>Rain</button>
-    <button class="theme-btn" data-query="fire flame slow motion">🔥<br>Fire</button>
+    <button class="theme-btn active"
+      data-cf="waterfall close up static mist"
+      data-pend="forest path drone flythrough slow">🌿<br>Nature</button>
+    <button class="theme-btn"
+      data-cf="stars night sky milky way static"
+      data-pend="star timelapse sky rotation long exposure">🌌<br>Galaxy</button>
+    <button class="theme-btn"
+      data-cf="calm ocean shore waves breaking static"
+      data-pend="aerial coastline drone ocean sunset">🌊<br>Ocean</button>
+    <button class="theme-btn"
+      data-cf="rain drops window glass close up"
+      data-pend="sunset timelapse clouds moving sky">🌧<br>Rain</button>
+    <button class="theme-btn"
+      data-cf="fire flame candle close up static"
+      data-pend="lava flow slow motion volcanic">🔥<br>Fire</button>
   </div>
 </div>
 
@@ -151,6 +161,19 @@
   <div class="mode-toggle">
     <button class="mode-btn active" data-mode="crossfade">↺ Crossfade loop<br><small style="opacity:0.6">restarts from beginning</small></button>
     <button class="mode-btn" data-mode="pendulum">⇄ Pendulum / reverse<br><small style="opacity:0.6">forward → reverse → forward</small></button>
+  </div>
+
+  <div>
+    <label style="font-size:0.75rem;letter-spacing:0.07em;color:var(--dim);display:flex;justify-content:space-between;margin-bottom:8px;">
+      <span>Playback speed</span>
+      <span id="speedVal" style="color:var(--cyan);font-family:'Share Tech Mono',monospace;">0.5x</span>
+    </label>
+    <input type="range" id="speedSlider" min="0.1" max="1.0" step="0.05" value="0.5"
+      style="width:100%;accent-color:var(--cyan);cursor:pointer;"
+      oninput="document.getElementById('speedVal').textContent=parseFloat(this.value).toFixed(2)+'x'">
+    <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--dim);margin-top:4px;">
+      <span>0.1x ultra slow</span><span>0.5x cinematic</span><span>1.0x normal</span>
+    </div>
   </div>
 
   <div class="dur-chips">
@@ -166,6 +189,10 @@
     <button class="btn btn-start" id="btnStart" onclick="startSession()">▶ START</button>
     <button class="btn btn-stop"  id="btnStop"  onclick="stopSession()">■ STOP</button>
   </div>
+  <button class="btn" id="btnTry" onclick="tryAnother()"
+    style="display:none;border-color:var(--dim);color:var(--dim);padding:10px;">
+    ↻ TRY ANOTHER CLIP
+  </button>
 </div>
 
 <div class="preview-wrap" id="preview">
@@ -192,12 +219,13 @@
 
 <script>
 const PROXY   = 'https://white-cloud-27a9.nanomarche.workers.dev';
-const CF_MS   = 4000;  // 4s crossfade — long and invisible
-const SPEED   = 0.5;   // slow-mo playback rate
+const CF_MS   = 4000;  // 4s crossfade
+let   SPEED   = 0.5;   // controlled by slider
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let query      = 'nature forest aerial drone';
-let loopMode   = 'crossfade'; // 'crossfade' | 'pendulum'
+let queryCF   = 'waterfall close up static mist';
+let queryPend = 'forest path drone flythrough slow';
+let loopMode  = 'crossfade';
 let targetSecs = 30;
 let running    = false;
 let loopN      = 0;
@@ -222,7 +250,9 @@ const srcVid  = document.getElementById('srcVid');
 // ── UI ────────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
-  b.classList.add('active'); query = b.dataset.query;
+  b.classList.add('active');
+  queryCF   = b.dataset.cf;
+  queryPend = b.dataset.pend;
 }));
 document.querySelectorAll('.dur-chip').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.dur-chip').forEach(x => x.classList.remove('active'));
@@ -248,10 +278,15 @@ function setProgress(frac) {
   document.getElementById('pgThumb').style.left = pct;
 }
 
-// ── Fetch best clip ───────────────────────────────────────────────────────────
-async function fetchClip(q) {
-  lg(`fetching: "${q}"...`);
-  const res = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape`);
+// ── Clip pool — keeps fetched results so "try another" doesn't re-hit API ────
+let clipPool  = [];   // all candidates from last fetch
+let clipIndex = 0;    // which one we're currently on
+
+async function fetchClipPool(q) {
+  // Random page 1-5 so repeat users get different results each time
+  const page = Math.floor(Math.random() * 5) + 1;
+  lg(`fetching page ${page} for "${q}"...`);
+  const res = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape&page=${page}`);
   if (!res.ok) throw new Error(`worker ${res.status}`);
   const data = await res.json();
   if (!data.videos?.length) throw new Error('no results');
@@ -262,7 +297,6 @@ async function fetchClip(q) {
                || files.find(f => f.width >= 960)
                || files[0];
     if (!file) return null;
-    // 20-40s is ideal: long enough for infrequent loops, short enough to buffer fast
     const durScore = (v.duration >= 20 && v.duration <= 40) ? 4
                    : (v.duration > 40 && v.duration <= 60)  ? 2
                    : (v.duration >= 10)                     ? 1 : 0;
@@ -270,35 +304,59 @@ async function fetchClip(q) {
     return { url: file.link, duration: v.duration, w: file.width, h: file.height, score: durScore + resScore };
   }).filter(Boolean);
 
-  scored.sort((a,b) => b.score - a.score);
-  return scored[0];
+  // Shuffle within same score tier so order varies each run
+  scored.sort((a,b) => b.score - a.score + (Math.random() - 0.5) * 0.5);
+
+  clipPool  = scored;
+  clipIndex = 0;
+  lg(`got ${scored.length} candidates`, 'lt');
+  return clipPool[0];
+}
+
+function nextClip() {
+  clipIndex = (clipIndex + 1) % clipPool.length;
+  return clipPool[clipIndex];
 }
 
 // ── START ─────────────────────────────────────────────────────────────────────
-async function startSession() {
+async function startSession(clip = null) {
   document.getElementById('btnStart').disabled = true;
   document.getElementById('btnStop').style.display = 'block';
+  document.getElementById('btnTry').style.display = 'none';
   document.getElementById('preview').classList.add('visible');
   document.getElementById('log').innerHTML = '';
   running = true; loopN = 1; elapsed = 0;
   setProgress(0);
 
-  let clip;
-  try {
-    clip = await fetchClip(query);
-    lg(`got clip · ${clip.duration}s · ${clip.w}×${clip.h}`, 'lc');
-    document.getElementById('hudClip').textContent = `${clip.duration}s · ${loopMode}`;
-    document.getElementById('infoR').textContent = `${clip.duration}s clip · ${fmt(targetSecs)} target`;
-  } catch(e) {
-    lg(`error: ${e.message}`, 'lg');
-    stopSession(); return;
+  if (!clip) {
+    const q = loopMode === 'pendulum' ? queryPend : queryCF;
+    try {
+      clip = await fetchClipPool(q);
+    } catch(e) {
+      lg(`error: ${e.message}`, 'lg');
+      stopSession(); return;
+    }
   }
+
+  SPEED = parseFloat(document.getElementById('speedSlider').value);
+  lg(`clip ${clip.duration}s · ${clip.w}×${clip.h} · speed ${SPEED}x · mode ${loopMode}`, 'lc');
+  document.getElementById('hudClip').textContent = `${clip.duration}s`;
+  document.getElementById('infoR').textContent = `${clip.duration}s · ${SPEED}x · ${fmt(targetSecs)} target`;
 
   if (loopMode === 'pendulum') {
     startPendulum(clip);
   } else {
     startCrossfade(clip);
   }
+}
+
+async function tryAnother() {
+  stopSession();
+  await new Promise(r => setTimeout(r, 300));
+  const q = loopMode === 'pendulum' ? queryPend : queryCF;
+  const clip = clipPool.length > 1 ? nextClip() : await fetchClipPool(q);
+  lg(`trying clip ${clipIndex + 1}/${clipPool.length}`, 'lt');
+  startSession(clip);
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
@@ -602,13 +660,15 @@ function startTick() {
 function stopSession() {
   running = false;
   cancelAnimationFrame(animId);
+  if (typeof reverseAnimId !== 'undefined') cancelAnimationFrame(reverseAnimId);
   clearTimeout(cfTimer);
   clearInterval(tickTimer);
   srcVid.pause();
   if (vA) vA.pause(); if (vB) vB.pause();
   document.getElementById('btnStart').disabled = false;
   document.getElementById('btnStop').style.display = 'none';
-  lg(`stopped · ${fmt(elapsed)} · ${loopN} bounce(s)`, 'lg');
+  if (clipPool.length > 0) document.getElementById('btnTry').style.display = 'block';
+  lg(`stopped · ${fmt(elapsed)} · ${loopN} loop(s)`, 'lg');
 }
 </script>
 </body>
