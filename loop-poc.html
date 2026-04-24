@@ -441,6 +441,7 @@ let CF_MS        = 4000;
 let clipPool     = [];
 let clipIndex    = 0;
 let currentClip  = null; // locked in — tryAnother changes this, restart does NOT
+let _lastEditorClip = null; // track which clip the editor was set up for
 
 let running      = false;
 let loopN        = 0;
@@ -517,11 +518,13 @@ function getQuery() {
   return loopMode === 'pendulum' ? sub.pend : sub.cf;
 }
 
-// ── Fetch ─────────────────────────────────────────────────────────────────────
 async function fetchPool(q) {
-  const page = Math.floor(Math.random() * 8) + 1;
-  lg(`fetching p${page}: "${q}"...`);
-  const res = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape&page=${page}`);
+  // For crossfade, append static-biasing keywords
+  const isCF  = loopMode === 'crossfade';
+  const qFull = isCF ? `${q} static still` : q;
+  const page  = Math.floor(Math.random() * 8) + 1;
+  lg(`fetching p${page}: "${qFull}"...`);
+  const res = await fetch(`${PROXY}?query=${encodeURIComponent(qFull)}&per_page=15&orientation=landscape&page=${page}`);
   if (!res.ok) throw new Error(`worker ${res.status}`);
   const data = await res.json();
   if (!data.videos?.length) throw new Error('no results');
@@ -532,26 +535,30 @@ async function fetchPool(q) {
                 || files.find(f => f.width >= 960) || files[0];
     if (!file) return null;
     const dur = v.duration;
-    const ds  = (dur >= 20 && dur <= 45) ? 4 : (dur > 45 && dur <= 90) ? 2 : dur >= 10 ? 1 : 0;
-    const rs  = file.width >= 1280 ? 1 : 0;
+    // For crossfade prefer longer clips (less frequent loops)
+    // For pendulum prefer 15-40s (nice travel distance)
+    const ds = isCF
+      ? ((dur >= 20 && dur <= 60) ? 4 : dur >= 10 ? 2 : 1)
+      : ((dur >= 15 && dur <= 40) ? 4 : dur >= 10 ? 2 : 1);
+    const rs = file.width >= 1280 ? 1 : 0;
     return { url: file.link, duration: dur, w: file.width, h: file.height, score: ds + rs };
   }).filter(Boolean);
 
-  // Shuffle within tiers for variety
   scored.sort((a, b) => b.score - a.score + (Math.random() - 0.5) * 0.4);
   clipPool  = scored;
   clipIndex = 0;
-  lg(`${scored.length} clips found`, 'lt');
+  lg(`${scored.length} clips · top: ${scored[0]?.duration}s ${scored[0]?.w}×${scored[0]?.h}`, 'lt');
   return scored[0];
 }
 
 // ── START ─────────────────────────────────────────────────────────────────────
-async function startSession(clip) {
-  // If no clip passed, fetch new pool. If clip passed, use it (tryAnother or restart).
-  SPEED  = parseFloat(document.getElementById('speedSlider').value);
-  CF_MS  = parseFloat(document.getElementById('cfSlider').value) * 1000;
+// RULE: never fetch unless currentClip is null (first ever start) or tryAnother called.
+// Stop/start always reuses currentClip.
+async function startSession(forceClip) {
+  SPEED = parseFloat(document.getElementById('speedSlider').value);
+  CF_MS = parseFloat(document.getElementById('cfSlider').value) * 1000;
 
-  stopCleanup(); // stop any running session without resetting currentClip
+  stopCleanup();
 
   running = true; loopN = 1; elapsed = 0;
   document.getElementById('btnStart').disabled = true;
@@ -559,22 +566,28 @@ async function startSession(clip) {
   document.getElementById('preview').style.display = 'flex';
   document.getElementById('log').innerHTML = '';
 
+  // Priority: forceClip (from tryAnother) > currentClip (reuse) > fetch (first time)
+  let clip = forceClip || currentClip;
+
   if (!clip) {
-    // First start — fetch
     try {
       clip = await fetchPool(getQuery());
+      currentClip = clip;
     } catch(e) {
       lg(`error: ${e.message}`, 'lg');
       stopCleanup(); return;
     }
-    currentClip = clip;
   }
 
   lg(`clip ${clip.duration}s · ${clip.w}×${clip.h} · ${SPEED}x · ${loopMode}`, 'lc');
   document.getElementById('hudClip').textContent = `${clip.duration}s`;
   document.getElementById('infoR').textContent   = `${clip.duration}s · ${SPEED}x · ${fmt(targetSecs)}`;
 
-  setupLoopEditor(clip);
+  // Only reset loop editor if this is a brand new clip
+  if (!loopOut || clip !== _lastEditorClip) {
+    setupLoopEditor(clip);
+    _lastEditorClip = clip;
+  }
   setProgress(0);
   sessionStart = performance.now();
 
@@ -585,25 +598,22 @@ async function startSession(clip) {
   }
 }
 
-// Restart with SAME clip
-function restartSession() {
-  if (currentClip) startSession(currentClip);
-}
-
 async function tryAnother() {
-  const q = getQuery();
   stopCleanup();
   await new Promise(r => setTimeout(r, 100));
+  const q = getQuery();
   let clip;
   if (clipPool.length > 1) {
     clipIndex = (clipIndex + 1) % clipPool.length;
     clip = clipPool[clipIndex];
-    lg(`clip ${clipIndex + 1}/${clipPool.length}`, 'lt');
+    lg(`trying clip ${clipIndex + 1}/${clipPool.length}`, 'lt');
   } else {
-    clip = await fetchPool(q).catch(e => { lg(e.message,'lg'); return null; });
+    clip = await fetchPool(q).catch(e => { lg(e.message, 'lg'); return null; });
     if (!clip) return;
   }
   currentClip = clip;
+  _lastEditorClip = null; // force editor reset for new clip
+  loopOut = null;
   startSession(clip);
 }
 
@@ -613,90 +623,109 @@ function setupLoopEditor(clip) {
   loopIn  = 0;
   loopOut = dur;
 
-  // Set slider ranges to clip duration
-  document.getElementById('inSlider').max  = dur;
-  document.getElementById('inSlider').value = 0;
-  document.getElementById('outSlider').max  = dur;
-  document.getElementById('outSlider').value = dur;
+  const inS  = document.getElementById('inSlider');
+  const outS = document.getElementById('outSlider');
+  inS.max = dur;  inS.value = 0;
+  outS.max = dur; outS.value = dur;
 
   document.getElementById('scrubEnd').textContent = fmtS(dur);
   document.getElementById('scrubMid').textContent = fmtS(dur / 2);
   document.getElementById('inVal').textContent    = '0.0s';
   document.getElementById('outVal').textContent   = fmtS(dur);
   document.getElementById('regionLabel').textContent = `IN: 0.0s · OUT: ${fmtS(dur)}`;
-
   updateRegionUI();
 }
 
 function onRegionChange() {
+  if (!currentClip) return;
   const inS  = document.getElementById('inSlider');
   const outS = document.getElementById('outSlider');
-  const dur  = currentClip ? currentClip.duration : 100;
-
   let newIn  = parseFloat(inS.value);
   let newOut = parseFloat(outS.value);
+  const MIN_GAP = 2;
 
-  // Enforce min gap of 2s
-  if (newIn >= newOut - 2) {
-    if (document.activeElement === inS) {
-      newIn = newOut - 2;
-      inS.value = newIn;
-    } else {
-      newOut = newIn + 2;
-      outS.value = newOut;
-    }
+  if (newIn >= newOut - MIN_GAP) {
+    if (document.activeElement === inS) { newIn = newOut - MIN_GAP; inS.value = newIn; }
+    else                                { newOut = newIn + MIN_GAP; outS.value = newOut; }
   }
 
   loopIn  = newIn;
   loopOut = newOut;
-
   document.getElementById('inVal').textContent  = fmtS(loopIn);
   document.getElementById('outVal').textContent = fmtS(loopOut);
-  document.getElementById('regionLabel').textContent = `IN: ${fmtS(loopIn)} · OUT: ${fmtS(loopOut)} · ${fmtS(loopOut-loopIn)} region`;
-
+  document.getElementById('regionLabel').textContent = `IN: ${fmtS(loopIn)} · OUT: ${fmtS(loopOut)} · ${fmtS(loopOut - loopIn)} region`;
   updateRegionUI();
 
-  // Restart loop from new in point — cleanly kill old timers first
-  if (running && loopMode === 'crossfade') {
+  // Apply immediately to active video + reschedule
+  if (running) {
     clearTimeout(cfTimer);
-    // Seek active to loopIn, reschedule
-    if (activeVid) {
-      activeVid.currentTime = loopIn;
+    if (loopMode === 'crossfade' && activeVid) {
+      if (activeVid.currentTime < loopIn || activeVid.currentTime > loopOut) {
+        activeVid.currentTime = loopIn;
+      }
       if (activeVid.paused) activeVid.play();
+      scheduleCF();
     }
-    scheduleCF();
+    if (loopMode === 'pendulum' && pendVid) {
+      if (pendPos < loopIn || pendPos > loopOut) {
+        pendPos = loopIn;
+        pendVid.currentTime = loopIn;
+        if (pendDir === 1) pendVid.play();
+      }
+    }
   }
 }
 
 function updateRegionUI() {
   if (!currentClip) return;
-  const dur  = currentClip.duration;
+  const dur    = currentClip.duration;
   const inPct  = (loopIn  / dur) * 100;
-  const outPct = (loopOut / dur) * 100;
+  const outPct = ((loopOut || dur) / dur) * 100;
   const region = document.getElementById('loopRegion');
   region.style.left  = inPct + '%';
   region.style.width = (outPct - inPct) + '%';
 }
 
-// Update scrubber playhead
 function updateScrubHead(pos, dur) {
   const pct = Math.min(pos / dur * 100, 100);
   document.getElementById('scrubHead').style.left  = pct + '%';
   document.getElementById('scrubFill').style.width = pct + '%';
 }
 
-// Click on scrubber to seek video
-document.getElementById('scrubWrap').addEventListener('click', e => {
-  if (!currentClip || !running) return;
-  const r    = e.currentTarget.getBoundingClientRect();
-  const frac = (e.clientX - r.left) / r.width;
-  const pos  = frac * currentClip.duration;
-  if (activeVid) {
-    activeVid.currentTime = pos;
-    clearTimeout(cfTimer);
-    scheduleCF();
+// Scrubber: click or drag to seek — works even when not running (preview scrub)
+(function() {
+  const wrap = document.getElementById('scrubWrap');
+  let dragging = false;
+
+  function seekScrub(e) {
+    if (!currentClip) return;
+    const r    = wrap.getBoundingClientRect();
+    const cx   = e.touches ? e.touches[0].clientX : e.clientX;
+    const frac = Math.max(0, Math.min(1, (cx - r.left) / r.width));
+    const pos  = frac * currentClip.duration;
+
+    updateScrubHead(pos, currentClip.duration);
+
+    // Seek whichever video is active
+    const vid = loopMode === 'crossfade' ? activeVid : pendVid;
+    if (vid) {
+      vid.currentTime = pos;
+      if (loopMode === 'crossfade') {
+        clearTimeout(cfTimer);
+        if (running) scheduleCF();
+      } else if (loopMode === 'pendulum') {
+        pendPos = pos;
+      }
+    }
   }
-});
+
+  wrap.addEventListener('mousedown',  e => { dragging = true; seekScrub(e); });
+  window.addEventListener('mousemove', e => { if (dragging) seekScrub(e); });
+  window.addEventListener('mouseup',   () => { dragging = false; });
+  wrap.addEventListener('touchstart',  e => { dragging = true; seekScrub(e); }, { passive: true });
+  window.addEventListener('touchmove', e => { if (dragging) seekScrub(e); }, { passive: true });
+  window.addEventListener('touchend',  () => { dragging = false; });
+})();
 
 // ── CROSSFADE ENGINE ──────────────────────────────────────────────────────────
 async function startCrossfade(clip) {
