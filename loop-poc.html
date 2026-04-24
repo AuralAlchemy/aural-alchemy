@@ -191,9 +191,9 @@
 <div class="log" id="log"></div>
 
 <script>
-const PROXY  = 'https://white-cloud-27a9.nanomarche.workers.dev';
-const CF_MS  = 2500;   // crossfade mode: fade duration
-const SLOW   = 0.6;    // playback speed — 0.6x feels slow-mo but still has visible motion
+const PROXY   = 'https://white-cloud-27a9.nanomarche.workers.dev';
+const CF_MS   = 4000;  // 4s crossfade — long and invisible
+const SPEED   = 0.5;   // slow-mo playback rate
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let query      = 'nature forest aerial drone';
@@ -262,9 +262,10 @@ async function fetchClip(q) {
                || files.find(f => f.width >= 960)
                || files[0];
     if (!file) return null;
-    // Sweet spot: 10-30s clips tend to have clear visible motion
-    const durScore = (v.duration >= 10 && v.duration <= 30) ? 3
-                   : (v.duration > 30 && v.duration <= 60)  ? 2 : 1;
+    // 20-40s is ideal: long enough for infrequent loops, short enough to buffer fast
+    const durScore = (v.duration >= 20 && v.duration <= 40) ? 4
+                   : (v.duration > 40 && v.duration <= 60)  ? 2
+                   : (v.duration >= 10)                     ? 1 : 0;
     const resScore = file.width >= 1280 ? 1 : 0;
     return { url: file.link, duration: v.duration, w: file.width, h: file.height, score: durScore + resScore };
   }).filter(Boolean);
@@ -426,48 +427,69 @@ srcVid.addEventListener('seeked', () => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════════
-// CROSSFADE MODE — dual video with pre-roll
+// CROSSFADE MODE
+// Both videos play the same clip at SPEED (slow-mo).
+// Timeline per loop:
+//   0 ─────────────────── (clipDur*1000/SPEED - CF_MS) ── CF_MS ── done
+//   active plays slow                                    crossfade  standby becomes active
+//                                                                   standby resets to 0
+// Key: standby starts from currentTime=0 ALWAYS.
+// Both are playing slow-mo so the clip feels long (20s clip = 40s at 0.5x).
 // ════════════════════════════════════════════════════════════════════════════════
 async function startCrossfade(clip) {
-  canvas.style.display = 'none'; // not used in crossfade mode
+  canvas.style.display = 'none';
 
-  // Dynamically create two video elements inside the stage
   const stage = document.querySelector('.stage');
-  // Remove old ones if any
   stage.querySelectorAll('video.cf-vid').forEach(v => v.remove());
 
   vA = makeVid(); vB = makeVid();
-  stage.insertBefore(vA, stage.firstChild);
   stage.insertBefore(vB, stage.firstChild);
+  stage.insertBefore(vA, stage.firstChild);
 
   function makeVid() {
     const v = document.createElement('video');
     v.className = 'cf-vid';
-    v.setAttribute('playsinline',''); v.muted = true;
-    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;';
+    v.setAttribute('playsinline', ''); v.muted = true;
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:none;';
     return v;
   }
 
-  clipDur = clip.duration;
   const url = clip.url;
-
   vA.src = url; vB.src = url;
-  vB.load();
 
-  await new Promise((res, rej) => {
-    vA.oncanplay = res;
-    vA.onerror   = () => rej(new Error('video load failed'));
-    vA.load();
-  });
+  // Wait for both to be ready
+  await Promise.all([
+    new Promise((res,rej) => { vA.oncanplaythrough=res; vA.onerror=rej; vA.load(); }),
+    new Promise((res,rej) => { vB.oncanplaythrough=res; vB.onerror=rej; vB.load(); }),
+  ]);
 
-  if (vA.duration && isFinite(vA.duration)) clipDur = vA.duration;
+  clipDur = (vA.duration && isFinite(vA.duration)) ? vA.duration : clip.duration;
+  // Effective clip duration at slow speed
+  const effectiveDur = clipDur / SPEED;
+  lg(`clip ${clipDur.toFixed(1)}s · at ${SPEED}x = ${effectiveDur.toFixed(0)}s effective · cf ${CF_MS/1000}s`, 'lc');
 
-  vA.currentTime = 0; vA.play();
-  vA.style.opacity = '1'; vA.style.zIndex = '2';
-  activeVid = vA; standbyVid = vB;
+  if (effectiveDur < CF_MS/1000 * 2) {
+    lg('clip too short for smooth crossfade at this speed — fetching might give better results', 'lg');
+  }
+
+  // Start vA playing slow
+  vA.playbackRate = SPEED;
+  vA.currentTime  = 0;
+  vA.play();
+  vA.style.opacity = '1';
+  vA.style.zIndex  = '2';
+
+  // Preload vB at start, not playing yet
+  vB.playbackRate = SPEED;
+  vB.currentTime  = 0;
+  vB.style.zIndex = '1';
+
+  activeVid  = vA;
+  standbyVid = vB;
 
   document.getElementById('hudLoop').textContent = 'LOOP 1';
-  document.getElementById('hudDir').textContent  = '↺ CF';
+  document.getElementById('hudDir').textContent  = `${SPEED}x`;
+  document.getElementById('hudClip').textContent = `${clipDur.toFixed(0)}s → ${effectiveDur.toFixed(0)}s`;
   sessionStart = performance.now();
 
   startTick();
@@ -476,37 +498,56 @@ async function startCrossfade(clip) {
 
 function scheduleCF() {
   if (!running) return;
-  const prerollMs = 5000;
-  const triggerIn = Math.max(clipDur * 1000 - prerollMs - CF_MS, 200);
-  cfTimer = setTimeout(prerollAndFade, triggerIn);
+  clearTimeout(cfTimer);
+
+  // How long until we should START the crossfade:
+  // We want to crossfade CF_MS before the active video naturally ends at SPEED.
+  // Active video's remaining real time = (clipDur - activeVid.currentTime) / SPEED * 1000
+  // We start CF that many ms before the end, minus CF_MS.
+  const remaining = ((clipDur - (activeVid ? activeVid.currentTime : 0)) / SPEED * 1000) - CF_MS;
+  const delay = Math.max(remaining, 500);
+
+  lg(`next loop in ${(delay/1000).toFixed(1)}s`, 'lt');
+  cfTimer = setTimeout(doCF, delay);
 }
 
-function prerollAndFade() {
+function doCF() {
   if (!running) return;
-  // Start standby at same position as outgoing so frames match during blend
-  const matchPos = Math.max(0, activeVid.currentTime - (CF_MS / 1000) * 0.3);
-  standbyVid.currentTime = matchPos;
-  standbyVid.style.opacity = '0';
-  standbyVid.style.zIndex  = '3';
-  standbyVid.play();
 
+  loopN++;
+  document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
+  lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
+
+  const out = activeVid;
+  const inn = standbyVid;
+
+  // Standby starts from 0, playing at SPEED — fresh loop
+  inn.currentTime  = 0;
+  inn.playbackRate = SPEED;
+  inn.play();
+  inn.style.zIndex    = '3'; // on top
+  inn.style.transition = 'none';
+  inn.style.opacity    = '0';
+
+  // Force reflow then fade in
+  inn.getBoundingClientRect();
+  inn.style.transition = `opacity ${CF_MS}ms ease-in-out`;
+  inn.style.opacity    = '1';
+
+  // After fade completes: outgoing stops, becomes standby
   setTimeout(() => {
-    loopN++;
-    document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
-    lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
+    out.pause();
+    out.currentTime  = 0;
+    out.style.transition = 'none';
+    out.style.opacity    = '0';
+    out.style.zIndex     = '2';
+    inn.style.zIndex     = '2';
 
-    standbyVid.style.transition = `opacity ${CF_MS}ms ease-in-out`;
-    standbyVid.style.opacity    = '1';
+    activeVid  = inn;
+    standbyVid = out;
 
-    const out = activeVid, inn = standbyVid;
-    setTimeout(() => {
-      out.pause(); out.currentTime = 0;
-      out.style.transition = 'none'; out.style.opacity = '0'; out.style.zIndex = '2';
-      inn.style.zIndex = '2';
-      activeVid = inn; standbyVid = out;
-      scheduleCF();
-    }, CF_MS + 100);
-  }, 300);
+    scheduleCF(); // schedule next loop from current position
+  }, CF_MS + 200);
 }
 
 // ── Seek ──────────────────────────────────────────────────────────────────────
