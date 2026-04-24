@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loop PoC · Aural Alchemy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@300;400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080c18; --cyan: #4dd9c0; --gold: #c9a84c;
+    --text: #c8d0e0; --dim: #5a6278;
+    --glass: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Jost', sans-serif; font-weight: 300;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 36px 20px 60px; gap: 24px;
+  }
+  header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .logo { width: 46px; height: 46px; }
+  h1 {
+    font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 400;
+    letter-spacing: 0.25em;
+    background: linear-gradient(90deg, var(--cyan), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sub { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--dim); letter-spacing: 0.1em; }
+  .card {
+    background: var(--glass); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 26px; width: 100%; max-width: 560px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .card-title { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em; color: var(--gold); }
+  .themes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+  .theme-btn {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 4px; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; gap: 4px; transition: all 0.18s; color: var(--dim);
+    font-family: 'Jost', sans-serif; font-size: 0.66rem; letter-spacing: 0.04em;
+  }
+  .theme-btn:hover { border-color: var(--cyan); color: var(--text); }
+  .theme-btn.active { border-color: var(--cyan); background: rgba(77,217,192,0.07); color: var(--cyan); }
+  .theme-icon { font-size: 1.2rem; }
+  .dur-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .dur-chip {
+    padding: 7px 14px; border: 1px solid var(--border); border-radius: 20px;
+    background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.06em; transition: all 0.18s;
+  }
+  .dur-chip:hover { border-color: var(--gold); color: var(--text); }
+  .dur-chip.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn {
+    padding: 12px; border-radius: 8px; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.18em;
+    text-transform: uppercase; transition: all 0.2s; border: 1px solid;
+  }
+  .btn-start { background: linear-gradient(135deg, rgba(77,217,192,0.15), rgba(201,168,76,0.08)); border-color: var(--cyan); color: var(--cyan); }
+  .btn-start:hover { background: rgba(77,217,192,0.22); }
+  .btn-start:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-stop { background: rgba(201,168,76,0.08); border-color: var(--gold); color: var(--gold); display: none; }
+  .btn-stop:hover { background: rgba(201,168,76,0.18); }
+
+  /* Player */
+  .preview-wrap { width: 100%; max-width: 560px; display: none; flex-direction: column; gap: 10px; }
+  .preview-wrap.visible { display: flex; }
+  .stage {
+    position: relative; width: 100%; aspect-ratio: 16/9;
+    border-radius: 10px; overflow: hidden; background: #000;
+    border: 1px solid var(--border);
+  }
+  /* Two video elements stacked — crossfade via opacity */
+  .stage video {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; opacity: 0;
+  }
+  .stage video.active { opacity: 1; }
+  /* Crossfade handled by CSS transition on the incoming video */
+  .stage video.fading-in {
+    opacity: 1;
+    transition: opacity 1.8s ease;
+  }
+  .stage video.fading-out {
+    opacity: 0;
+    transition: opacity 1.8s ease;
+  }
+  .hud {
+    position: absolute; z-index: 4;
+    background: rgba(8,12,24,0.82); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 9px;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.09em;
+    pointer-events: none;
+  }
+  .hud-tl { top:10px; left:12px; color:var(--gold); border-color:rgba(201,168,76,0.3); opacity:0; transition:opacity 0.2s; }
+  .hud-tr { top:10px; right:12px; color:var(--cyan); }
+  .hud-bl { bottom:10px; left:12px; color:var(--dim); font-size:0.58rem; }
+  .hud-br { bottom:10px; right:12px; color:var(--cyan); }
+  .progress-track {
+    width: 100%; height: 6px; background: var(--border); border-radius: 3px;
+    position: relative; cursor: pointer; transition: height 0.15s;
+  }
+  .progress-track:hover { height: 9px; }
+  .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--gold)); border-radius:3px; pointer-events:none; }
+  .pg-thumb {
+    position:absolute; top:50%; left:0%; transform:translate(-50%,-50%);
+    width:14px; height:14px; border-radius:50%;
+    background:#fff; border:2px solid var(--cyan);
+    pointer-events:none; opacity:0; transition:opacity 0.15s;
+  }
+  .progress-track:hover .pg-thumb { opacity:1; }
+  .info-row { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.67rem; color:var(--dim); }
+  .ok { color:var(--cyan); }
+  .log {
+    width:100%; max-width:560px; background:rgba(0,0,0,0.28);
+    border:1px solid var(--border); border-radius:8px;
+    padding:12px 15px; font-family:'Share Tech Mono',monospace;
+    font-size:0.66rem; color:var(--dim); line-height:1.75;
+    max-height:140px; overflow-y:auto; display:none;
+  }
+  .log.on { display:block; }
+  .lc{color:var(--cyan);} .lg{color:var(--gold);} .lt{color:var(--text);}
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4dd9c0"/><stop offset="100%" stop-color="#c9a84c"/>
+    </linearGradient></defs>
+    <circle cx="50" cy="50" r="46" stroke="url(#g)" stroke-width="1.4" fill="none"/>
+    <polygon points="50,4 6.7,73 93.3,73" stroke="url(#g)" stroke-width="1.4" fill="none"/>
+  </svg>
+  <h1>LOOP VALIDATOR</h1>
+  <p class="sub">aural alchemy · real pexels footage · seamless loop</p>
+</header>
+
+<div class="card">
+  <span class="card-title">01 · Theme</span>
+  <div class="themes">
+    <button class="theme-btn active" data-query="nature forest green">🌿<br>Nature</button>
+    <button class="theme-btn" data-query="galaxy stars nebula space">🌌<br>Galaxy</button>
+    <button class="theme-btn" data-query="ocean waves water">🌊<br>Ocean</button>
+    <button class="theme-btn" data-query="rain storm clouds">🌧<br>Rain</button>
+    <button class="theme-btn" data-query="fire flame burning">🔥<br>Fire</button>
+  </div>
+</div>
+
+<div class="card">
+  <span class="card-title">02 · Target Duration</span>
+  <div class="dur-chips">
+    <button class="dur-chip active" data-secs="30">30s</button>
+    <button class="dur-chip" data-secs="60">1 min</button>
+    <button class="dur-chip" data-secs="180">3 min</button>
+    <button class="dur-chip" data-secs="600">10 min</button>
+    <button class="dur-chip" data-secs="1800">30 min</button>
+    <button class="dur-chip" data-secs="3600">1 hr</button>
+  </div>
+  <div class="row2">
+    <button class="btn btn-start" id="btnStart" onclick="startSession()">▶ START</button>
+    <button class="btn btn-stop"  id="btnStop"  onclick="stopSession()">■ STOP</button>
+  </div>
+</div>
+
+<div class="preview-wrap" id="preview">
+  <div class="stage" id="stage">
+    <video id="vA" playsinline muted></video>
+    <video id="vB" playsinline muted></video>
+    <div class="hud hud-tl" id="hudCf">✦ LOOP</div>
+    <div class="hud hud-tr" id="hudLoop">LOOP 1</div>
+    <div class="hud hud-bl" id="hudClip"></div>
+    <div class="hud hud-br" id="hudTime">0:00</div>
+  </div>
+  <div class="progress-track" id="pgTrack">
+    <div class="progress-fill" id="pgFill"></div>
+    <div class="pg-thumb" id="pgThumb"></div>
+  </div>
+  <div class="info-row">
+    <span id="infoL">—</span>
+    <span id="infoR">—</span>
+  </div>
+</div>
+
+<div class="log" id="log"></div>
+
+<script>
+const PROXY = 'https://white-cloud-27a9.nanomarche.workers.dev';
+const CF_MS = 1800; // crossfade duration ms
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let query      = 'nature forest green';
+let targetSecs = 30;
+let running    = false;
+let loopN      = 0;
+let elapsed    = 0;
+let sessionStart = 0;
+let tickTimer  = null;
+let cfTimer    = null;
+let clipUrl    = null;
+let clipDur    = 0;
+
+let vA, vB;
+let activeVid  = null; // currently fully visible video
+let standbyVid = null; // preloaded, waiting
+
+// ── UI bindings ───────────────────────────────────────────────────────────────
+document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); query = b.dataset.query;
+}));
+document.querySelectorAll('.dur-chip').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.dur-chip').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); targetSecs = parseInt(b.dataset.secs);
+}));
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+function lg(msg, cls='lt') {
+  const el = document.getElementById('log');
+  el.classList.add('on');
+  const d = document.createElement('div');
+  d.className = cls; d.textContent = '› '+msg;
+  el.appendChild(d); el.scrollTop = el.scrollHeight;
+}
+function setProgress(frac) {
+  const pct = Math.min(frac*100, 100)+'%';
+  document.getElementById('pgFill').style.width = pct;
+  document.getElementById('pgThumb').style.left = pct;
+}
+function flashHud() {
+  const el = document.getElementById('hudCf');
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, CF_MS + 300);
+}
+
+// ── Fetch best clip from Pexels via worker ────────────────────────────────────
+async function fetchClip(q) {
+  lg(`fetching: "${q}"...`);
+  const res = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape`);
+  if (!res.ok) throw new Error(`worker ${res.status}`);
+  const data = await res.json();
+  if (!data.videos?.length) throw new Error('no results');
+
+  // Pick clip: prefer duration 15-45s (good loop length), prefer HD
+  const scored = data.videos.map(v => {
+    const files = v.video_files || [];
+    // prefer 1280 width, avoid huge 4K files (slow to load)
+    const file = files.find(f => f.width >= 1280 && f.width <= 1920)
+               || files.find(f => f.width >= 960)
+               || files[0];
+    if (!file) return null;
+    const durScore = (v.duration >= 15 && v.duration <= 45) ? 2 : 1;
+    const resScore = file.width >= 1280 ? 1 : 0;
+    return { url: file.link, duration: v.duration, w: file.width, h: file.height, score: durScore + resScore };
+  }).filter(Boolean);
+
+  scored.sort((a,b) => b.score - a.score);
+  return scored[0];
+}
+
+// ── Main start ────────────────────────────────────────────────────────────────
+async function startSession() {
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnStop').style.display = 'block';
+  document.getElementById('preview').classList.add('visible');
+  document.getElementById('log').innerHTML = '';
+  running = true; loopN = 1; elapsed = 0;
+  setProgress(0);
+
+  vA = document.getElementById('vA');
+  vB = document.getElementById('vB');
+
+  // Reset both
+  [vA,vB].forEach(v => {
+    v.className = ''; v.removeAttribute('src'); v.load();
+  });
+
+  try {
+    const clip = await fetchClip(query);
+    clipUrl = clip.url;
+    clipDur = clip.duration;
+    lg(`got clip · ${clip.duration}s · ${clip.w}×${clip.h}`, 'lc');
+    lg(`~${Math.ceil(targetSecs/clipDur)} loops to fill ${fmt(targetSecs)}`);
+    document.getElementById('hudClip').textContent = `${clip.duration}s clip`;
+    document.getElementById('infoR').textContent = `${clip.duration}s clip · ${fmt(targetSecs)} target`;
+  } catch(e) {
+    lg(`error: ${e.message}`, 'lg');
+    stopSession(); return;
+  }
+
+  // Load into vA, play it
+  vA.src = clipUrl;
+  vB.src = clipUrl;
+  vB.load(); // preload standby
+
+  await new Promise((res, rej) => {
+    vA.oncanplay = res;
+    vA.onerror = () => rej(new Error('video load failed'));
+    vA.load();
+  });
+
+  // Use actual duration from video element if available
+  if (vA.duration && isFinite(vA.duration)) clipDur = vA.duration;
+
+  vA.currentTime = 0;
+  vA.play();
+  vA.classList.add('active');
+  activeVid  = vA;
+  standbyVid = vB;
+
+  document.getElementById('hudLoop').textContent = 'LOOP 1';
+  sessionStart = performance.now();
+
+  startTick();
+  scheduleCF();
+}
+
+// ── Crossfade scheduling ──────────────────────────────────────────────────────
+function scheduleCF() {
+  if (!running) return;
+  // Fire crossfade CF_MS before the clip ends
+  const triggerIn = Math.max((clipDur * 1000) - CF_MS - 100, 200);
+  cfTimer = setTimeout(doCrossfade, triggerIn);
+}
+
+function doCrossfade() {
+  if (!running) return;
+  loopN++;
+  document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
+  flashHud();
+  lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
+
+  const incoming = standbyVid;
+  const outgoing = activeVid;
+
+  // Start incoming from beginning
+  incoming.currentTime = 0;
+  incoming.play();
+
+  // Crossfade: incoming fades in on top, outgoing stays fully visible underneath
+  // We use the same proven technique: outgoing keeps opacity 1, incoming goes 0→1
+  incoming.style.transition = 'none';
+  incoming.style.opacity = '0';
+  incoming.style.zIndex = '2';
+  outgoing.style.zIndex = '1';
+
+  // Force reflow then start transition
+  incoming.getBoundingClientRect();
+  incoming.style.transition = `opacity ${CF_MS}ms ease`;
+  incoming.style.opacity = '1';
+
+  setTimeout(() => {
+    // Crossfade done — outgoing becomes standby, reset it
+    outgoing.pause();
+    outgoing.currentTime = 0;
+    outgoing.style.transition = 'none';
+    outgoing.style.opacity = '0';
+    outgoing.style.zIndex = '1';
+    incoming.style.zIndex = '2';
+
+    // Swap roles
+    activeVid  = incoming;
+    standbyVid = outgoing;
+
+    scheduleCF();
+  }, CF_MS + 150);
+}
+
+// ── Seek ──────────────────────────────────────────────────────────────────────
+function seekTo(frac) {
+  if (!running || !clipDur) return;
+  const seekSecs = Math.max(0, Math.min(frac * targetSecs, targetSecs - 0.1));
+  sessionStart = performance.now() - seekSecs * 1000;
+  elapsed = seekSecs;
+
+  // Figure out scene offset within current loop
+  const sceneOffset = seekSecs % clipDur;
+  loopN = Math.floor(seekSecs / clipDur) + 1;
+  document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
+
+  // Reset active video to scene offset
+  activeVid.currentTime = sceneOffset;
+  if (activeVid.paused) activeVid.play();
+
+  // Reset standby
+  standbyVid.currentTime = 0;
+  standbyVid.style.opacity = '0';
+
+  clearTimeout(cfTimer);
+  // Reschedule: trigger CF_MS before end of current loop cycle
+  const remaining = (clipDur - sceneOffset) * 1000 - CF_MS - 100;
+  cfTimer = setTimeout(doCrossfade, Math.max(remaining, 200));
+
+  setProgress(frac);
+  lg(`⏩ ${fmt(seekSecs)} · loop ${loopN}`, 'lg');
+}
+
+// Progress bar click/drag
+(function() {
+  const track = document.getElementById('pgTrack');
+  let drag = false;
+  const frac = e => {
+    const r = track.getBoundingClientRect();
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    return Math.max(0, Math.min(1, (x - r.left) / r.width));
+  };
+  track.addEventListener('mousedown', e => { if (running) { drag=true; seekTo(frac(e)); } });
+  window.addEventListener('mousemove', e => { if (drag) seekTo(frac(e)); });
+  window.addEventListener('mouseup', () => { drag=false; });
+  track.addEventListener('touchstart', e => { if (running) { drag=true; seekTo(frac(e)); } }, {passive:true});
+  window.addEventListener('touchmove', e => { if (drag) seekTo(frac(e)); }, {passive:true});
+  window.addEventListener('touchend', () => { drag=false; });
+})();
+
+// ── Tick ──────────────────────────────────────────────────────────────────────
+function startTick() {
+  clearInterval(tickTimer);
+  tickTimer = setInterval(() => {
+    if (!running) { clearInterval(tickTimer); return; }
+    elapsed = (performance.now() - sessionStart) / 1000;
+    setProgress(elapsed / targetSecs);
+    document.getElementById('hudTime').textContent = fmt(elapsed);
+    document.getElementById('infoL').innerHTML = `<span class="ok">${fmt(elapsed)}</span> / ${fmt(targetSecs)}`;
+    if (elapsed >= targetSecs) { lg('target reached · done', 'lc'); stopSession(); }
+  }, 400);
+}
+
+// ── Stop ──────────────────────────────────────────────────────────────────────
+function stopSession() {
+  running = false;
+  clearTimeout(cfTimer); clearInterval(tickTimer);
+  [vA,vB].forEach(v => { v.pause(); });
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').style.display = 'none';
+  lg(`stopped · ${fmt(elapsed)} · ${loopN} loop(s)`, 'lg');
+}
+</script>
+</body>
+</html>
