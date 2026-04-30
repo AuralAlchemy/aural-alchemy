@@ -253,10 +253,10 @@ input[type=range].handle { accent-color: var(--gold); }
   </div>
 
   <div class="slider-row">
-    <div class="slider-label"><span>Playback speed</span><span id="speedVal">0.50x</span></div>
-    <input type="range" id="speedSlider" min="0.1" max="0.5" step="0.01" value="0.5"
+    <div class="slider-label"><span>Playback speed</span><span id="speedVal">1.00x</span></div>
+    <input type="range" id="speedSlider" min="0.5" max="1.0" step="0.01" value="1.0"
       oninput="onSpeedChange(this.value)">
-    <div class="slider-ticks"><span>0.1x slow</span><span>0.3x</span><span>0.5x normal</span></div>
+    <div class="slider-ticks"><span>0.5x slow</span><span>0.75x</span><span>1.0x normal</span></div>
   </div>
 
   <div class="slider-row" id="cfRow">
@@ -547,7 +547,8 @@ function ensureMirrorCanvas() {
   const stage = document.getElementById('stage');
   if (!mirrorCanvas) {
     mirrorCanvas = document.createElement('canvas');
-    mirrorCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;';
+    // z-index 4 = above dissolveCanvas (3) but below HUD elements (z-index 10+)
+    mirrorCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;';
     stage.appendChild(mirrorCanvas);
     mirrorCtx = mirrorCanvas.getContext('2d');
   }
@@ -666,18 +667,28 @@ function updateEffectTransform(now) {
     scale = 1.0 + breathe * (zoomBase - 1.0);
   }
 
-  // Apply zoom to the rendering canvas (dissolveCanvas for CF, pendCanvas for pendulum)
-  // Use CSS transform — canvas stays same size, content scales from center
-  const target = dissolveCanvas || pendCanvas;
-  if (target) {
-    target.style.transform = scale !== 1 ? `scale(${scale})` : '';
-    target.style.transformOrigin = 'center center';
+  // Apply zoom to all rendering canvases and videos in stage
+  // Use a wrapper div approach — transform the content, not the stage box
+  const stage = document.getElementById('stage');
+  if (stage) {
+    const transform = scale !== 1 ? `scale(${scale})` : '';
+    // Apply to dissolveCanvas, pendCanvas, and any cf-vid elements
+    [dissolveCanvas, pendCanvas].forEach(c => {
+      if (c) { c.style.transform = transform; c.style.transformOrigin = 'center center'; }
+    });
+    stage.querySelectorAll('video.cf-vid').forEach(v => {
+      v.style.transform = transform; v.style.transformOrigin = 'center center';
+    });
+    // Apply zoom to mirror canvas too so it scales with the content
+    if (mirrorCanvas) {
+      mirrorCanvas.style.transform = transform;
+      mirrorCanvas.style.transformOrigin = 'center center';
+    }
   }
 
-  // Mirror canvas — always on top, pointer-events none
+  // Draw mirror effect
   if (mirrorMode !== 'none') {
     drawMirror();
-    if (mirrorCanvas) mirrorCanvas.style.zIndex = '10';
   } else if (mirrorCanvas) {
     mirrorCtx.clearRect(0, 0, mirrorCanvas.width, mirrorCanvas.height);
   }
@@ -980,11 +991,15 @@ async function startExport() {
     return;
   }
 
-  // Poll for status every 3 seconds
+
+  // Poll every 5s — retry silently on network failures (Render free tier can sleep)
+  let failCount = 0;
   const pollId = setInterval(async () => {
     try {
-      const res  = await fetch(`${EXPORT_SERVER}/status/${jobId}`);
-      const job  = await res.json();
+      const res = await fetch(`${EXPORT_SERVER}/status/${jobId}`);
+      if (!res.ok) throw new Error(`${res.status}`);
+      const job = await res.json();
+      failCount = 0;
 
       if (job.status === 'downloading') {
         btn.textContent = `⏳ DOWNLOADING ${job.progress}%`;
@@ -996,13 +1011,9 @@ async function startExport() {
         btn.textContent = '⬇ EXPORT MP4';
         btn.style.color = 'rgba(255,255,255,0.6)';
         btn.style.borderColor = 'rgba(255,255,255,0.2)';
-
         const sizeMB = (job.size / 1024 / 1024).toFixed(1);
         lg(`✓ export ready · ${sizeMB}MB`, 'lc');
-
-        // Show download button
         showDownloadButton(job.url, sizeMB);
-
       } else if (job.status === 'error') {
         clearInterval(pollId);
         btn.dataset.polling = '';
@@ -1012,9 +1023,18 @@ async function startExport() {
         lg(`export failed: ${job.error}`, 'lg');
       }
     } catch(e) {
-      lg(`polling error: ${e.message}`, 'lg');
+      failCount++;
+      if (failCount <= 3) lg(`server busy, retrying...`, 'lt');
+      if (failCount > 20) {
+        clearInterval(pollId);
+        btn.dataset.polling = '';
+        btn.textContent = '⬇ EXPORT MP4';
+        btn.style.color = 'rgba(255,255,255,0.6)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+        lg('server unreachable — check Render logs', 'lg');
+      }
     }
-  }, 3000);
+  }, 5000);
 
   btn.dataset.polling = String(pollId);
 }
