@@ -949,11 +949,11 @@ async function startExport() {
   // Gather settings
   const payload = {
     clipUrl:    currentClip.url,
-    loopIn:     loopIn,
+    loopIn:     loopIn || 0,
     loopOut:    loopOut || currentClip.duration,
-    duration:   targetSecs,
-    speed:      SPEED,
-    resolution: fetchResolution,
+    duration:   targetSecs || 60,
+    speed:      SPEED || 0.5,
+    resolution: fetchResolution || '1080',
   };
 
   lg(`sending to export server...`, 'lt');
