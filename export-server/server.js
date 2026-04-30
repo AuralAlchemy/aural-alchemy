@@ -25,8 +25,18 @@ setInterval(() => {
   });
 }, 10 * 60 * 1000);
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
+app.use(express.json({ limit: '1mb' }));
+
+// Keep-alive for long polls
+app.use((req, res, next) => {
+  res.setHeader('Connection', 'keep-alive');
+  next();
+});
 
 // Serve exported files for download
 app.use('/exports', express.static(EXPORTS_DIR));
@@ -115,13 +125,12 @@ async function processExport({ jobId, clipUrl, loopIn, loopOut, duration, speed,
       `-stream_loop ${loops}`,
       `-i "${tmpLoop}"`,
       `-t ${duration}`,
-      `-vf "setpts=${pts}*PTS,scale=${scale}:force_original_aspect_ratio=decrease,pad=${scale}:(ow-iw)/2:(oh-ih)/2"`,
+      `-vf "setpts=${pts}*PTS,scale=${scale}:force_original_aspect_ratio=decrease,pad=${scale}:(ow-iw)/2:(oh-ih)/2,format=yuv420p"`,
       '-c:v libx264',
-      '-preset fast',
-      '-crf 18',
-      '-pix_fmt yuv420p',
+      '-preset ultrafast',  // fastest encoding — smaller file, faster export
+      '-crf 23',
       '-movflags +faststart',
-      '-an',  // no audio (user provides their own music)
+      '-an',
       `"${outFile}"`
     ].join(' ');
 
@@ -168,7 +177,7 @@ function downloadFile(url, dest) {
 function runCmd(cmd) {
   return new Promise((resolve, reject) => {
     console.log('[ffmpeg]', cmd.substring(0, 120) + '...');
-    exec(cmd, { maxBuffer: 100 * 1024 * 1024 }, (err, stdout, stderr) => {
+    exec(cmd, { maxBuffer: 100 * 1024 * 1024, timeout: 30 * 60 * 1000 }, (err, stdout, stderr) => {
       if (err) reject(new Error(stderr || err.message));
       else resolve(stdout);
     });
