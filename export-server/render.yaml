@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: aural-alchemy-export
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: BASE_URL
+        sync: false  # set this to your Render URL after first deploy
+    # FFmpeg is pre-installed on Render's Ubuntu instances
+    # No extra setup needed
