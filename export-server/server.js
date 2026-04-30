@@ -40,15 +40,17 @@ const jobs = {};
 // ── POST /export — start a job ────────────────────────────────────────────────
 app.post('/export', async (req, res) => {
   const {
-    clipUrl,          // Pexels direct video URL
-    loopIn  = 0,      // loop region start (seconds)
-    loopOut,          // loop region end (seconds) — null = full clip
-    duration = 60,    // target output duration (seconds)
-    speed    = 0.5,   // playback speed (0.1 - 1.0)
-    resolution = '1080', // '1080' | '2k' | '4k'
+    clipUrl,
+    loopIn  = 0,
+    loopOut,
+    duration = 60,
+    speed    = 0.5,
+    resolution = '1080',
   } = req.body;
 
   if (!clipUrl) return res.status(400).json({ error: 'clipUrl required' });
+  if (!duration || isNaN(duration)) return res.status(400).json({ error: 'invalid duration' });
+  if (!speed    || isNaN(speed))    return res.status(400).json({ error: 'invalid speed' });
 
   const jobId   = uuidv4();
   const tmpIn   = path.join(EXPORTS_DIR, `${jobId}_input.mp4`);
