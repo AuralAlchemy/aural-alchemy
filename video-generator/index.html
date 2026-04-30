@@ -349,7 +349,7 @@ input[type=range].handle { accent-color: var(--gold); }
       </button>
       <button onclick="startExport()" id="btnExport"
         style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 12px;color:rgba(255,255,255,0.6);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">
-        ⬇ REC MP4
+        ⬇ EXPORT MP4
       </button>
     </div>
     <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--dim);" id="infoL">—</span>
@@ -927,54 +927,128 @@ document.addEventListener('fullscreenchange', () => {
 let mediaRecorder = null;
 let recordedChunks = [];
 
-function startExport() {
+// ── Server-side export ────────────────────────────────────────────────────────
+const EXPORT_SERVER = 'https://aural-alchemy-export.onrender.com';
+
+async function startExport() {
   const btn = document.getElementById('btnExport');
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
+
+  // If already exporting, cancel UI
+  if (btn.dataset.polling) {
+    clearInterval(parseInt(btn.dataset.polling));
+    btn.dataset.polling = '';
+    btn.textContent = '⬇ EXPORT MP4';
+    btn.style.color = 'rgba(255,255,255,0.6)';
+    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    lg('export cancelled', 'lg');
     return;
   }
 
-  if (!running) { lg('start a session first', 'lg'); return; }
+  if (!currentClip) { lg('start a session first', 'lg'); return; }
 
-  // Record from dissolveCanvas (crossfade) or pendCanvas (pendulum) — these are always rendering
-  const srcCanvas = loopMode === 'crossfade' ? dissolveCanvas : pendCanvas;
-  const srcVid    = loopMode === 'crossfade' ? activeVid : pendVid;
-
-  let stream;
-  if (srcCanvas) {
-    try { stream = srcCanvas.captureStream(30); } catch(e) {}
-  }
-  if (!stream && srcVid) {
-    try { stream = srcVid.captureStream ? srcVid.captureStream(30) : srcVid.mozCaptureStream(30); } catch(e) {}
-  }
-  if (!stream) { lg('capture not supported in this browser', 'lg'); return; }
-
-  const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
-  const mimeType = types.find(t => { try { return MediaRecorder.isTypeSupported(t); } catch(e) { return false; } }) || 'video/webm';
-
-  recordedChunks = [];
-  try {
-    mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 10_000_000 });
-  } catch(e) {
-    try { mediaRecorder = new MediaRecorder(stream); } catch(e2) { lg('MediaRecorder not supported', 'lg'); return; }
-  }
-
-  mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: mimeType });
-    lg(`saved: ${(blob.size/1024/1024).toFixed(1)}MB · ${mimeType.includes('mp4') ? 'mp4' : 'webm'}`, 'lc');
-    if (blob.size < 500) { lg('file too small — try recording longer', 'lg'); return; }
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `loop-${Date.now()}.webm`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-    btn.textContent = '⬇ REC MP4'; btn.style.color = 'rgba(255,255,255,0.6)'; btn.style.borderColor = 'rgba(255,255,255,0.2)';
+  // Gather settings
+  const payload = {
+    clipUrl:    currentClip.url,
+    loopIn:     loopIn,
+    loopOut:    loopOut || currentClip.duration,
+    duration:   targetSecs,
+    speed:      SPEED,
+    resolution: fetchResolution,
   };
 
-  mediaRecorder.start(200);
-  btn.textContent = '⏹ STOP REC'; btn.style.color = '#ff6b6b'; btn.style.borderColor = '#ff6b6b';
-  lg('recording… click STOP REC when done', 'lc');
+  lg(`sending to export server...`, 'lt');
+  btn.textContent = '⏳ STARTING...';
+  btn.style.color = '#c9a84c';
+  btn.style.borderColor = '#c9a84c';
+
+  let jobId;
+  try {
+    const res  = await fetch(`${EXPORT_SERVER}/export`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.jobId) throw new Error(data.error || 'no jobId returned');
+    jobId = data.jobId;
+    lg(`job started · ${jobId.substring(0,8)}...`, 'lc');
+  } catch(e) {
+    lg(`export error: ${e.message}`, 'lg');
+    btn.textContent = '⬇ EXPORT MP4';
+    btn.style.color = 'rgba(255,255,255,0.6)';
+    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    return;
+  }
+
+  // Poll for status every 3 seconds
+  const pollId = setInterval(async () => {
+    try {
+      const res  = await fetch(`${EXPORT_SERVER}/status/${jobId}`);
+      const job  = await res.json();
+
+      if (job.status === 'downloading') {
+        btn.textContent = `⏳ DOWNLOADING ${job.progress}%`;
+      } else if (job.status === 'processing') {
+        btn.textContent = `⚙ PROCESSING ${job.progress}%`;
+      } else if (job.status === 'done') {
+        clearInterval(pollId);
+        btn.dataset.polling = '';
+        btn.textContent = '⬇ EXPORT MP4';
+        btn.style.color = 'rgba(255,255,255,0.6)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+
+        const sizeMB = (job.size / 1024 / 1024).toFixed(1);
+        lg(`✓ export ready · ${sizeMB}MB`, 'lc');
+
+        // Show download button
+        showDownloadButton(job.url, sizeMB);
+
+      } else if (job.status === 'error') {
+        clearInterval(pollId);
+        btn.dataset.polling = '';
+        btn.textContent = '⬇ EXPORT MP4';
+        btn.style.color = 'rgba(255,255,255,0.6)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+        lg(`export failed: ${job.error}`, 'lg');
+      }
+    } catch(e) {
+      lg(`polling error: ${e.message}`, 'lg');
+    }
+  }, 3000);
+
+  btn.dataset.polling = String(pollId);
+}
+
+function showDownloadButton(url, sizeMB) {
+  // Remove existing download button if any
+  const existing = document.getElementById('btnDownload');
+  if (existing) existing.remove();
+
+  const btn = document.createElement('a');
+  btn.id        = 'btnDownload';
+  btn.href      = url;
+  btn.download  = `aural-alchemy-loop-${Date.now()}.mp4`;
+  btn.target    = '_blank';
+  btn.textContent = `⬇ DOWNLOAD MP4 (${sizeMB}MB)`;
+  btn.style.cssText = `
+    display:inline-block;
+    background:linear-gradient(135deg,rgba(77,217,192,0.2),rgba(201,168,76,0.1));
+    border:1px solid var(--cyan);
+    border-radius:6px;
+    padding:8px 16px;
+    color:var(--cyan);
+    font-family:'Share Tech Mono',monospace;
+    font-size:0.72rem;
+    cursor:pointer;
+    text-decoration:none;
+    letter-spacing:0.08em;
+    margin-top:4px;
+  `;
+
+  // Insert after the quick controls row
+  const preview = document.getElementById('preview');
+  const controls = preview.querySelector('div');
+  controls.parentNode.insertBefore(btn, controls.nextSibling);
 }
 
 // ── Fix doCF dissolve — canvas compositing, zero brightness dip ───────────────
