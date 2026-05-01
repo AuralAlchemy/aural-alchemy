@@ -116,8 +116,10 @@ async function processExport({ jobId, clipUrl, loopIn, loopOut, duration, speed,
       `"${tmpLoop}"`
     ].join(' ');
 
-    await runCmd(trimCmd);
+    await runCmd(trimCmd, jobId);
     job.progress = 50;
+    job.status = 'processing';
+    console.log(`[${jobId}] trim done, starting encode...`);
 
     // Step 2: Loop + slow down + scale + encode to final MP4
     const mainCmd = [
@@ -134,8 +136,11 @@ async function processExport({ jobId, clipUrl, loopIn, loopOut, duration, speed,
       `"${outFile}"`
     ].join(' ');
 
-    await runCmd(mainCmd);
+    job.progress = 60;
+    console.log(`[${jobId}] encoding ${duration}s video at ${speed}x speed...`);
+    await runCmd(mainCmd, jobId);
     job.progress = 90;
+    console.log(`[${jobId}] encode done`);
 
     // Cleanup temp files
     [tmpIn, tmpLoop].forEach(f => { try { fs.unlinkSync(f); } catch(e) {} });
@@ -174,12 +179,19 @@ function downloadFile(url, dest) {
   });
 }
 
-function runCmd(cmd) {
+function runCmd(cmd, jobId) {
   return new Promise((resolve, reject) => {
-    console.log('[ffmpeg]', cmd.substring(0, 120) + '...');
-    exec(cmd, { maxBuffer: 100 * 1024 * 1024, timeout: 30 * 60 * 1000 }, (err, stdout, stderr) => {
-      if (err) reject(new Error(stderr || err.message));
-      else resolve(stdout);
+    console.log(`[${jobId||'cmd'}] running: ${cmd.substring(0, 100)}...`);
+    const start = Date.now();
+    exec(cmd, { maxBuffer: 200 * 1024 * 1024, timeout: 30 * 60 * 1000 }, (err, stdout, stderr) => {
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+      if (err) {
+        console.error(`[${jobId||'cmd'}] FAILED after ${elapsed}s:`, stderr?.slice(-500) || err.message);
+        reject(new Error(stderr?.slice(-300) || err.message));
+      } else {
+        console.log(`[${jobId||'cmd'}] done in ${elapsed}s`);
+        resolve(stdout);
+      }
     });
   });
 }
