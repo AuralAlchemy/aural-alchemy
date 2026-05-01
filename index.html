@@ -3,223 +3,1711 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aural Alchemy · Sound. Vibration. Transcendence.</title>
-<meta name="description" content="Aural Alchemy creates professional tools for healing, meditation and music production. Binaural beats, isochronic tones, MIDI generation and sacred frequency tools.">
-<meta name="theme-color" content="#080e10">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://auralalchemy.github.io/">
-<meta property="og:title" content="Aural Alchemy · Sound. Vibration. Transcendence.">
-<meta property="og:description" content="Embrace the transformative potential of aural magic. Healing frequencies, MIDI tools, breathwork and ambient music.">
-<meta property="og:image" content="https://alchemyaural.com/og-image.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://alchemyaural.com/og-image.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%232dd4bf'/><stop offset='100%' stop-color='%23d4a843'/></linearGradient><clipPath id='c'><circle cx='26' cy='26' r='26'/></clipPath></defs><circle cx='26' cy='26' r='26' fill='%23080e10'/><g clip-path='url(%23c)'><circle cx='26' cy='26' r='22' stroke='url(%23g)' stroke-width='1' fill='none' opacity='0.65'/><polygon points='26,5 7.81,36.5 44.19,36.5' stroke='url(%23g)' stroke-width='1.5' fill='none'/><line x1='13.88' y1='26' x2='38.12' y2='26' stroke='url(%23g)' stroke-width='1.5'/><circle cx='26' cy='26' r='2' fill='%232dd4bf'/></g></svg>">
-<link rel="stylesheet" href="style.css">
+<title>Loop PoC · Aural Alchemy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@300;400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-.hero{min-height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative}
-.hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.4em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:1.5rem}
-.hero-title{font-size:clamp(2.2rem,8vw,6rem);line-height:1.05;margin-bottom:1rem}
-.hero-tagline{font-family:'Share Tech Mono',monospace;font-size:clamp(0.65rem,1.5vw,0.82rem);letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem}
-.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3.5rem}
-.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.4rem;opacity:0.3;animation:fadeIn 1s ease 1.5s both}
-.scroll-hint span{font-family:'Share Tech Mono',monospace;font-size:0.5rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase}
-.scroll-arrow{width:1px;height:36px;background:linear-gradient(to bottom,var(--teal-dim),transparent)}
-.tools-section{max-width:1100px;margin:0 auto;padding:4rem 2rem}
-.section-header{text-align:center;margin-bottom:3rem}
-.section-header h2{font-size:clamp(1.5rem,3vw,2.1rem);margin-top:0.5rem}
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;align-items:stretch}
-.tool-card{display:flex;flex-direction:column;gap:1.1rem;text-decoration:none;color:inherit;height:100%}
-.tool-icon{width:44px;height:44px}
-.tool-tag{font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:0.22em;color:var(--teal-dim);text-transform:uppercase;margin-bottom:0.2rem}
-.tool-card h3{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;letter-spacing:0.08em;background:linear-gradient(135deg,#2dd4bf,#d4a843);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.4rem}
-.tool-card p{font-size:0.8rem;color:var(--text-dim);line-height:1.75;flex:1}
-.tool-pills{display:flex;flex-wrap:wrap;gap:0.35rem;margin:0.2rem 0}
-.pill{font-family:'Share Tech Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;color:var(--text-muted);border:1px solid var(--border);border-radius:3px;padding:0.18rem 0.45rem;text-transform:uppercase}
-.shop-section{max-width:1100px;margin:0 auto;padding:0 2rem 5rem}
-.shop-banner{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:2.5rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;position:relative;overflow:hidden}
-.shop-banner::after{content:'';position:absolute;right:-60px;top:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(212,168,67,0.06),transparent 70%);pointer-events:none}
-.shop-banner h2{font-size:clamp(1.2rem,2.5vw,1.7rem);margin-bottom:0.5rem}
-.shop-banner p{font-size:0.8rem;color:var(--text-dim);max-width:480px;line-height:1.7}
-.coming-badge{position:absolute;top:1rem;right:1rem;font-family:'Share Tech Mono',monospace;font-size:0.5rem;letter-spacing:0.18em;color:var(--gold);border:1px solid var(--gold-dim);border-radius:3px;padding:0.18rem 0.45rem;text-transform:uppercase;background:rgba(212,168,67,0.05)}
-.freq-wave{width:min(700px,90vw);height:55px;opacity:0.45;margin-bottom:1rem}
-@media(max-width:600px){.shop-banner,.hero-cta{flex-direction:column;align-items:flex-start}}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080c18; --cyan: #4dd9c0; --gold: #c9a84c;
+  --text: #c8d0e0; --dim: #5a6278;
+  --glass: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+}
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Jost', sans-serif; font-weight: 300;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; padding: 36px 20px 80px; gap: 20px;
+}
+header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.logo { width: 42px; height: 42px; }
+h1 {
+  font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 400; letter-spacing: 0.25em;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sub { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--dim); letter-spacing: 0.1em; }
+.card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 24px; width: 100%; max-width: 620px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.card-title { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); }
+
+/* Theme grid */
+.theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.theme-btn {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 3px; cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; transition: all 0.18s; color: var(--dim);
+  font-family: 'Jost', sans-serif; font-size: 0.62rem;
+}
+.theme-btn:hover { border-color: var(--cyan); color: var(--text); }
+.theme-btn.active { border-color: var(--cyan); background: rgba(77,217,192,0.07); color: var(--cyan); }
+.theme-icon { font-size: 1.1rem; }
+
+/* Sub-theme dropdown */
+.sub-row { display: flex; gap: 10px; align-items: center; }
+.sub-row label { font-size: 0.7rem; color: var(--dim); white-space: nowrap; font-family: 'Share Tech Mono', monospace; }
+select {
+  flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 10px; color: var(--text);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; outline: none;
+  cursor: pointer; transition: border-color 0.2s;
+}
+select:focus { border-color: var(--cyan); }
+select option { background: #0d1224; }
+
+/* Mode toggle */
+.mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mode-btn {
+  padding: 9px 6px; border: 1px solid var(--border); border-radius: 8px;
+  background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.04em; transition: all 0.18s; text-align: center; line-height: 1.5;
+}
+.mode-btn:hover { border-color: var(--gold); color: var(--text); }
+.mode-btn.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+/* Duration chips */
+.dur-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.dur-chip {
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 20px;
+  background: rgba(0,0,0,0.3); color: var(--dim); cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; transition: all 0.18s;
+}
+.dur-chip:hover { border-color: var(--gold); color: var(--text); }
+.dur-chip.active { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+/* Slider row */
+.slider-row { display: flex; flex-direction: column; gap: 5px; }
+.slider-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+.slider-label span:last-child { color: var(--cyan); }
+input[type=range] { width: 100%; accent-color: var(--cyan); cursor: pointer; height: 4px; }
+.slider-ticks { display: flex; justify-content: space-between; font-size: 0.58rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; margin-top: 2px; }
+
+/* Buttons */
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn {
+  padding: 11px; border-radius: 8px; cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.16em;
+  text-transform: uppercase; transition: all 0.2s; border: 1px solid;
+}
+.btn-start { background: linear-gradient(135deg, rgba(77,217,192,0.15), rgba(201,168,76,0.08)); border-color: var(--cyan); color: var(--cyan); }
+.btn-start:hover:not(:disabled) { background: rgba(77,217,192,0.22); }
+.btn-start:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-stop { background: rgba(201,168,76,0.08); border-color: var(--gold); color: var(--gold); display: none; }
+.btn-stop:hover { background: rgba(201,168,76,0.18); }
+.btn-try {
+  border-color: var(--dim); color: var(--dim); background: transparent;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+}
+.btn-try:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.stage:-webkit-full-screen { width:100vw!important; height:100vh!important; border-radius:0; aspect-ratio:unset; }
+.stage:-moz-full-screen    { width:100vw!important; height:100vh!important; border-radius:0; aspect-ratio:unset; }
+.stage:fullscreen          { width:100vw!important; height:100vh!important; border-radius:0; aspect-ratio:unset; }
+
+/* Preview */
+.preview-wrap { width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 10px; }
+.stage {
+  position: relative; width: 100%; aspect-ratio: 16/9;
+  border-radius: 10px; overflow: hidden; background: #111;
+  border: 1px solid var(--border);
+}
+.stage video.cf-vid {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: none;
+}
+.hud {
+  position: absolute; z-index: 10;
+  background: rgba(8,12,24,0.85); border: 1px solid var(--border);
+  border-radius: 4px; padding: 3px 8px; pointer-events: none;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em;
+}
+.hud-tl { top:10px; left:10px; color:var(--gold); }
+.hud-tr { top:10px; right:10px; color:var(--cyan); }
+.hud-br { bottom:10px; right:10px; color:var(--cyan); }
+.hud-bl { bottom:10px; left:10px; color:var(--dim); font-size:0.56rem; }
+
+/* Session progress bar */
+.progress-track {
+  width: 100%; height: 7px; background: var(--border); border-radius: 3px;
+  position: relative; cursor: pointer; transition: height 0.15s;
+}
+.progress-track:hover { height: 10px; }
+.progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--gold)); border-radius:3px; pointer-events:none; }
+.pg-thumb {
+  position:absolute; top:50%; left:0%; transform:translate(-50%,-50%);
+  width:13px; height:13px; border-radius:50%;
+  background:#fff; border:2px solid var(--cyan);
+  pointer-events:none; opacity:0; transition:opacity 0.15s;
+}
+.progress-track:hover .pg-thumb { opacity:1; }
+
+/* Loop region editor */
+.loop-editor { display: flex; flex-direction: column; gap: 8px; }
+.loop-editor-title {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.15em; color: var(--gold);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.loop-editor-title small { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--dim); letter-spacing: 0.06em; }
+
+/* Full video scrubber */
+.scrub-wrap {
+  position: relative; width: 100%; height: 52px;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 7px;
+  overflow: hidden; cursor: crosshair;
+}
+.scrub-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: linear-gradient(90deg, rgba(77,217,192,0.15), rgba(201,168,76,0.1));
+  pointer-events: none;
+}
+/* Loop region highlight */
+.loop-region {
+  position: absolute; top: 0; height: 100%;
+  background: rgba(201,168,76,0.18); border-left: 2px solid var(--gold); border-right: 2px solid var(--gold);
+  pointer-events: none;
+}
+/* Playhead */
+.scrub-head {
+  position: absolute; top: 0; height: 100%; width: 2px;
+  background: var(--cyan); pointer-events: none;
+}
+.scrub-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--dim);
+}
+/* In/out handles */
+.handle-row { display: flex; gap: 10px; align-items: center; }
+.handle-input {
+  flex: 1; display: flex; flex-direction: column; gap: 4px;
+}
+.handle-input label { font-size: 0.65rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+input[type=range].handle { accent-color: var(--gold); }
+
+.info-row { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--dim); }
+.ok{color:var(--cyan);}
+
+.log {
+  width:100%; max-width:620px; background:rgba(0,0,0,0.25);
+  border:1px solid var(--border); border-radius:8px;
+  padding:10px 14px; font-family:'Share Tech Mono',monospace;
+  font-size:0.64rem; color:var(--dim); line-height:1.7;
+  max-height:110px; overflow-y:auto;
+}
+.lc{color:var(--cyan);} .lg{color:var(--gold);} .lt{color:var(--text);}
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="/" class="nav-brand">
-    <svg viewBox="0 0 52 52" fill="none"><defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#d4a843"/></linearGradient><clipPath id="nc"><circle cx="26" cy="26" r="26"/></clipPath></defs><circle cx="26" cy="26" r="26" fill="#080e10"/><g clip-path="url(#nc)"><circle cx="26" cy="26" r="22" stroke="url(#ng)" stroke-width="1" fill="none" opacity="0.65"/><polygon points="26,5 7.81,36.5 44.19,36.5" stroke="url(#ng)" stroke-width="1.5" fill="none"/><line x1="13.88" y1="26" x2="38.12" y2="26" stroke="url(#ng)" stroke-width="1.5"/><circle cx="26" cy="26" r="2" fill="#2dd4bf" opacity="0.9"/></g></svg>
-    <span class="nav-brand-text">AURAL ALCHEMY</span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="/" class="active">Home</a></li>
-    <li><a href="/frequency-generator">Frequency Generator</a></li>
-    <li><a href="/midi-generator">MIDI Generator</a></li>
-    <li><a href="/breathwork">Breathwork</a></li>
-    <li><a href="/music">Music</a></li>
-    <li><a href="/shop">Shop</a></li>
-  </ul>
-  <div class="nav-toggle"><span></span><span></span><span></span></div>
-</nav>
+<header>
+  <svg class="logo" viewBox="0 0 100 100" fill="none">
+    <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4dd9c0"/><stop offset="100%" stop-color="#c9a84c"/>
+    </linearGradient></defs>
+    <circle cx="50" cy="50" r="46" stroke="url(#g)" stroke-width="1.4" fill="none"/>
+    <polygon points="50,4 6.7,73 93.3,73" stroke="url(#g)" stroke-width="1.4" fill="none"/>
+  </svg>
+  <h1>LOOP VALIDATOR</h1>
+  <p class="sub">aural alchemy · seamless loop poc</p>
+</header>
 
-<div class="page-wrap">
-<!-- Sacred Geometry Background -->
-<svg class="aa-geometry" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.10"/>
-  <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.10"/>
-</svg>
-
-  <section class="hero">
-
-    <p class="hero-eyebrow anim-fade-up">Aural Alchemy</p>
-    <h1 class="hero-title grad-title anim-fade-up delay-1">Sound.<br>Vibration.<br>Transcendence.</h1>
-    <p class="hero-tagline anim-fade-up delay-2">Healing frequencies · MIDI tools · Ambient music &amp; samples</p>
-    <p class="hero-desc anim-fade-up delay-2" style="font-size:0.82rem;color:var(--text-dim);line-height:1.85;max-width:520px;margin:0 auto 2.5rem;font-weight:300">Embrace the transformative potential of aural magic. Let the power of sound, vibration and profound meditations guide you on a journey to inner peace, creative expansion and transcendence.</p>
-
-    <div class="hero-cta anim-fade-up delay-3">
-      <a href="/frequency-generator" class="btn btn-ghost">⟡ Frequency Generator</a>
-      <a href="/midi-generator" class="btn btn-ghost">⬡ MIDI Generator</a>
-      <a href="/breathwork" class="btn btn-ghost">◎ Breathwork</a>
-      <a href="/music" class="btn btn-ghost">♪ Music</a>
-      <a href="https://auralalchemy.gumroad.com" target="_blank" class="btn btn-gold">◈ Shop</a>
-    </div>
-
-    <canvas class="freq-wave anim-fade-in delay-4" id="heroWave"></canvas>
-
-    <div class="scroll-hint">
-      <span>Scroll</span>
-      <div class="scroll-arrow"></div>
-    </div>
-  </section>
-
-  <div class="divider"><span class="divider-symbol">🜁</span></div>
-
-  <section class="tools-section">
-    <div class="section-header anim-fade-up">
-      <h2 class="grad-title">Tools</h2>
-    </div>
-
-    <div class="tools-grid">
-
-      <a href="/frequency-generator" class="card tool-card anim-fade-up delay-1">
-        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="22" stroke="#2dd4bf" stroke-width="1" opacity="0.45"/>
-          <path d="M4,24 Q10,10 16,24 Q22,38 28,24 Q34,10 40,24 Q43,30 46,24" stroke="#2dd4bf" stroke-width="1.5" fill="none"/>
-        </svg>
-        <div>
-          <p class="tool-tag">Web App</p>
-          <h3>Frequency Generator</h3>
-          <p>Professional healing frequency generator with binaural beats, isochronic tones and pure frequencies. Solfeggio, chakras, Pythagorean tuning and Schumann resonance. WAV export included.</p>
-        </div>
-        <div class="tool-pills">
-          <span class="pill">Binaural Beats</span>
-          <span class="pill">Isochronic</span>
-          <span class="pill">Solfeggio</span>
-          <span class="pill">Chakras</span>
-          <span class="pill">WAV Export</span>
-        </div>
-        <span class="btn btn-primary" style="align-self:flex-start;margin-top:auto">Launch →</span>
-      </a>
-
-      <a href="/midi-generator" class="card tool-card anim-fade-up delay-2">
-        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
-          <rect x="4" y="16" width="7" height="20" rx="1" stroke="#d4a843" stroke-width="1.2" fill="none"/>
-          <rect x="15" y="10" width="7" height="26" rx="1" stroke="#d4a843" stroke-width="1.2" fill="none"/>
-          <rect x="26" y="19" width="7" height="17" rx="1" stroke="#d4a843" stroke-width="1.2" fill="none"/>
-          <rect x="37" y="13" width="7" height="10" rx="1" fill="#d4a843" opacity="0.5"/>
-          <line x1="3" y1="40" x2="45" y2="40" stroke="#d4a843" stroke-width="0.7" opacity="0.3"/>
-        </svg>
-        <div>
-          <p class="tool-tag">Web App</p>
-          <h3>MIDI Generator</h3>
-          <p>AI-powered MIDI generation for music producers. Generate chord progressions tuned to sacred frequencies and alchemical scales. Runs in your browser.</p>
-        </div>
-        <div class="tool-pills">
-          <span class="pill">AI Powered</span>
-          <span class="pill">Sacred Scales</span>
-          <span class="pill">MIDI Export</span>
-        </div>
-        <span class="btn btn-gold" style="align-self:flex-start;margin-top:auto">Launch →</span>
-      </a>
-
-      <a href="/breathwork" class="card tool-card anim-fade-up delay-3">
-        <svg class="tool-icon" viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="20" stroke="#2dd4bf" stroke-width="1.2" fill="none" opacity="0.5"/>
-          <ellipse cx="24" cy="24" rx="8" ry="13" stroke="#2dd4bf" stroke-width="1" fill="none" opacity="0.6"/>
-          <circle cx="24" cy="24" r="3" fill="#2dd4bf" opacity="0.7"/>
-        </svg>
-        <div>
-          <p class="tool-tag">Free</p>
-          <h3>Breathwork</h3>
-          <p>Guided breathing sessions with synthesized breath sounds and animated orb. 25+ science-backed patterns including box breathing, Wim Hof, coherent breathing and physiological sigh.</p>
-        </div>
-        <div class="tool-pills">
-          <span class="pill">Box Breathing</span>
-          <span class="pill">Wim Hof</span>
-          <span class="pill">Coherent</span>
-          <span class="pill">4-7-8</span>
-          <span class="pill">25+ Patterns</span>
-        </div>
-        <span class="btn btn-primary" style="align-self:flex-start;margin-top:auto">Launch →</span>
-      </a>
-      </div>
-    </section>
-
-  <div class="divider"><span class="divider-symbol">◈</span></div>
-
-  <section class="shop-section">
-    <div class="shop-banner anim-fade-up">
-      <div>
-        <p class="label" style="margin-bottom:0.5rem">Gumroad</p>
-        <h2 class="grad-title">Digital Products</h2>
-        <p>MIDI packs, sample packs, meditations, visual art, ebooks and more. All products on Gumroad.</p>
-      </div>
-      <a href="https://auralalchemy.gumroad.com" target="_blank" rel="noopener" class="btn btn-gold">Visit Shop →</a>
-    </div>
-  </section>
-
+<!-- THEME -->
+<div class="card">
+  <span class="card-title">01 · Theme</span>
+  <div class="theme-grid" id="themeGrid">
+    <button class="theme-btn active" data-theme="nature"><span class="theme-icon">🌿</span>Nature</button>
+    <button class="theme-btn" data-theme="water"><span class="theme-icon">💧</span>Water</button>
+    <button class="theme-btn" data-theme="sky"><span class="theme-icon">🌌</span>Sky</button>
+    <button class="theme-btn" data-theme="fire"><span class="theme-icon">🔥</span>Fire</button>
+    <button class="theme-btn" data-theme="weather"><span class="theme-icon">🌧</span>Weather</button>
+    <button class="theme-btn" data-theme="light"><span class="theme-icon">✨</span>Light</button>
+    <button class="theme-btn" data-theme="earth"><span class="theme-icon">🏔</span>Earth</button>
+    <button class="theme-btn" data-theme="abstract"><span class="theme-icon">🔮</span>Abstract</button>
+    <button class="theme-btn" data-theme="urban"><span class="theme-icon">🌆</span>Urban</button>
+    <button class="theme-btn" data-theme="cosmos"><span class="theme-icon">🪐</span>Cosmos</span></button>
+  </div>
+  <div class="sub-row">
+    <label>Subtype ·</label>
+    <select id="subSelect"></select>
+  </div>
 </div>
 
-<footer>
-    <span class="footer-brand">AURAL ALCHEMY</span>
-  <ul class="footer-links">
-    <li><a href="/frequency-generator">Frequency Generator</a></li>
-    <li><a href="/midi-generator">MIDI Generator</a></li>
-    <li><a href="/breathwork">Breathwork</a></li>
-    <li><a href="/music">Music</a></li>
-    <li><a href="https://auralalchemy.gumroad.com" target="_blank">Shop</a></li>
-  </ul>
-  <span class="footer-copy">© 2026 Aural Alchemy</span>
-</footer>
+<!-- MODE + SETTINGS -->
+<div class="card">
+  <span class="card-title">02 · Mode · Settings</span>
 
-<script src="nav.js"></script>
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="crossfade">↺ Crossfade<br><small style="opacity:0.55;font-size:0.6rem">static shots · ambient</small></button>
+    <button class="mode-btn" data-mode="pendulum">⇄ Pendulum<br><small style="opacity:0.55;font-size:0.6rem">motion shots · slow-mo reverse</small></button>
+  </div>
+
+  <div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--dim);margin-bottom:8px;letter-spacing:0.08em;">FETCH RESOLUTION</div>
+    <div style="display:flex;gap:7px;">
+      <button class="dur-chip active" id="res1080" onclick="setResolution('1080')">1080p HD</button>
+      <button class="dur-chip" id="res2k"   onclick="setResolution('2k')">2K</button>
+      <button class="dur-chip" id="res4k"   onclick="setResolution('4k')">4K</button>
+    </div>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-label"><span>Playback speed</span><span id="speedVal">1.00x</span></div>
+    <input type="range" id="speedSlider" min="0.5" max="1.0" step="0.01" value="1.0"
+      oninput="onSpeedChange(this.value)">
+    <div class="slider-ticks"><span>0.5x slow</span><span>0.75x</span><span>1.0x normal</span></div>
+  </div>
+
+  <div class="slider-row" id="cfRow">
+    <div class="slider-label"><span>Crossfade duration</span><span id="cfVal">4.0s</span></div>
+    <input type="range" id="cfSlider" min="1" max="12" step="0.5" value="4"
+      oninput="document.getElementById('cfVal').textContent=parseFloat(this.value).toFixed(1)+'s'">
+    <div class="slider-ticks"><span>1s</span><span>4s</span><span>8s</span><span>12s</span></div>
+  </div>
+
+  <div class="dur-chips">
+    <button class="dur-chip active" data-secs="30">30s</button>
+    <button class="dur-chip" data-secs="60">1 min</button>
+    <button class="dur-chip" data-secs="180">3 min</button>
+    <button class="dur-chip" data-secs="600">10 min</button>
+    <button class="dur-chip" data-secs="1800">30 min</button>
+    <button class="dur-chip" data-secs="3600">1 hr</button>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-start" id="btnStart" onclick="startSession()">▶ START</button>
+    <button class="btn btn-stop"  id="btnStop"  onclick="stopSession()">■ STOP</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-try" id="btnTry" onclick="tryAnother()">↻ TRY ANOTHER CLIP</button>
+    <button class="btn btn-try" id="btnSwitchMode" onclick="switchModeKeepClip()" style="display:none;">⇄ SAME CLIP · PENDULUM</button>
+  </div>
+</div>
+
+<!-- EFFECTS -->
+<div class="card">
+  <span class="card-title">03 · Effects</span>
+
+
+  <div class="slider-row">
+    <div class="slider-label"><span>Zoom amount</span><span id="zoomVal">1.00×</span></div>
+    <input type="range" id="zoomSlider" min="1.0" max="2.0" step="0.01" value="1.0"
+      oninput="document.getElementById('zoomVal').textContent=parseFloat(this.value).toFixed(2)+'×'; applyEffects()">
+    <div class="slider-ticks"><span>1× off</span><span>1.5×</span><span>2×</span></div>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-label"><span>Zoom breathe speed</span><span id="zoomSpeedVal">0.000</span></div>
+    <input type="range" id="zoomSpeedSlider" min="0" max="0.05" step="0.001" value="0"
+      oninput="document.getElementById('zoomSpeedVal').textContent=parseFloat(this.value).toFixed(3); applyEffects()">
+    <div class="slider-ticks"><span>off</span><span>ultra slow</span><span>slow breathe</span></div>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="dur-chip" id="mirrorOff"     onclick="setMirror('none')"          style="border-color:var(--cyan);color:var(--cyan);">No mirror</button>
+    <button class="dur-chip" id="mirrorHL"      onclick="setMirror('h-left')">← Mirror left</button>
+    <button class="dur-chip" id="mirrorHR"      onclick="setMirror('h-right')">Mirror right →</button>
+    <button class="dur-chip" id="mirrorVT"      onclick="setMirror('v-top')">↑ Mirror top</button>
+    <button class="dur-chip" id="mirrorVB"      onclick="setMirror('v-bottom')">Mirror bottom ↓</button>
+    <button class="dur-chip" id="mirrorKaleid"  onclick="setMirror('kaleidoscope')">⊞ Kaleidoscope</button>
+  </div>
+</div>
+
+<!-- PREVIEW + LOOP EDITOR -->
+<div class="preview-wrap" id="preview" style="display:none;">
+
+  <!-- Main playback stage -->
+  <div class="stage" id="stage">
+    <div class="hud hud-tl" id="hudMode">—</div>
+    <div class="hud hud-tr" id="hudLoop">—</div>
+    <div class="hud hud-bl" id="hudClip">—</div>
+    <div class="hud hud-br" id="hudTime">0:00</div>
+    <div id="cfOverlay" style="position:absolute;inset:0;opacity:0;pointer-events:none;z-index:5;transition:none;"></div>
+    <!-- Fullscreen button -->
+    <button onclick="toggleFullscreen()" title="Fullscreen"
+      style="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:12;background:rgba(8,12,24,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:3px 10px;color:rgba(255,255,255,0.6);font-size:0.75rem;cursor:pointer;transition:all 0.2s;"
+      onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">⛶</button>
+  </div>
+
+  <!-- Session progress bar -->
+  <div class="progress-track" id="pgTrack">
+    <div class="progress-fill" id="pgFill"></div>
+    <div class="pg-thumb" id="pgThumb"></div>
+  </div>
+
+  <!-- Quick controls under session bar -->
+  <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+    <div style="display:flex;gap:6px;">
+      <button onclick="togglePlayPause()" id="btnPlayPause"
+        style="background:rgba(77,217,192,0.1);border:1px solid var(--cyan);border-radius:6px;padding:4px 12px;color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">
+        ⏸ PAUSE
+      </button>
+      <button onclick="restartMain()"
+        style="background:rgba(201,168,76,0.07);border:1px solid var(--gold);border-radius:6px;padding:4px 12px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">
+        ↺ RESTART
+      </button>
+      <button onclick="startExport()" id="btnExport"
+        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 12px;color:rgba(255,255,255,0.6);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">
+        ⬇ EXPORT MP4
+      </button>
+    </div>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--dim);" id="infoL">—</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--dim);" id="infoR">—</span>
+  </div>
+
+  <!-- ── Loop Region Editor ───────────────────────────────────────────────── -->
+  <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.15em;color:var(--gold);">LOOP REGION</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;">
+        <span style="color:var(--cyan);">IN <span id="inVal">0.0s</span></span>
+        <span style="color:var(--dim);"> · </span>
+        <span style="color:var(--gold);">OUT <span id="outVal">—</span></span>
+        <span style="color:var(--dim);"> · </span>
+        <span id="regionDur" style="color:var(--dim);">—</span>
+      </span>
+    </div>
+
+    <!-- Small loop preview video -->
+    <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:7px;overflow:hidden;background:#000;border:1px solid var(--border);">
+      <video id="loopPreviewVid" playsinline muted loop
+        style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <div style="position:absolute;bottom:6px;right:8px;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.55);pointer-events:none;" id="loopPreviewPos">0.0s</div>
+      <div style="position:absolute;bottom:6px;left:8px;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(201,168,76,0.8);pointer-events:none;">LOOP PREVIEW</div>
+    </div>
+
+    <!-- Loop preview scrub bar + marker timeline — canvas drawn, no CSS fights -->
+    <canvas id="timelineCanvas" height="44"
+      style="width:100%;height:44px;display:block;cursor:crosshair;border-radius:4px;"></canvas>
+
+    <!-- Time labels -->
+    <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.57rem;color:var(--dim);margin-top:2px;">
+      <span>0s</span><span id="scrubMid">—</span><span id="scrubEnd">—</span>
+    </div>
+  </div>
+</div>
+
+<div class="log" id="log"></div>
+
 <script>
-(function(){
-  const canvas=document.getElementById('heroWave');
-  if(!canvas)return;
-  const c=canvas.getContext('2d');
-  let frame,start;
-  function draw(ts){
-    if(!start)start=ts;
-    const e=(ts-start)*0.001;
-    const W=canvas.offsetWidth,H=canvas.offsetHeight;
-    canvas.width=W;canvas.height=H;
-    c.clearRect(0,0,W,H);
-    [[1.4,'#2dd4bf',0.68],[0.85,'#d4a843',0.42],[0.5,'#a78bfa',0.28]].forEach(([spd,col,amp],i)=>{
-      c.beginPath();c.strokeStyle=col;c.lineWidth=1.3;c.globalAlpha=0.65;
-      for(let x=0;x<=W;x++){
-        const t=x/W;
-        const y=H/2+Math.sin(t*Math.PI*2*(3+i)+e*spd)*H*amp*0.4;
-        x===0?c.moveTo(x,y):c.lineTo(x,y);
-      }
-      c.stroke();
-    });
-    c.globalAlpha=1;
-    frame=requestAnimationFrame(draw);
+// ── Theme / subtype data ──────────────────────────────────────────────────────
+const THEMES = {
+  nature: {
+    label: 'Nature',
+    subs: {
+      'Forest stream': { cf:'calm forest stream flowing close up', pend:'forest path drone flythrough slow motion' },
+      'Waterfall':     { cf:'waterfall close up mist static',       pend:'waterfall aerial drone above' },
+      'Meadow':        { cf:'meadow grass breeze static close',      pend:'meadow aerial drone golden hour' },
+      'Jungle':        { cf:'jungle leaves rain close up static',    pend:'jungle canopy drone flythrough' },
+      'Fog & mist':    { cf:'forest fog mist morning atmospheric',   pend:'misty forest road slow drive' },
+    }
+  },
+  water: {
+    label: 'Water',
+    subs: {
+      'Ocean shore':   { cf:'ocean waves breaking shore static',     pend:'aerial coastline ocean drone slow' },
+      'Deep ocean':    { cf:'underwater deep ocean particles',       pend:'underwater ocean swim slow motion' },
+      'Rain on glass': { cf:'rain drops window glass close up',      pend:'rain storm street city slow motion' },
+      'River':         { cf:'river flowing close up static rocks',   pend:'river aerial drone flythrough canyon' },
+      'Lake':          { cf:'calm lake surface reflection still',    pend:'lake aerial sunrise drone pan' },
+    }
+  },
+  sky: {
+    label: 'Sky',
+    subs: {
+      'Sunset':        { cf:'sunset sky static golden warm',         pend:'sunset timelapse clouds moving horizon' },
+      'Sunrise':       { cf:'sunrise sky pink orange static',        pend:'sunrise timelapse golden hour mountains' },
+      'Clouds':        { cf:'clouds blue sky static fluffy',         pend:'clouds timelapse fast moving dramatic' },
+      'Storm sky':     { cf:'dramatic storm sky dark clouds static', pend:'storm clouds timelapse lightning' },
+      'Aurora':        { cf:'aurora borealis static night sky',      pend:'aurora timelapse northern lights moving' },
+    }
+  },
+  fire: {
+    label: 'Fire',
+    subs: {
+      'Candle':        { cf:'candle flame close up static dark',     pend:'candle light bokeh slow motion' },
+      'Bonfire':       { cf:'bonfire flames close up night',         pend:'bonfire embers slow motion rising' },
+      'Fireplace':     { cf:'fireplace flames crackling close',      pend:'fireplace glow warm slow motion' },
+      'Lava':          { cf:'lava close up texture glowing static',  pend:'lava flow slow motion volcanic' },
+      'Ember & sparks':{ cf:'embers glowing close dark static',      pend:'sparks flying slow motion fire' },
+    }
+  },
+  weather: {
+    label: 'Weather',
+    subs: {
+      'Rain':          { cf:'rain drops puddle close up static',     pend:'rain storm city street slow motion' },
+      'Snow':          { cf:'snow falling close up static bokeh',    pend:'snow falling slow motion forest' },
+      'Thunder':       { cf:'dark storm clouds rain atmospheric',    pend:'lightning storm timelapse dramatic' },
+      'Wind':          { cf:'wind grass field moving close static',  pend:'wind storm trees moving aerial' },
+      'Fog':           { cf:'thick fog atmospheric static moody',    pend:'fog rolling valley timelapse morning' },
+    }
+  },
+  light: {
+    label: 'Light',
+    subs: {
+      'Bokeh':         { cf:'bokeh lights blurry abstract static',   pend:'bokeh lights slow motion glowing' },
+      'Golden hour':   { cf:'golden hour light rays dust static',    pend:'golden hour sunset drone aerial pan' },
+      'Light rays':    { cf:'light rays forest beams dust static',   pend:'light rays water slow motion godray' },
+      'Neon':          { cf:'neon lights city blur abstract',        pend:'neon city rain reflection slow motion' },
+      'Stars':         { cf:'stars night sky milky way static',      pend:'star trail timelapse sky rotation' },
+    }
+  },
+  earth: {
+    label: 'Earth',
+    subs: {
+      'Mountains':     { cf:'mountain landscape still static',       pend:'mountain aerial drone flyover slow' },
+      'Desert':        { cf:'desert sand dunes wind static',         pend:'desert aerial drone sand dunes pan' },
+      'Cliffs':        { cf:'cliff rocks ocean static dramatic',     pend:'cliff aerial drone coastline flyover' },
+      'Volcanic':      { cf:'volcanic rock texture lava static',     pend:'volcano aerial drone smoke crater' },
+      'Cave':          { cf:'cave rock texture dark moody static',   pend:'cave water drip slow motion dark' },
+    }
+  },
+  abstract: {
+    label: 'Abstract',
+    subs: {
+      'Particles':     { cf:'particles dust floating dark abstract', pend:'particles flow slow motion abstract' },
+      'Ink in water':  { cf:'ink water diffusion close abstract',    pend:'ink water slow motion diffusion drop' },
+      'Smoke':         { cf:'smoke wisps dark background abstract',  pend:'smoke slow motion dark dramatic' },
+      'Liquid':        { cf:'liquid abstract color swirl static',    pend:'liquid paint pour slow motion abstract' },
+      'Fractal':       { cf:'abstract fractal glow dark background', pend:'abstract light tunnel zoom slow' },
+    }
+  },
+  urban: {
+    label: 'Urban',
+    subs: {
+      'City night':    { cf:'city lights night static bokeh',        pend:'city aerial drone night flyover' },
+      'Rain city':     { cf:'rain city street reflection static',    pend:'rain city slow motion neon reflection' },
+      'Traffic':       { cf:'traffic light trails long exposure',    pend:'traffic timelapse city intersection' },
+      'Architecture':  { cf:'building facade abstract geometry',     pend:'architecture drone aerial urban fly' },
+      'Subway':        { cf:'subway tunnel light abstract static',   pend:'subway train slow motion light trail' },
+    }
+  },
+  cosmos: {
+    label: 'Cosmos',
+    subs: {
+      'Milky Way':     { cf:'milky way galaxy static night sky',     pend:'milky way timelapse rotation star trail' },
+      'Nebula':        { cf:'nebula space abstract color deep',      pend:'space nebula zoom slow fly through' },
+      'Moon':          { cf:'moon close up static craters night',    pend:'moon timelapse rising clouds slow' },
+      'Planets':       { cf:'planet space abstract static dark',     pend:'planet rotation slow space zoom' },
+      'Solar':         { cf:'sun solar flare abstract static',       pend:'solar eclipse timelapse slow motion' },
+    }
+  },
+};
+
+const PROXY         = 'https://white-cloud-27a9.nanomarche.workers.dev';
+const MIN_LOOP_SECS = 5;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let loopMode      = 'crossfade';
+let targetSecs    = 30;
+let SPEED         = 1.0;
+let CF_MS         = 4000;
+let currentClip   = null;
+let clipPool      = [];
+let clipIndex     = 0;
+let fetchedForKey = null;
+let fetchResolution = '1080'; // '1080' | '2k' | '4k'
+let running       = false;
+let loopN         = 0;
+let elapsed       = 0;
+let sessionStart  = 0;
+let tickTimer     = null;
+let cfTimer       = null;
+let loopIn        = 0;
+let loopOut       = 0;
+let vA, vB, activeVid, standbyVid;
+let pendVid, pendPos, pendDir, pendRafId, revRafId, lastPendT;
+let pendFrame; // hoisted so restartFromLoopIn can call it
+
+// ── Speed — live change ───────────────────────────────────────────────────────
+function onSpeedChange(val) {
+  SPEED = parseFloat(val);
+  document.getElementById('speedVal').textContent = SPEED.toFixed(2) + 'x';
+  // Apply immediately to playing videos
+  [vA, vB, activeVid, standbyVid, pendVid].filter((v,i,a) => v && a.indexOf(v)===i).forEach(v => {
+    try { v.playbackRate = SPEED; } catch(e) {}
+  });
+}
+
+// ── Effects ───────────────────────────────────────────────────────────────────
+let mirrorMode   = 'none';
+let zoomBase     = 1.0;
+let zoomPulse    = 0.0;
+let cfStyle      = 'dissolve';
+let effectsRafId = null;
+let zoomPhaseStart = 0; // wall time when zoom breathe last started from 1.0
+
+// Mirror canvas — overlaid on stage, draws reflected quadrant
+let mirrorCanvas = null;
+let mirrorCtx    = null;
+
+function ensureMirrorCanvas() {
+  const stage = document.getElementById('stage');
+  if (!mirrorCanvas) {
+    mirrorCanvas = document.createElement('canvas');
+    // z-index 4 = above dissolveCanvas (3) but below HUD elements (z-index 10+)
+    mirrorCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;';
+    stage.appendChild(mirrorCanvas);
+    mirrorCtx = mirrorCanvas.getContext('2d');
   }
-  frame=requestAnimationFrame(draw);
+  const r = stage.getBoundingClientRect();
+  if (mirrorCanvas.width !== Math.round(r.width) || mirrorCanvas.height !== Math.round(r.height)) {
+    mirrorCanvas.width  = Math.round(r.width);
+    mirrorCanvas.height = Math.round(r.height);
+  }
+}
+
+function drawMirror() {
+  if (mirrorMode === 'none') {
+    if (mirrorCanvas) mirrorCtx.clearRect(0, 0, mirrorCanvas.width, mirrorCanvas.height);
+    return;
+  }
+  ensureMirrorCanvas();
+  const W = mirrorCanvas.width, H = mirrorCanvas.height;
+  mirrorCtx.clearRect(0, 0, W, H);
+
+  const src = (loopMode === 'crossfade') ? activeVid : (pendVid || null);
+  if (!src || src.readyState < 2) return;
+
+  const vW = src.videoWidth  || W;
+  const vH = src.videoHeight || H;
+
+  if (mirrorMode === 'h-left') {
+    // Take left half of video, display on left side
+    // Then flip it and display on right side
+    mirrorCtx.drawImage(src, 0, 0, vW/2, vH, 0, 0, W/2, H);
+    mirrorCtx.save();
+    mirrorCtx.translate(W, 0); mirrorCtx.scale(-1, 1);
+    mirrorCtx.drawImage(src, 0, 0, vW/2, vH, 0, 0, W/2, H);
+    mirrorCtx.restore();
+
+  } else if (mirrorMode === 'h-right') {
+    // Take right half of video, display on right side
+    // Then flip it and display on left side
+    mirrorCtx.drawImage(src, vW/2, 0, vW/2, vH, W/2, 0, W/2, H);
+    mirrorCtx.save();
+    mirrorCtx.translate(W, 0); mirrorCtx.scale(-1, 1);
+    mirrorCtx.drawImage(src, vW/2, 0, vW/2, vH, W/2, 0, W/2, H);
+    mirrorCtx.restore();
+
+  } else if (mirrorMode === 'v-top') {
+    // Take top half of video, display on top
+    // Then flip it and display on bottom
+    mirrorCtx.drawImage(src, 0, 0, vW, vH/2, 0, 0, W, H/2);
+    mirrorCtx.save();
+    mirrorCtx.translate(0, H); mirrorCtx.scale(1, -1);
+    mirrorCtx.drawImage(src, 0, 0, vW, vH/2, 0, 0, W, H/2);
+    mirrorCtx.restore();
+
+  } else if (mirrorMode === 'v-bottom') {
+    // Take bottom half of video, display on bottom
+    // Then flip it and display on top
+    mirrorCtx.drawImage(src, 0, vH/2, vW, vH/2, 0, H/2, W, H/2);
+    mirrorCtx.save();
+    mirrorCtx.translate(0, H); mirrorCtx.scale(1, -1);
+    mirrorCtx.drawImage(src, 0, vH/2, vW, vH/2, 0, H/2, W, H/2);
+    mirrorCtx.restore();
+
+  } else if (mirrorMode === 'kaleidoscope') {
+    // Top-left quadrant of video, tiled to all 4 corners with appropriate mirrors
+    mirrorCtx.drawImage(src, 0, 0, vW/2, vH/2, 0, 0, W/2, H/2); // TL normal
+    mirrorCtx.save();
+    mirrorCtx.translate(W, 0); mirrorCtx.scale(-1, 1);
+    mirrorCtx.drawImage(src, 0, 0, vW/2, vH/2, 0, 0, W/2, H/2); // TR h-flip
+    mirrorCtx.restore();
+    mirrorCtx.save();
+    mirrorCtx.translate(0, H); mirrorCtx.scale(1, -1);
+    mirrorCtx.drawImage(src, 0, 0, vW/2, vH/2, 0, 0, W/2, H/2); // BL v-flip
+    mirrorCtx.restore();
+    mirrorCtx.save();
+    mirrorCtx.translate(W, H); mirrorCtx.scale(-1, -1);
+    mirrorCtx.drawImage(src, 0, 0, vW/2, vH/2, 0, 0, W/2, H/2); // BR both-flip
+    mirrorCtx.restore();
+  }
+}
+
+function applyEffects() {
+  zoomBase  = parseFloat(document.getElementById('zoomSlider').value);
+  zoomPulse = parseFloat(document.getElementById('zoomSpeedSlider').value);
+  if (zoomPulse > 0) zoomPhaseStart = performance.now();
+}
+
+function setCFStyle(style) {
+  cfStyle = style;
+  ['cfStyleDissolve','cfStyleBlack','cfStyleWhite','cfStyleFlash'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderColor='var(--border)'; el.style.color='var(--dim)'; }
+  });
+  const activeEl = document.getElementById({ dissolve:'cfStyleDissolve', black:'cfStyleBlack', white:'cfStyleWhite', flash:'cfStyleFlash' }[style]);
+  if (activeEl) { activeEl.style.borderColor='var(--cyan)'; activeEl.style.color='var(--cyan)'; }
+}
+
+function setMirror(mode) {
+  mirrorMode = mode;
+  const idMap = {
+    none: 'mirrorOff', 'h-left': 'mirrorHL', 'h-right': 'mirrorHR',
+    'v-top': 'mirrorVT', 'v-bottom': 'mirrorVB', kaleidoscope: 'mirrorKaleid'
+  };
+  Object.values(idMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderColor = 'var(--border)'; el.style.color = 'var(--dim)'; }
+  });
+  const activeEl = document.getElementById(idMap[mode]);
+  if (activeEl) { activeEl.style.borderColor = 'var(--cyan)'; activeEl.style.color = 'var(--cyan)'; }
+}
+
+function updateEffectTransform(now) {
+  // Zoom only when pulse speed > 0 — zoom amount alone does nothing
+  // Image always returns to 1.0x (no zoom) at the bottom of each breathe cycle
+  let scale = 1.0;
+  if (zoomPulse > 0 && zoomBase > 1.0) {
+    const t = (now - zoomPhaseStart) * 0.001;
+    const sine = Math.sin(t * zoomPulse * Math.PI * 2);
+    const breathe = (sine + 1) / 2; // 0..1
+    scale = 1.0 + breathe * (zoomBase - 1.0);
+  }
+
+  const stage = document.getElementById('stage');
+  if (stage) {
+    const transform = scale !== 1.0 ? `scale(${scale.toFixed(4)})` : '';
+    [dissolveCanvas, pendCanvas].forEach(c => {
+      if (c) { c.style.transform = transform; c.style.transformOrigin = 'center center'; }
+    });
+    stage.querySelectorAll('video.cf-vid').forEach(v => {
+      v.style.transform = transform; v.style.transformOrigin = 'center center';
+    });
+    if (mirrorCanvas) {
+      mirrorCanvas.style.transform = transform;
+      mirrorCanvas.style.transformOrigin = 'center center';
+    }
+  }
+
+  if (mirrorMode !== 'none') drawMirror();
+  else if (mirrorCanvas) mirrorCtx.clearRect(0, 0, mirrorCanvas.width, mirrorCanvas.height);
+}
+
+function effectsLoop(now) {
+  updateEffectTransform(now);
+  effectsRafId = requestAnimationFrame(effectsLoop);
+}
+requestAnimationFrame(effectsLoop);
+
+// ── UI bindings ───────────────────────────────────────────────────────────────
+function buildSubSelect(theme) {
+  const sel  = document.getElementById('subSelect');
+  const subs = THEMES[theme]?.subs || {};
+  sel.innerHTML = '';
+  Object.keys(subs).forEach(k => {
+    const opt = document.createElement('option');
+    opt.value = k; opt.textContent = k;
+    sel.appendChild(opt);
+  });
+}
+
+document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.theme-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  buildSubSelect(b.dataset.theme);
+}));
+document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  loopMode = b.dataset.mode;
+  document.getElementById('cfRow').style.display = loopMode === 'crossfade' ? '' : 'none';
+}));
+document.querySelectorAll('.dur-chip').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.dur-chip').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  targetSecs = parseInt(b.dataset.secs);
+}));
+buildSubSelect('nature');
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const fmt  = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+const fmtS = s => s.toFixed(1) + 's';
+
+function lg(msg, cls='lt') {
+  const el = document.getElementById('log');
+  const d  = document.createElement('div');
+  d.className = cls; d.textContent = '› ' + msg;
+  el.appendChild(d); el.scrollTop = el.scrollHeight;
+}
+function setProgress(frac) {
+  const pct = Math.min(frac * 100, 100) + '%';
+  document.getElementById('pgFill').style.width = pct;
+  document.getElementById('pgThumb').style.left = pct;
+}
+function getTheme()    { return document.querySelector('.theme-btn.active')?.dataset.theme || 'nature'; }
+function getSub()      { return document.getElementById('subSelect').value || ''; }
+function getFetchKey() { return `${getTheme()}|${getSub()}|${loopMode}`; }
+function getQuery() {
+  const theme = getTheme(), sub = getSub();
+  const subs  = THEMES[theme]?.subs || {};
+  const entry = subs[sub] || subs[Object.keys(subs)[0]];
+  return loopMode === 'crossfade'
+    ? entry.cf + ' locked off tripod static shot'
+    : entry.pend;
+}
+
+function setResolution(res) {
+  fetchResolution = res;
+  ['res1080','res2k','res4k'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderColor='var(--border)'; el.style.color='var(--dim)'; }
+  });
+  const el = document.getElementById({'1080':'res1080','2k':'res2k','4k':'res4k'}[res]);
+  if (el) { el.style.borderColor='var(--gold)'; el.style.color='var(--gold)'; }
+  fetchedForKey = null; // force re-fetch with new resolution
+}
+
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+async function fetchPool() {
+  const q    = getQuery();
+  const page = Math.floor(Math.random() * 8) + 1;
+  lg(`fetching "${q.split(' locked')[0]}" p${page}...`);
+  const res  = await fetch(`${PROXY}?query=${encodeURIComponent(q)}&per_page=15&orientation=landscape&page=${page}`);
+  if (!res.ok) throw new Error(`worker ${res.status}`);
+  const data = await res.json();
+  if (!data.videos?.length) throw new Error('no results');
+  const isCF = loopMode === 'crossfade';
+  const list = data.videos.map(v => {
+    const files = v.video_files || [];
+    // Pick file based on resolution preference
+    let file;
+    if (fetchResolution === '4k') {
+      file = files.find(f => f.width >= 3840)
+          || files.find(f => f.width >= 2560)
+          || files.find(f => f.width >= 1920)
+          || files[0];
+    } else if (fetchResolution === '2k') {
+      file = files.find(f => f.width >= 2560 && f.width < 3840)
+          || files.find(f => f.width >= 1920)
+          || files.find(f => f.width >= 1280)
+          || files[0];
+    } else {
+      // 1080p — prefer exactly 1920, fallback to 1280
+      file = files.find(f => f.width >= 1920 && f.width < 2560)
+          || files.find(f => f.width >= 1280)
+          || files[0];
+    }
+    if (!file) return null;
+    const dur = v.duration;
+    const ds  = isCF
+      ? (dur >= 20 && dur <= 60 ? 4 : dur >= 10 ? 2 : 1)
+      : (dur >= 15 && dur <= 40 ? 4 : dur >= 10 ? 2 : 1);
+    return { url: file.link, duration: dur, w: file.width, h: file.height, score: ds + (file.width >= 1280 ? 1 : 0) };
+  }).filter(Boolean);
+  list.sort((a,b) => b.score - a.score + (Math.random()-0.5)*0.3);
+  clipPool = list; clipIndex = 0;
+  fetchedForKey = getFetchKey();
+  lg(`${list.length} clips · best: ${list[0]?.duration}s`, 'lt');
+  return list[0];
+}
+
+// ── Session ───────────────────────────────────────────────────────────────────
+async function startSession() {
+  SPEED = parseFloat(document.getElementById('speedSlider').value);
+  CF_MS = parseFloat(document.getElementById('cfSlider').value) * 1000;
+  stopCleanup();
+  running = true; loopN = 1; elapsed = 0;
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnStop').style.display = 'block';
+  document.getElementById('preview').style.display = 'flex';
+  document.getElementById('log').innerHTML = '';
+  requestAnimationFrame(tlResize); // size canvas now that it's visible
+
+  const key = getFetchKey();
+  if (!currentClip || fetchedForKey !== key) {
+    try { currentClip = await fetchPool(); }
+    catch(e) { lg(e.message,'lg'); stopCleanup(); return; }
+    setupLoopEditor(currentClip);
+  }
+
+  const clip = currentClip;
+  lg(`${clip.duration}s · ${clip.w}×${clip.h} · ${SPEED}x · ${loopMode}`, 'lc');
+  document.getElementById('hudClip').textContent = `${clip.duration}s`;
+  document.getElementById('infoR').textContent   = `${clip.duration}s · ${SPEED}x · ${fmt(targetSecs)}`;
+  // Show switch-mode button when clip is loaded
+  document.getElementById('btnSwitchMode').style.display = 'block';
+  document.getElementById('btnSwitchMode').textContent   =
+    loopMode === 'crossfade' ? '⇄ SAME CLIP · PENDULUM' : '↺ SAME CLIP · CROSSFADE';
+  setProgress(0);
+  sessionStart = performance.now();
+  manualPaused = false;
+  const ppBtn = document.getElementById('btnPlayPause');
+  if (ppBtn) { ppBtn.textContent = '⏸ PAUSE'; ppBtn.disabled = false; ppBtn.style.opacity = ''; }
+  if (loopMode === 'crossfade') startCrossfade(clip);
+  else startPendulum(clip);
+}
+
+async function tryAnother() {
+  stopCleanup();
+  const key = getFetchKey();
+  let clip;
+  if (fetchedForKey === key && clipPool.length > 1) {
+    clipIndex = (clipIndex + 1) % clipPool.length;
+    clip = clipPool[clipIndex];
+    lg(`clip ${clipIndex+1}/${clipPool.length}`, 'lt');
+  } else {
+    try { clip = await fetchPool(); } catch(e) { lg(e.message,'lg'); return; }
+  }
+  currentClip = clip;
+  setupLoopEditor(clip);
+  await new Promise(r => setTimeout(r, 80));
+  startSession();
+}
+
+// Keep same clip, switch between crossfade and pendulum
+function switchModeKeepClip() {
+  if (!currentClip) return;
+  stopCleanup();
+  loopMode = loopMode === 'crossfade' ? 'pendulum' : 'crossfade';
+  // Update mode buttons
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === loopMode);
+  });
+  document.getElementById('cfRow').style.display = loopMode === 'crossfade' ? '' : 'none';
+  document.getElementById('btnSwitchMode').textContent =
+    loopMode === 'crossfade' ? '⇄ SAME CLIP · PENDULUM' : '↺ SAME CLIP · CROSSFADE';
+  // Don't re-fetch — keep currentClip and fetchedForKey as-is so startSession skips fetch
+  fetchedForKey = getFetchKey(); // update key so startSession doesn't re-fetch
+  startSession();
+}
+
+// ── Play/Pause ────────────────────────────────────────────────────────────────
+let manualPaused = false;
+let pausedAtElapsed = 0;
+
+function togglePlayPause() {
+  const vid = (loopMode === 'crossfade') ? activeVid : pendVid;
+  const btn = document.getElementById('btnPlayPause');
+  if (!vid) return;
+  if (manualPaused) {
+    sessionStart = performance.now() - pausedAtElapsed * 1000;
+    vid.play();
+    if (loopMode === 'crossfade' && standbyVid) standbyVid.play();
+    loopPreviewVid.play();
+    manualPaused = false;
+    if (btn) btn.textContent = '⏸ PAUSE';
+  } else {
+    pausedAtElapsed = elapsed;
+    vid.pause();
+    if (loopMode === 'crossfade' && standbyVid) standbyVid.pause();
+    loopPreviewVid.pause();
+    manualPaused = true;
+    if (btn) btn.textContent = '▶ PLAY';
+  }
+}
+
+// ── Fullscreen ────────────────────────────────────────────────────────────────
+function toggleFullscreen() {
+  const stage = document.getElementById('stage');
+  if (!document.fullscreenElement) {
+    const req = stage.requestFullscreen || stage.webkitRequestFullscreen || stage.mozRequestFullScreen;
+    if (req) req.call(stage);
+  } else {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    if (exit) exit.call(document);
+  }
+}
+// Resize effect canvases when fullscreen changes — not every rAF
+document.addEventListener('fullscreenchange', () => {
+  setTimeout(() => {
+    if (dissolveCanvas) {
+      const r = document.getElementById('stage').getBoundingClientRect();
+      dissolveCanvas.width  = Math.round(r.width)  || 960;
+      dissolveCanvas.height = Math.round(r.height) || 540;
+    }
+    if (mirrorCanvas) {
+      const r = document.getElementById('stage').getBoundingClientRect();
+      mirrorCanvas.width  = Math.round(r.width)  || 960;
+      mirrorCanvas.height = Math.round(r.height) || 540;
+    }
+  }, 100);
+});
+
+// ── MP4 Export via MediaRecorder ──────────────────────────────────────────────
+let mediaRecorder = null;
+let recordedChunks = [];
+
+// ── Server-side export ────────────────────────────────────────────────────────
+const EXPORT_SERVER = 'https://aural-alchemy-export.onrender.com';
+
+async function startExport() {
+  const btn = document.getElementById('btnExport');
+
+  // If already exporting, cancel UI
+  if (btn.dataset.polling) {
+    clearInterval(parseInt(btn.dataset.polling));
+    btn.dataset.polling = '';
+    btn.textContent = '⬇ EXPORT MP4';
+    btn.style.color = 'rgba(255,255,255,0.6)';
+    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    lg('export cancelled', 'lg');
+    return;
+  }
+
+  if (!currentClip) { lg('start a session first', 'lg'); return; }
+
+  // Gather settings
+  const payload = {
+    clipUrl:    currentClip.url,
+    loopIn:     loopIn || 0,
+    loopOut:    loopOut || currentClip.duration,
+    duration:   targetSecs || 60,
+    speed:      SPEED || 0.5,
+    resolution: fetchResolution || '1080',
+  };
+
+  lg(`sending to export server...`, 'lt');
+  btn.textContent = '⏳ STARTING...';
+  btn.style.color = '#c9a84c';
+  btn.style.borderColor = '#c9a84c';
+
+  let jobId;
+  try {
+    const res  = await fetch(`${EXPORT_SERVER}/export`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.jobId) throw new Error(data.error || 'no jobId returned');
+    jobId = data.jobId;
+    lg(`job started · ${jobId.substring(0,8)}...`, 'lc');
+  } catch(e) {
+    lg(`export error: ${e.message}`, 'lg');
+    btn.textContent = '⬇ EXPORT MP4';
+    btn.style.color = 'rgba(255,255,255,0.6)';
+    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    return;
+  }
+
+
+  // Poll every 5s — retry silently on network failures (Render free tier can sleep)
+  let failCount = 0;
+  const pollId = setInterval(async () => {
+    try {
+      const res = await fetch(`${EXPORT_SERVER}/status/${jobId}`);
+      if (!res.ok) throw new Error(`${res.status}`);
+      const job = await res.json();
+      failCount = 0;
+
+      if (job.status === 'downloading') {
+        btn.textContent = `⏳ DOWNLOADING ${job.progress}%`;
+      } else if (job.status === 'processing') {
+        btn.textContent = `⚙ PROCESSING ${job.progress}%`;
+      } else if (job.status === 'done') {
+        clearInterval(pollId);
+        btn.dataset.polling = '';
+        btn.textContent = '⬇ EXPORT MP4';
+        btn.style.color = 'rgba(255,255,255,0.6)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+        const sizeMB = (job.size / 1024 / 1024).toFixed(1);
+        lg(`✓ export ready · ${sizeMB}MB`, 'lc');
+        showDownloadButton(job.url, sizeMB);
+      } else if (job.status === 'error') {
+        clearInterval(pollId);
+        btn.dataset.polling = '';
+        btn.textContent = '⬇ EXPORT MP4';
+        btn.style.color = 'rgba(255,255,255,0.6)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+        lg(`export failed: ${job.error}`, 'lg');
+      }
+    } catch(e) {
+      failCount++;
+      if (failCount <= 3) lg(`server busy, retrying...`, 'lt');
+      if (failCount > 20) {
+        clearInterval(pollId);
+        btn.dataset.polling = '';
+        btn.textContent = '⬇ EXPORT MP4';
+        btn.style.color = 'rgba(255,255,255,0.6)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+        lg('server unreachable — check Render logs', 'lg');
+      }
+    }
+  }, 5000);
+
+  btn.dataset.polling = String(pollId);
+}
+
+function showDownloadButton(url, sizeMB) {
+  // Remove existing download button if any
+  const existing = document.getElementById('btnDownload');
+  if (existing) existing.remove();
+
+  const btn = document.createElement('a');
+  btn.id        = 'btnDownload';
+  btn.href      = url;
+  btn.download  = `aural-alchemy-loop-${Date.now()}.mp4`;
+  btn.target    = '_blank';
+  btn.textContent = `⬇ DOWNLOAD MP4 (${sizeMB}MB)`;
+  btn.style.cssText = `
+    display:inline-block;
+    background:linear-gradient(135deg,rgba(77,217,192,0.2),rgba(201,168,76,0.1));
+    border:1px solid var(--cyan);
+    border-radius:6px;
+    padding:8px 16px;
+    color:var(--cyan);
+    font-family:'Share Tech Mono',monospace;
+    font-size:0.72rem;
+    cursor:pointer;
+    text-decoration:none;
+    letter-spacing:0.08em;
+    margin-top:4px;
+  `;
+
+  // Insert after the quick controls row
+  const preview = document.getElementById('preview');
+  const controls = preview.querySelector('div');
+  controls.parentNode.insertBefore(btn, controls.nextSibling);
+}
+
+// ── Fix doCF dissolve — canvas compositing, zero brightness dip ───────────────
+// We use a compositing canvas that draws outgoing at (1-t) alpha and incoming at t alpha
+// Both always sum to full brightness. No dark frame possible.
+let dissolveCanvas = null, dissolveCtx = null, dissolveRafId = null;
+let isCFDissolving = false;
+
+function startDissolveCanvas(stage) {
+  if (!dissolveCanvas) {
+    dissolveCanvas = document.createElement('canvas');
+    dissolveCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;';
+    stage.appendChild(dissolveCanvas);
+    dissolveCtx = dissolveCanvas.getContext('2d');
+  }
+  const r = stage.getBoundingClientRect();
+  dissolveCanvas.width  = Math.round(r.width)  || 960;
+  dissolveCanvas.height = Math.round(r.height) || 540;
+}
+// Call this whenever the main video position or play state changes
+function syncLoopPreview() {
+  if (!loopPreviewVid || !currentClip) return;
+  const mainVid = (loopMode === 'crossfade') ? activeVid : pendVid;
+  if (!mainVid) return;
+  const t = loopMode === 'pendulum' ? pendPos : mainVid.currentTime;
+  loopPreviewVid.currentTime = t;
+  document.getElementById('loopPreviewPos').textContent = fmtS(t);
+  if (manualPaused) {
+    loopPreviewVid.pause();
+  }
+}
+const loopPreviewVid = document.getElementById('loopPreviewVid');
+let isDragging = false; // suppress ontimeupdate scrubhead updates while dragging
+
+function setupLoopEditor(clip) {
+  loopIn  = 0;
+  loopOut = clip.duration;
+  loopPreviewVid.src = clip.url;
+  loopPreviewVid.load();
+
+  let editorInitialized = false;
+  loopPreviewVid.oncanplay = () => {
+    // Only run ONCE — never reset loopOut after initial load
+    if (editorInitialized) return;
+    editorInitialized = true;
+    if (isFinite(loopPreviewVid.duration) && loopPreviewVid.duration > 0) {
+      loopOut = loopPreviewVid.duration;
+      currentClip = { ...currentClip, duration: loopPreviewVid.duration };
+    }
+    loopPreviewVid.currentTime = 0;
+    loopPreviewVid.play();
+    renderTimeline();
+  };
+
+  loopPreviewVid.ontimeupdate = () => {
+    if (!currentClip) return;
+    document.getElementById('loopPreviewPos').textContent = fmtS(loopPreviewVid.currentTime);
+  };
+  renderTimeline();
+}
+
+function restartMain() {
+  if (!running) { startSession(); return; }
+  clearTimeout(cfTimer);
+  cancelAnimationFrame(pendRafId);
+  cancelAnimationFrame(revRafId);
+  loopN = 1;
+  sessionStart = performance.now(); // reset elapsed
+  elapsed = 0;
+  setProgress(0);
+  if (loopMode === 'crossfade' && activeVid && standbyVid) {
+    activeVid.currentTime  = loopIn;
+    standbyVid.currentTime = loopIn;
+    activeVid.style.opacity = '1'; activeVid.style.zIndex = '2';
+    standbyVid.style.opacity = '0'; standbyVid.style.transition = 'none';
+    activeVid.play();
+    document.getElementById('hudLoop').textContent = 'LOOP 1';
+    scheduleCF();
+  } else if (loopMode === 'pendulum' && pendVid) {
+    pendDir = 1; pendPos = loopIn;
+    pendVid.currentTime = loopIn;
+    lastPendT = performance.now();
+    pendVid.play();
+    document.getElementById('hudLoop').textContent = '▶ FWD';
+    if (pendFrame) pendRafId = requestAnimationFrame(pendFrame);
+  }
+  manualPaused = false;
+  const ppBtn2 = document.getElementById('btnPlayPause');
+  if (ppBtn2) { ppBtn2.textContent = '⏸ PAUSE'; ppBtn2.disabled = false; ppBtn2.style.opacity = ''; }
+  syncLoopPreview();
+  lg('↺ restarted', 'lt');
+}
+
+// ── Canvas timeline — no CSS positioning, no snap-back bugs ──────────────────
+const tlCanvas = document.getElementById('timelineCanvas');
+const tlCtx    = tlCanvas.getContext('2d');
+let tlHead     = 0;
+
+function tlResize() {
+  const r = tlCanvas.getBoundingClientRect();
+  if (r.width > 0 && Math.round(r.width) !== tlCanvas.width) {
+    tlCanvas.width = Math.round(r.width);
+    tlDraw();
+  }
+}
+window.addEventListener('resize', tlResize);
+// Delay resize until layout is stable
+requestAnimationFrame(() => requestAnimationFrame(tlResize));
+
+function tlDraw() {
+  if (!currentClip) return;
+  const W   = tlCanvas.width;
+  const H   = tlCanvas.height;
+  const dur = currentClip.duration;
+  const TY  = H * 0.62; // track center y
+  const TH  = 5;
+  const MH  = 11; // marker half-height above track
+  const inX  = (loopIn  / dur) * W;
+  const outX = (loopOut / dur) * W;
+  const hX   = tlHead * W;
+
+  tlCtx.clearRect(0, 0, W, H);
+
+  // Track bg
+  tlCtx.fillStyle = 'rgba(255,255,255,0.08)';
+  tlCtx.beginPath(); tlCtx.roundRect(0, TY-TH/2, W, TH, 2); tlCtx.fill();
+
+  // Region
+  tlCtx.fillStyle = 'rgba(201,168,76,0.3)';
+  tlCtx.fillRect(inX, TY-TH/2, outX-inX, TH);
+
+  // Fill to head
+  tlCtx.fillStyle = 'rgba(77,217,192,0.18)';
+  tlCtx.fillRect(0, TY-TH/2, Math.min(hX, inX > 0 ? inX : hX), TH);
+
+  // Playhead line
+  tlCtx.strokeStyle = 'rgba(77,217,192,0.7)'; tlCtx.lineWidth = 1.5;
+  tlCtx.beginPath(); tlCtx.moveTo(hX, TY-MH-4); tlCtx.lineTo(hX, TY+MH+2); tlCtx.stroke();
+
+  // IN marker — cyan line + small top handle
+  tlCtx.strokeStyle = '#4dd9c0'; tlCtx.lineWidth = 2.5;
+  tlCtx.beginPath(); tlCtx.moveTo(inX, TY-MH); tlCtx.lineTo(inX, TY+MH); tlCtx.stroke();
+  tlCtx.fillStyle = '#4dd9c0';
+  tlCtx.beginPath(); tlCtx.moveTo(inX-7, TY-MH); tlCtx.lineTo(inX+7, TY-MH); tlCtx.lineTo(inX, TY-MH+9); tlCtx.closePath(); tlCtx.fill();
+
+  // OUT marker — gold line + small top handle
+  tlCtx.strokeStyle = '#c9a84c'; tlCtx.lineWidth = 2.5;
+  tlCtx.beginPath(); tlCtx.moveTo(outX, TY-MH); tlCtx.lineTo(outX, TY+MH); tlCtx.stroke();
+  tlCtx.fillStyle = '#c9a84c';
+  tlCtx.beginPath(); tlCtx.moveTo(outX-7, TY-MH); tlCtx.lineTo(outX+7, TY-MH); tlCtx.lineTo(outX, TY-MH+9); tlCtx.closePath(); tlCtx.fill();
+}
+
+function renderTimeline() {
+  if (!currentClip) return;
+  const dur = currentClip.duration;
+  document.getElementById('scrubEnd').textContent = fmtS(dur);
+  document.getElementById('scrubMid').textContent = fmtS(dur/2);
+  document.getElementById('inVal').textContent    = fmtS(loopIn);
+  document.getElementById('outVal').textContent   = fmtS(loopOut);
+  const rs = loopOut - loopIn;
+  const re = document.getElementById('regionDur');
+  if (rs < MIN_LOOP_SECS) { re.style.color='var(--gold)'; re.textContent=`⚠ min ${MIN_LOOP_SECS}s`; }
+  else                    { re.style.color='var(--dim)';  re.textContent=fmtS(rs)+' region'; }
+  tlDraw();
+}
+
+function updatePlayhead(pos) {
+  if (!currentClip || isDragging) return;
+  tlHead = Math.min(pos / currentClip.duration, 1);
+  tlDraw();
+}
+
+// ── Canvas drag ───────────────────────────────────────────────────────────────
+(function() {
+  let drag = null;
+  const HIT = 18;
+
+  function syncSize() {
+    const r = tlCanvas.getBoundingClientRect();
+    if (r.width > 0 && tlCanvas.width !== Math.round(r.width)) {
+      tlCanvas.width = Math.round(r.width);
+    }
+  }
+
+  function cx(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+
+  function toSecs(clientX) {
+    const r = tlCanvas.getBoundingClientRect();
+    const frac = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    return frac * (currentClip ? currentClip.duration : 1);
+  }
+
+  function markerClientX(secs) {
+    const dur = currentClip ? currentClip.duration : 1;
+    const r   = tlCanvas.getBoundingClientRect();
+    return (secs / dur) * r.width + r.left;
+  }
+
+  function whichTarget(clientX) {
+    if (!currentClip) return 'head';
+    const dOut = Math.abs(clientX - markerClientX(loopOut));
+    const dIn  = Math.abs(clientX - markerClientX(loopIn));
+    if (dOut <= HIT && dOut <= dIn) return 'out';
+    if (dIn  <= HIT)                return 'in';
+    return 'head';
+  }
+
+  function onDown(e) {
+    if (!currentClip) return;
+    e.preventDefault();
+    syncSize();
+    tlDraw(); // ensure canvas is current before hit testing
+    drag = whichTarget(cx(e));
+    isDragging = true;
+    if (drag === 'in' || drag === 'out') loopPreviewVid.pause();
+    tlCanvas.style.cursor = 'grabbing';
+    onMove(e);
+  }
+
+  function onMove(e) {
+    if (!drag || !currentClip) return;
+    const pos = toSecs(cx(e));
+    const dur = currentClip.duration;
+    if (drag === 'in') {
+      loopIn = Math.max(0, Math.min(pos, loopOut - MIN_LOOP_SECS));
+      renderTimeline();
+    } else if (drag === 'out') {
+      loopOut = Math.min(dur, Math.max(pos, loopIn + MIN_LOOP_SECS));
+      renderTimeline();
+    } else {
+      tlHead = Math.max(0, Math.min(pos / dur, 1));
+      loopPreviewVid.currentTime = pos;
+      tlDraw();
+    }
+  }
+
+  function onUp() {
+    if (!drag) return;
+    const wasMoved = drag === 'in' || drag === 'out';
+    isDragging = false;
+    drag = null;
+    tlCanvas.style.cursor = 'crosshair';
+
+    if (wasMoved && currentClip) {
+      // 1. Loop preview — reset to loopIn and resume playing in region
+      loopPreviewVid.currentTime = loopIn;
+      loopPreviewVid.play();
+
+      // 2. Main stage video — seek to 0 (beginning of clip)
+      //    and reset session progress bar + elapsed to 0
+      clearTimeout(cfTimer);
+      cancelAnimationFrame(pendRafId);
+      cancelAnimationFrame(revRafId);
+      sessionStart = performance.now();
+      elapsed = 0;
+      setProgress(0);
+      tlHead = 0; // main playhead back to start
+      tlDraw();
+
+      if (loopMode === 'crossfade' && activeVid) {
+        activeVid.currentTime  = loopIn; // start from loopIn (beginning of selected region)
+        standbyVid.currentTime = loopIn;
+        activeVid.style.opacity = '1'; activeVid.style.zIndex = '2';
+        standbyVid.style.opacity = '0'; standbyVid.style.transition = 'none';
+        if (!manualPaused) activeVid.play();
+        if (running) scheduleCF();
+      } else if (loopMode === 'pendulum' && pendVid) {
+        pendPos = loopIn; pendDir = 1;
+        pendVid.currentTime = loopIn;
+        lastPendT = performance.now();
+        if (!manualPaused && running) pendVid.play();
+        if (running && pendFrame) pendRafId = requestAnimationFrame(pendFrame);
+      }
+    }
+  }
+
+  tlCanvas.addEventListener('mousemove', e => {
+    if (drag || !currentClip) return;
+    const t = whichTarget(e.clientX);
+    tlCanvas.style.cursor = t === 'head' ? 'col-resize' : 'ew-resize';
+  });
+
+  tlCanvas.addEventListener('mousedown',  e => onDown(e));
+  tlCanvas.addEventListener('touchstart', e => onDown(e), {passive:false});
+  window.addEventListener('mousemove',  e => { if (drag) onMove(e); });
+  window.addEventListener('touchmove',  e => { if (drag) onMove(e); }, {passive:false});
+  window.addEventListener('mouseup',    () => onUp());
+  window.addEventListener('touchend',   () => onUp());
 })();
+
+
+
+// ── Crossfade engine ──────────────────────────────────────────────────────────
+// For smooth slow-mo at low playbackRate, we use a canvas + rVFC
+// to draw frames at the correct timing ourselves.
+// At speed >= 0.5, native playbackRate is smooth enough.
+let cfCanvas = null, cfCtx = null;
+let cfRafId  = null;
+
+function ensureCFCanvas(stage) {
+  if (!cfCanvas) {
+    cfCanvas = document.createElement('canvas');
+    cfCanvas.className = 'cf-vid';
+    cfCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:2;pointer-events:none;';
+    stage.insertBefore(cfCanvas, stage.firstChild);
+    cfCtx = cfCanvas.getContext('2d');
+  }
+  const r = stage.getBoundingClientRect();
+  cfCanvas.width  = Math.round(r.width)  || 960;
+  cfCanvas.height = Math.round(r.height) || 540;
+}
+
+async function startCrossfade(clip) {
+  const stage = document.getElementById('stage');
+  stage.querySelectorAll('video.cf-vid, canvas.cf-vid').forEach(v => { if (v !== cfCanvas) v.remove(); });
+  // Hide pendCanvas from previous pendulum session
+  if (pendCanvas) { pendCanvas.style.display = 'none'; }
+  if (cfCanvas) { cfCanvas.remove(); cfCanvas = null; }
+  cancelAnimationFrame(cfRafId); cancelAnimationFrame(pendRafId); cancelAnimationFrame(revRafId);
+
+  function mkVid() {
+    const v = document.createElement('video');
+    v.className = 'cf-vid'; v.setAttribute('playsinline',''); v.muted = true;
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:none;';
+    return v;
+  }
+  vA = mkVid(); vB = mkVid();
+  stage.insertBefore(vB, stage.firstChild);
+  stage.insertBefore(vA, stage.firstChild);
+  vA.src = clip.url; vB.src = clip.url;
+  await Promise.all([
+    new Promise(r => { vA.oncanplaythrough = r; vA.load(); }),
+    new Promise(r => { vB.oncanplaythrough = r; vB.load(); }),
+  ]);
+  if (isFinite(vA.duration) && vA.duration > 0) {
+    if (loopOut >= clip.duration - 0.5) loopOut = vA.duration;
+    currentClip = { ...clip, duration: vA.duration };
+    renderTimeline();
+  }
+  if ((loopOut - loopIn) < CF_MS / 1000 * 1.5) {
+    lg(`⚠ region too short for crossfade — auto-expanding`, 'lg');
+    loopIn = Math.max(0, loopOut - CF_MS / 1000 * 2.5);
+    renderTimeline();
+  }
+  vA.playbackRate = SPEED; vA.currentTime = loopIn; vA.play();
+  vB.playbackRate = SPEED; vB.currentTime = loopIn;
+  vA.style.opacity = '0'; vB.style.opacity = '0'; // hide native elements always
+  activeVid = vA; standbyVid = vB;
+
+  // Always use a permanent canvas for rendering — zero opacity switches, zero dark frames
+  startDissolveCanvas(stage);
+  dissolveCanvas.style.display = 'block';
+  dissolveCanvas.style.zIndex = '3';
+  // Continuous render loop — draws activeVid to canvas
+  // Key: only clear+draw if video has a new frame ready — never leave canvas blank
+  function cfPaint() {
+    if (!running) return;
+    if (!isCFDissolving && activeVid && activeVid.readyState >= 2) {
+      const W = dissolveCanvas.width, H = dissolveCanvas.height;
+      // Draw directly without clearing — new frame overwrites old
+      // This means if there's ever a gap, the last frame stays visible (no black)
+      dissolveCtx.globalAlpha = 1;
+      dissolveCtx.drawImage(activeVid, 0, 0, W, H);
+    }
+    cfRafId = requestAnimationFrame(cfPaint);
+  }
+  cfRafId = requestAnimationFrame(cfPaint);
+
+  document.getElementById('hudMode').textContent = `↺ ${(CF_MS/1000).toFixed(0)}s`;
+  document.getElementById('hudLoop').textContent = 'LOOP 1';
+  startTick(); scheduleCF();
+}
+
+function scheduleCF() {
+  if (!running) return;
+  clearTimeout(cfTimer);
+  const cur   = activeVid ? activeVid.currentTime : loopIn;
+  const delay = Math.max(((loopOut - cur) / SPEED * 1000) - CF_MS, 200);
+  cfTimer = setTimeout(doCF, delay);
+}
+
+function doCF() {
+  if (!running) return;
+  loopN++;
+  document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
+  lg(`✦ loop ${loopN} · ${fmt(elapsed)}`, 'lc');
+
+  const out = activeVid, inn = standbyVid;
+  const W = dissolveCanvas.width, H = dissolveCanvas.height;
+  const startT = performance.now();
+  isCFDissolving = true;
+
+  inn.currentTime = loopIn; inn.playbackRate = SPEED; inn.play();
+
+  cancelAnimationFrame(dissolveRafId);
+  function dissolveFrame(now) {
+    if (!running) return;
+    const progress = Math.min((now - startT) / CF_MS, 1);
+    const t = progress < 0.5
+      ? 2 * progress * progress
+      : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+    const outReady = out.readyState >= 2;
+    const innReady = inn.readyState >= 2;
+
+    // Only clearRect if we have something to draw — never leave canvas black
+    if (outReady || innReady) {
+      dissolveCtx.clearRect(0, 0, W, H);
+      if (outReady) {
+        dissolveCtx.globalAlpha = 1 - t;
+        dissolveCtx.drawImage(out, 0, 0, W, H);
+      }
+      if (innReady) {
+        dissolveCtx.globalAlpha = t;
+        dissolveCtx.drawImage(inn, 0, 0, W, H);
+      }
+      dissolveCtx.globalAlpha = 1;
+    }
+
+    if (progress < 1) {
+      dissolveRafId = requestAnimationFrame(dissolveFrame);
+    } else {
+      // Final frame: draw inn at full opacity
+      if (innReady) {
+        dissolveCtx.globalAlpha = 1;
+        dissolveCtx.drawImage(inn, 0, 0, W, H);
+      }
+      out.pause(); out.currentTime = loopIn;
+      activeVid = inn; standbyVid = out;
+      isCFDissolving = false;
+      scheduleCF();
+    }
+  }
+  dissolveRafId = requestAnimationFrame(dissolveFrame);
+}
+
+// ── Pendulum engine ───────────────────────────────────────────────────────────
+// For smooth slow-mo we use a canvas + requestVideoFrameCallback (Chrome) 
+// or rAF fallback. Forward plays natively at SPEED, reverse steps via rAF.
+let pendCanvas, pendCtx;
+
+async function startPendulum(clip) {
+  const stage = document.getElementById('stage');
+  stage.querySelectorAll('video.cf-vid, canvas.cf-vid').forEach(v => v.remove());
+  // Hide dissolveCanvas from previous crossfade session
+  if (dissolveCanvas) { dissolveCanvas.style.display = 'none'; }
+  cancelAnimationFrame(cfRafId); cancelAnimationFrame(dissolveRafId);
+  isCFDissolving = false;
+
+  // Use canvas for smooth frame control
+  pendCanvas = document.createElement('canvas');
+  pendCanvas.className = 'cf-vid';
+  pendCanvas.width  = 960; pendCanvas.height = 540;
+  pendCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;';
+  pendCtx = pendCanvas.getContext('2d');
+  stage.insertBefore(pendCanvas, stage.firstChild);
+
+  pendVid = document.createElement('video');
+  pendVid.setAttribute('playsinline',''); pendVid.muted = true;
+  pendVid.style.display = 'none';
+  stage.appendChild(pendVid);
+  pendVid.src = clip.url;
+
+  await new Promise(r => { pendVid.oncanplaythrough = r; pendVid.load(); });
+  if (isFinite(pendVid.duration) && pendVid.duration > 0) {
+    if (loopOut >= clip.duration - 0.5) loopOut = pendVid.duration;
+    currentClip = { ...clip, duration: pendVid.duration };
+    renderTimeline();
+  }
+
+  pendPos = loopIn; pendDir = 1; lastPendT = performance.now();
+  pendVid.playbackRate = SPEED;
+  pendVid.currentTime  = loopIn;
+  pendVid.play();
+
+  document.getElementById('hudMode').textContent = `⇄ ${SPEED}x`;
+  document.getElementById('hudLoop').textContent = '▶ FWD';
+  startTick();
+
+  // Draw loop using rVFC if available
+  function drawFrame() {
+    if (!running) return;
+    pendCtx.drawImage(pendVid, 0, 0, 960, 540);
+  }
+
+  // Assign to hoisted pendFrame so timeline drag can restart it
+  pendFrame = function(now) {
+    if (!running) return;
+    drawFrame();
+    checkPendBounds();
+    pendRafId = requestAnimationFrame(pendFrame);
+  };
+
+  if (pendVid.requestVideoFrameCallback) {
+    function onVFC() {
+      if (!running) return;
+      drawFrame();
+      checkPendBounds();
+      pendVid.requestVideoFrameCallback(onVFC);
+    }
+    pendVid.requestVideoFrameCallback(onVFC);
+  } else {
+    pendRafId = requestAnimationFrame(pendFrame);
+  }
+}
+
+function checkPendBounds() {
+  if (pendDir === 1) {
+    pendPos = pendVid.currentTime;
+    if (pendPos >= loopOut - 0.06) {
+      pendDir = -1; pendPos = loopOut; pendVid.pause();
+      loopN++; document.getElementById('hudLoop').textContent = `◀ ×${loopN}`;
+      lg(`↩ rev · ${fmt(elapsed)}`, 'lc');
+      reverseStep(performance.now());
+    }
+  }
+}
+
+function reverseStep(now) {
+  if (!running || pendDir !== -1) return;
+  const dt   = Math.min((now - lastPendT) / 1000, 0.05); // cap dt to avoid jumps
+  lastPendT  = now;
+  pendPos    = Math.max(loopIn, pendPos - SPEED * dt);
+  pendVid.currentTime = pendPos;
+
+  // Draw after seek settles
+  const drawAndContinue = () => {
+    if (!running) return;
+    pendCtx.drawImage(pendVid, 0, 0, 960, 540);
+    updatePlayhead(pendPos);
+    if (pendPos <= loopIn + 0.04) {
+      // Flip to forward
+      pendDir = 1; pendPos = loopIn;
+      pendVid.currentTime = loopIn;
+      pendVid.play();
+      loopN++; document.getElementById('hudLoop').textContent = `▶ ×${loopN}`;
+      lg(`↪ fwd · ${fmt(elapsed)}`, 'lc');
+    } else {
+      revRafId = requestAnimationFrame(reverseStep);
+    }
+  };
+
+  if (Math.abs(pendVid.currentTime - pendPos) < 0.3) {
+    drawAndContinue();
+  } else {
+    pendVid.onseeked = () => { pendVid.onseeked = null; drawAndContinue(); };
+  }
+}
+
+// ── Tick ──────────────────────────────────────────────────────────────────────
+function startTick() {
+  clearInterval(tickTimer);
+  tickTimer = setInterval(() => {
+    if (!running) { clearInterval(tickTimer); return; }
+    if (!manualPaused) elapsed = (performance.now() - sessionStart) / 1000;
+    setProgress(elapsed / targetSecs);
+    document.getElementById('hudTime').textContent = fmt(elapsed);
+    document.getElementById('infoL').innerHTML = `<span class="ok">${fmt(elapsed)}</span> / ${fmt(targetSecs)}`;
+    // Only update playhead from tick if nothing else is controlling it
+    if (!isDragging && !manualPaused) {
+      if (loopMode === 'crossfade' && activeVid && currentClip) updatePlayhead(activeVid.currentTime);
+      if (loopMode === 'pendulum') updatePlayhead(pendPos);
+      syncLoopPreview();
+    }
+    if (elapsed >= targetSecs) { lg('done ✓','lc'); stopCleanup(); }
+  }, 400);
+}
+
+// ── Stop ──────────────────────────────────────────────────────────────────────
+function stopCleanup() {
+  running = false;
+  clearTimeout(cfTimer); clearInterval(tickTimer);
+  cancelAnimationFrame(pendRafId); cancelAnimationFrame(revRafId); cancelAnimationFrame(cfRafId); cancelAnimationFrame(dissolveRafId);
+  [vA, vB, pendVid].forEach(v => { if (v) v.pause(); });
+  if (loopPreviewVid) loopPreviewVid.pause();
+  manualPaused = false;
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').style.display = 'none';
+  // Disable play/pause until user restarts or scrubs
+  const ppBtn = document.getElementById('btnPlayPause');
+  if (ppBtn) { ppBtn.textContent = '▶ PLAY'; ppBtn.disabled = true; ppBtn.style.opacity = '0.4'; }
+}
+function stopSession() { stopCleanup(); lg(`stopped · ${fmt(elapsed)} · ${loopN} loop(s)`,'lg'); }
+
+// ── Session progress drag ─────────────────────────────────────────────────────
+(function() {
+  const track = document.getElementById('pgTrack');
+  let drag = false;
+  const getFrac = e => {
+    const r = track.getBoundingClientRect(), x = e.touches ? e.touches[0].clientX : e.clientX;
+    return Math.max(0, Math.min(1, (x - r.left) / r.width));
+  };
+
+  function applyFrac(f, e) {
+    elapsed = f * targetSecs;
+    sessionStart = performance.now() - f * targetSecs * 1000;
+    setProgress(f);
+    syncLoopPreview();
+    if (currentClip && running) {
+      const regionDur = loopOut - loopIn;
+      const scrubSecs = f * targetSecs;
+      const newLoopN = Math.floor(scrubSecs / (regionDur / SPEED)) + 1;
+      if (newLoopN !== loopN) {
+        loopN = newLoopN;
+        document.getElementById('hudLoop').textContent = `LOOP ${loopN}`;
+      }
+      const cyclePos = (scrubSecs * SPEED) % regionDur;
+      const vid = loopMode === 'crossfade' ? activeVid : pendVid;
+      if (vid) {
+        vid.currentTime = loopIn + cyclePos;
+        clearTimeout(cfTimer); isCFDissolving = false; scheduleCF();
+      }
+    }
+    const ppBtn = document.getElementById('btnPlayPause');
+    if (ppBtn && ppBtn.disabled) { ppBtn.disabled = false; ppBtn.style.opacity = ''; ppBtn.textContent = '⏸ PAUSE'; }
+  }
+
+  track.addEventListener('mousedown', e => {
+    drag = true;
+    if (running) {
+      applyFrac(getFrac(e), e); // apply immediately on click
+    } else if (currentClip) {
+      startSession().then(() => { applyFrac(getFrac(e), e); togglePlayPause(); });
+    }
+  });
+  window.addEventListener('mousemove', e => { if (drag && running) applyFrac(getFrac(e), e); });
+  window.addEventListener('mouseup', () => { drag = false; });
+  track.addEventListener('touchstart', e => { drag = true; if (running) applyFrac(getFrac(e), e); }, {passive:true});
+  window.addEventListener('touchmove', e => { if (drag && running) applyFrac(getFrac(e), e); }, {passive:true});
+  window.addEventListener('touchend', () => { drag = false; });
+})();
+
+// ── Restart session when key settings change ──────────────────────────────────
+function restartOnSettingChange() {
+  if (!currentClip) return;
+  stopCleanup();
+  startSession();
+}
+
+document.querySelectorAll('.dur-chip[data-secs]').forEach(b => {
+  b.addEventListener('click', () => { if (running) restartOnSettingChange(); });
+});
+document.querySelectorAll('.mode-btn').forEach(b => {
+  b.addEventListener('click', () => { if (running) restartOnSettingChange(); });
+});
 </script>
 </body>
 </html>
