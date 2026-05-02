@@ -375,6 +375,34 @@ input[type=range].handle { accent-color: var(--gold); }
         ⬇ EXPORT MP4
       </button>
     </div>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="infoL">—</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="infoR">—</span>
+  </div>
+
+  <!-- ── Loop Region Editor ── -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.15em;color:var(--gold);">LOOP REGION</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;">
+        <span style="color:var(--teal);">IN <span id="inVal">0.0s</span></span>
+        <span style="color:var(--text-dim);"> · </span>
+        <span style="color:var(--gold);">OUT <span id="outVal">—</span></span>
+        <span style="color:var(--text-dim);"> · </span>
+        <span id="regionDur" style="color:var(--text-dim);">—</span>
+      </span>
+    </div>
+    <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:7px;overflow:hidden;background:#000;border:1px solid var(--border);">
+      <video id="loopPreviewVid" playsinline muted loop style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <div style="position:absolute;bottom:6px;right:8px;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.55);pointer-events:none;" id="loopPreviewPos">0.0s</div>
+      <div style="position:absolute;bottom:6px;left:8px;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(201,168,76,0.8);pointer-events:none;">LOOP PREVIEW</div>
+    </div>
+    <canvas id="timelineCanvas" height="44" style="width:100%;height:44px;display:block;cursor:crosshair;border-radius:4px;"></canvas>
+    <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.57rem;color:var(--text-dim);margin-top:2px;">
+      <span>0s</span><span id="scrubMid">—</span><span id="scrubEnd">—</span>
+    </div>
+  </div>
+
+</div><!-- /preview-wrap -->
 
 <!-- AUDIO UPLOAD -->
 <div class="card" style="width:100%;max-width:620px;">
@@ -426,43 +454,6 @@ input[type=range].handle { accent-color: var(--gold); }
       </div>
     </div>
   </div>
-    </div>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="infoL">—</span>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="infoR">—</span>
-  </div>
-
-  <!-- ── Loop Region Editor ───────────────────────────────────────────────── -->
-  <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;margin-top:4px;">
-
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.15em;color:var(--gold);">LOOP REGION</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;">
-        <span style="color:var(--teal);">IN <span id="inVal">0.0s</span></span>
-        <span style="color:var(--text-dim);"> · </span>
-        <span style="color:var(--gold);">OUT <span id="outVal">—</span></span>
-        <span style="color:var(--text-dim);"> · </span>
-        <span id="regionDur" style="color:var(--text-dim);">—</span>
-      </span>
-    </div>
-
-    <!-- Small loop preview video -->
-    <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:7px;overflow:hidden;background:#000;border:1px solid var(--border);">
-      <video id="loopPreviewVid" playsinline muted loop
-        style="width:100%;height:100%;object-fit:cover;display:block;"></video>
-      <div style="position:absolute;bottom:6px;right:8px;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.55);pointer-events:none;" id="loopPreviewPos">0.0s</div>
-      <div style="position:absolute;bottom:6px;left:8px;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(201,168,76,0.8);pointer-events:none;">LOOP PREVIEW</div>
-    </div>
-
-    <!-- Loop preview scrub bar + marker timeline — canvas drawn, no CSS fights -->
-    <canvas id="timelineCanvas" height="44"
-      style="width:100%;height:44px;display:block;cursor:crosshair;border-radius:4px;"></canvas>
-
-    <!-- Time labels -->
-    <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.57rem;color:var(--text-dim);margin-top:2px;">
-      <span>0s</span><span id="scrubMid">—</span><span id="scrubEnd">—</span>
-    </div>
-  </div>
-</div>
 
 <div class="log" id="log"></div>
 
