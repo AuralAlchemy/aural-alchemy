@@ -37,6 +37,7 @@ h1 {
   background: var(--glass); border: 1px solid var(--border);
   border-radius: 12px; padding: 20px 24px; width: 100%; max-width: 620px;
   display: flex; flex-direction: column; gap: 14px;
+  position: relative; z-index: 1;
 }
 .card-title { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); }
 
@@ -224,16 +225,16 @@ input[type=range].handle { accent-color: var(--gold); }
   <div class="nav-toggle"><span></span><span></span><span></span></div>
 </nav>
 
-<div class="page-wrap" style="width:100%;display:flex;flex-direction:column;align-items:center;padding-bottom:80px;">
+<div style="width:100%;display:flex;flex-direction:column;align-items:center;padding-bottom:80px;position:relative;z-index:1;">
 
-<!-- Sacred Geometry Background -->
-<svg class="aa-geometry" viewBox="0 0 500 500" fill="none" style="pointer-events:none;">
+<!-- Sacred Geometry Background — position fixed, pointer-events none, behind everything -->
+<svg class="aa-geometry" viewBox="0 0 500 500" fill="none" style="pointer-events:none;z-index:0;">
   <circle cx="250" cy="250" r="220" stroke="#2dd4bf" stroke-width="0.8" opacity="0.10"/>
   <polygon points="250,30 59.47,360 440.53,360" stroke="#2dd4bf" stroke-width="0.8" fill="none" opacity="0.10"/>
 </svg>
 
 <!-- Page header -->
-<div style="text-align:center;padding:calc(var(--nav-h) + 2rem) 0 1.5rem;pointer-events:none;">
+<div style="text-align:center;padding:calc(var(--nav-h) + 2rem) 0 1.5rem;position:relative;z-index:1;">
   <p style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.6rem;">Aural Alchemy</p>
   <h1 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;letter-spacing:0.12em;background:linear-gradient(135deg,#2dd4bf 0%,#d4a843 60%,#2dd4bf 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.4rem;">Ambient Video Generator</h1>
   <p style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;">seamless ambient loops · cloud export</p>
@@ -1980,7 +1981,7 @@ document.querySelectorAll('.mode-btn').forEach(b => {
 </script>
 
 <script src="/nav.js"></script>
-</div><!-- /page-wrap -->
+</div><!-- /app wrapper -->
 
 <footer>
   <span class="footer-brand">AURAL ALCHEMY</span>
