@@ -234,7 +234,8 @@ input[type=range].handle { accent-color: var(--gold); }
 </svg>
 
 <!-- Page header -->
-<div style="text-align:center;padding:calc(var(--nav-h) + 2rem) 0 1.5rem;position:relative;z-index:1;">
+<div id="aa-app-content" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+<div style="text-align:center;padding:calc(var(--nav-h) + 2rem) 0 1.5rem;">
   <p style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.6rem;">Aural Alchemy</p>
   <h1 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;letter-spacing:0.12em;background:linear-gradient(135deg,#2dd4bf 0%,#d4a843 60%,#2dd4bf 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.4rem;">Ambient Video Generator</h1>
   <p style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;">seamless ambient loops · cloud export</p>
@@ -1981,6 +1982,8 @@ document.querySelectorAll('.mode-btn').forEach(b => {
 </script>
 
 <script src="/nav.js"></script>
+</div><!-- /aa-app-content -->
+
 </div><!-- /app wrapper -->
 
 <footer>
