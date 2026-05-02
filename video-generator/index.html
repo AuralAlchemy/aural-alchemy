@@ -14,6 +14,11 @@
   --text: #c8d0e0; --dim: #5a6278;
   --glass: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
 }
+/* Force aa-geometry to never block clicks */
+.aa-geometry { pointer-events: none !important; }
+/* Force page-wrap children to be clickable */
+.page-wrap * { pointer-events: auto; }
+.page-wrap .aa-geometry { pointer-events: none !important; }
 body {
   background: var(--bg); color: var(--text);
   font-family: 'Jost', sans-serif; font-weight: 300;
