@@ -887,7 +887,7 @@ function getQuery() {
   const theme = getTheme(), sub = getSub();
   const subs  = THEMES[theme]?.subs || {};
   const entry = subs[sub] || subs[Object.keys(subs)[0]];
-  return loopMode === 'crossfade'
+  return (loopMode === 'crossfade' || loopMode === 'smartloop')
     ? entry.cf + ' locked off tripod static shot'
     : entry.pend;
 }
