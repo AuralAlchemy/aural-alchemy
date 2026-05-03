@@ -1081,20 +1081,21 @@ let manualPaused = false;
 let pausedAtElapsed = 0;
 
 function togglePlayPause() {
-  const vid = (loopMode === 'crossfade') ? activeVid : pendVid;
+  const vid = (loopMode === 'pendulum') ? pendVid : activeVid;
   const btn = document.getElementById('btnPlayPause');
   if (!vid) return;
+  const isCFlike = loopMode !== 'pendulum';
   if (manualPaused) {
     sessionStart = performance.now() - pausedAtElapsed * 1000;
     vid.play();
-    if (loopMode === 'crossfade' && standbyVid) standbyVid.play();
+    if (isCFlike && standbyVid) standbyVid.play();
     loopPreviewVid.play();
     manualPaused = false;
     if (btn) btn.textContent = '⏸ PAUSE';
   } else {
     pausedAtElapsed = elapsed;
     vid.pause();
-    if (loopMode === 'crossfade' && standbyVid) standbyVid.pause();
+    if (isCFlike && standbyVid) standbyVid.pause();
     loopPreviewVid.pause();
     manualPaused = true;
     if (btn) btn.textContent = '▶ PLAY';
@@ -1805,6 +1806,26 @@ async function startPendulum(clip) {
     currentClip = { ...clip, duration: pendVid.duration };
     renderTimeline();
   }
+
+  // Pre-buffer the loop region so reverse seeking is smooth
+  document.getElementById('hudMode').textContent = '⏳ buffering…';
+  lg('buffering loop region…', 'lt');
+  await new Promise(r => {
+    const giveUp = setTimeout(r, 15000);
+    function check() {
+      if (!running) { clearTimeout(giveUp); r(); return; }
+      const buf = pendVid.buffered;
+      for (let i = 0; i < buf.length; i++) {
+        if (buf.start(i) <= loopIn + 0.1 && buf.end(i) >= loopOut - 0.1) {
+          clearTimeout(giveUp); r(); return;
+        }
+      }
+      setTimeout(check, 250);
+    }
+    check();
+  });
+  if (!running) return;
+  lg('buffered ✓ · starting pendulum', 'lc');
 
   pendPos = loopIn; pendDir = 1; lastPendT = performance.now();
   pendVid.playbackRate = SPEED;
