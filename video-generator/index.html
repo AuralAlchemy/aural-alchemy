@@ -44,7 +44,7 @@ select {
 }
 select:focus { border-color: var(--teal); }
 select option { background: var(--bg2); }
-.mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mode-toggle { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .mode-btn {
   padding: 9px 6px; border: 1px solid var(--border); border-radius: 8px;
   background: var(--bg3); color: var(--text-dim); cursor: pointer;
@@ -219,6 +219,7 @@ input[type=range].handle { accent-color: var(--gold); }
   <div class="mode-toggle">
     <button class="mode-btn active" data-mode="crossfade">↺ Crossfade<br><small style="opacity:0.55;font-size:0.6rem">static shots · ambient</small></button>
     <button class="mode-btn" data-mode="pendulum">⇄ Pendulum<br><small style="opacity:0.55;font-size:0.6rem">motion shots · slow-mo reverse</small></button>
+    <button class="mode-btn" data-mode="smartloop">⊕ Smart Loop<br><small style="opacity:0.55;font-size:0.6rem">auto · best cut point</small></button>
   </div>
 
   <div>
@@ -902,6 +903,64 @@ function setResolution(res) {
   fetchedForKey = null; // force re-fetch with new resolution
 }
 
+// ── Smart Loop: frame-similarity cut-point detection ─────────────────────────
+async function findBestLoopPoints(url, duration) {
+  const N = 6, W = 16, H = 9;
+  const v = document.createElement('video');
+  v.crossOrigin = 'anonymous'; v.muted = true; v.preload = 'metadata';
+  v.src = url; v.load();
+  try {
+    await new Promise((res, rej) => { v.oncanplaythrough = res; v.onerror = rej; setTimeout(rej, 6000); });
+  } catch { v.src = ''; return null; }
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  async function grab(t) {
+    v.currentTime = t;
+    await new Promise(r => { v.onseeked = r; });
+    x.drawImage(v, 0, 0, W, H);
+    try { return [...x.getImageData(0, 0, W, H).data]; } catch { return null; }
+  }
+  function dist(a, b) {
+    let d = 0;
+    for (let i = 0; i < a.length; i += 4)
+      d += Math.abs(a[i]-b[i]) + Math.abs(a[i+1]-b[i+1]) + Math.abs(a[i+2]-b[i+2]);
+    return d;
+  }
+  const sf = [], ef = [];
+  for (let i = 0; i < N; i++) {
+    const px = await grab(duration * 0.05 + duration * 0.3 * i / (N - 1));
+    if (!px) { v.src = ''; return null; }
+    sf.push({ t: v.currentTime, px });
+  }
+  for (let i = 0; i < N; i++) {
+    const px = await grab(duration * 0.65 + duration * 0.3 * i / (N - 1));
+    if (!px) { v.src = ''; return null; }
+    ef.push({ t: v.currentTime, px });
+  }
+  let best = Infinity, loopIn = sf[0].t, loopOut = ef[N - 1].t;
+  for (const s of sf) for (const e of ef) {
+    const d = dist(s.px, e.px);
+    if (d < best) { best = d; loopIn = s.t; loopOut = e.t; }
+  }
+  v.src = '';
+  return { loopIn, loopOut };
+}
+
+async function startSmartLoop(clip) {
+  lg('⊕ finding best loop points…', 'lt');
+  const pts = await findBestLoopPoints(clip.url, clip.duration);
+  if (!running) return;
+  if (pts && pts.loopOut - pts.loopIn >= MIN_LOOP_SECS) {
+    loopIn = pts.loopIn; loopOut = pts.loopOut;
+    renderTimeline();
+    lg(`⊕ loop: ${fmtS(pts.loopIn)} → ${fmtS(pts.loopOut)}`, 'lc');
+  } else {
+    lg('⊕ using full clip (CORS or too short)', 'lg');
+  }
+  CF_MS = 400;
+  startCrossfade(clip);
+}
+
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 async function fetchPool() {
   const q    = getQuery();
@@ -979,6 +1038,7 @@ async function startSession() {
   const ppBtn = document.getElementById('btnPlayPause');
   if (ppBtn) { ppBtn.textContent = '⏸ PAUSE'; ppBtn.disabled = false; ppBtn.style.opacity = ''; }
   if (loopMode === 'crossfade') startCrossfade(clip);
+  else if (loopMode === 'smartloop') startSmartLoop(clip);
   else startPendulum(clip);
 }
 
@@ -1330,7 +1390,9 @@ function setupLoopEditor(clip) {
 
   loopPreviewVid.ontimeupdate = () => {
     if (!currentClip) return;
-    document.getElementById('loopPreviewPos').textContent = fmtS(loopPreviewVid.currentTime);
+    const ct = loopPreviewVid.currentTime;
+    document.getElementById('loopPreviewPos').textContent = fmtS(ct);
+    if (ct >= loopOut - 0.05) loopPreviewVid.currentTime = loopIn;
   };
   renderTimeline();
 }
@@ -1836,7 +1898,6 @@ function startTick() {
     if (!isDragging && !manualPaused) {
       if (loopMode === 'crossfade' && activeVid && currentClip) updatePlayhead(activeVid.currentTime);
       if (loopMode === 'pendulum') updatePlayhead(pendPos);
-      syncLoopPreview();
       applyFadeOverlay();
     }
     if (elapsed >= targetSecs) { lg('done ✓','lc'); stopCleanup(); }
@@ -1908,10 +1969,11 @@ function stopSession() { stopCleanup(); lg(`stopped · ${fmt(elapsed)} · ${loop
 })();
 
 // ── Restart session when key settings change ──────────────────────────────────
+let _restartDebounce = null;
 function restartOnSettingChange() {
   if (!currentClip) return;
-  stopCleanup();
-  startSession();
+  clearTimeout(_restartDebounce);
+  _restartDebounce = setTimeout(() => { stopCleanup(); startSession(); }, 500);
 }
 
 document.querySelectorAll('.dur-chip[data-secs]').forEach(b => {
