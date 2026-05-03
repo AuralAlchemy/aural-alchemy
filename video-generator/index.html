@@ -1727,7 +1727,7 @@ async function startPendulum(clip) {
   pendCanvas = document.createElement('canvas');
   pendCanvas.className = 'cf-vid';
   pendCanvas.width  = 960; pendCanvas.height = 540;
-  pendCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;';
+  pendCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;pointer-events:none;';
   pendCtx = pendCanvas.getContext('2d');
   stage.insertBefore(pendCanvas, stage.firstChild);
 
