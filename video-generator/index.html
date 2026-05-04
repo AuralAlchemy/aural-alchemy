@@ -375,6 +375,11 @@ input[type=range].handle { accent-color: var(--gold); }
         style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 12px;color:rgba(255,255,255,0.6);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">
         ⬇ EXPORT MP4
       </button>
+      <button onclick="exportHyperFrames()" id="btnHF"
+        title="Download a HyperFrames .html composition for deterministic rendering"
+        style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.4);border-radius:6px;padding:4px 12px;color:rgba(201,168,76,0.75);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">
+        ⬡ HF EXPORT
+      </button>
     </div>
     <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="infoL">—</span>
     <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="infoR">—</span>
@@ -1335,6 +1340,128 @@ function showDownloadButton(url, sizeMB) {
   const preview = document.getElementById('preview');
   const controls = preview.querySelector('div');
   controls.parentNode.insertBefore(btn, controls.nextSibling);
+}
+
+// ── HyperFrames composition export ───────────────────────────────────────────
+function exportHyperFrames() {
+  if (!currentClip) { lg('start a session first', 'lg'); return; }
+
+  const clipUrl   = currentClip.url;
+  const clipIn    = loopIn  || 0;
+  const clipOut   = loopOut || currentClip.duration;
+  const regionDur = Math.max(clipOut - clipIn, 0.5);
+  const totalDur  = uploadedAudioDuration > 0
+    ? Math.ceil(uploadedAudioDuration)
+    : (targetSecs || 60);
+  const loopCount = Math.max(1, Math.ceil(totalDur / regionDur));
+
+  if (loopCount > 300) {
+    lg('⚠ ' + loopCount + ' clips — loop region is very short. Consider widening it before exporting.', 'lg');
+  }
+
+  const theme    = getTheme();
+  const sub      = getSub();
+  const safeName = theme + '-' + sub.replace(/\s+/g, '-').toLowerCase();
+
+  // One video element per loop cycle, each trimmed to [loopIn, loopOut]
+  const clipLines = [];
+  for (let i = 0; i < loopCount; i++) {
+    const start = (i * regionDur).toFixed(3);
+    const dur   = Math.min(regionDur, totalDur - i * regionDur).toFixed(3);
+    if (parseFloat(dur) <= 0.01) break;
+    clipLines.push(
+      '    <video id="v' + i + '"'
+      + ' data-start="' + start + '"'
+      + ' data-duration="' + dur + '"'
+      + ' data-track-index="0"'
+      + ' data-media-start="' + clipIn.toFixed(3) + '"'
+      + ' src="' + clipUrl + '"'
+      + ' muted playsinline crossorigin="anonymous"'
+      + ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>'
+    );
+  }
+
+  // GSAP fade-in / fade-out tweens on a black overlay div
+  const tweenLines = [];
+  if (fadeInEnabled && fadeInDur > 0) {
+    tweenLines.push('    tl.from("#fade-overlay", { opacity: 1, duration: ' + fadeInDur + ', ease: "power2.out" }, 0);');
+  }
+  if (fadeOutEnabled && fadeOutDur > 0) {
+    const fadeStart = Math.max(0, totalDur - fadeOutDur).toFixed(3);
+    tweenLines.push('    tl.to("#fade-overlay", { opacity: 1, duration: ' + fadeOutDur + ', ease: "power2.in" }, ' + fadeStart + ');');
+  }
+
+  const needsOverlay = fadeInEnabled || fadeOutEnabled;
+  const zoomCss      = zoomBase > 1.001
+    ? 'transform:scale(' + zoomBase.toFixed(3) + ');transform-origin:center center;'
+    : '';
+
+  // Notes for effects that are canvas-based and not yet wired in HF
+  const notes = [];
+  if (mirrorMode !== 'none')
+    notes.push('  <!-- Mirror effect "' + mirrorMode + '" requires canvas rendering — wire in Phase 2 -->');
+  if (Math.abs(SPEED - 1.0) > 0.01)
+    notes.push('  <!-- Playback speed was ' + SPEED + 'x — set video.defaultPlaybackRate in Phase 2 -->');
+  if (zoomPulse > 0 && zoomBase > 1.001)
+    notes.push('  <!-- Zoom breathe speed ' + zoomPulse + ' — add a GSAP fromTo sine tween on #video-wrap in Phase 2 -->');
+  if (uploadedAudioFile)
+    notes.push('  <!-- Audio: "' + uploadedAudioFile.name + '" — embed as <audio> element with the local file path -->');
+
+  const lines = [
+    '<!DOCTYPE html>',
+    '<html lang="en">',
+    '<head>',
+    '<meta charset="UTF-8">',
+    '<title>Aural Alchemy — ' + theme + ' · ' + sub + '</title>',
+    '<!--',
+    '  Aural Alchemy · HyperFrames Composition',
+    '  Theme    : ' + theme + ' · ' + sub,
+    '  Mode     : ' + loopMode,
+    '  Loop     : ' + clipIn.toFixed(3) + 's → ' + clipOut.toFixed(3) + 's (' + regionDur.toFixed(2) + 's × ' + loopCount + ' clips)',
+    '  Speed    : ' + SPEED + 'x',
+    '  Duration : ' + totalDur + 's',
+    '  Zoom     : ' + zoomBase.toFixed(2) + 'x' + (zoomPulse > 0 ? ' (breathe ' + zoomPulse + ')' : ''),
+    '  Mirror   : ' + mirrorMode,
+    '  Fade in  : ' + (fadeInEnabled ? fadeInDur + 's' : 'off'),
+    '  Fade out : ' + (fadeOutEnabled ? fadeOutDur + 's' : 'off'),
+    '  Exported : ' + new Date().toISOString(),
+    '  NOTE     : Pexels video URLs expire. Render or open this file promptly.',
+    '-->',
+    '</head>',
+    '<body>',
+    '<div data-composition-id="aa-loop" data-width="1920" data-height="1080" data-duration="' + totalDur + '">',
+    '',
+    '  <div id="video-wrap" style="position:absolute;inset:0;' + zoomCss + '">',
+  ].concat(clipLines).concat([
+    '  </div>',
+    '',
+  ]).concat(notes).concat([
+    '',
+    needsOverlay ? '  <div id="fade-overlay" style="position:absolute;inset:0;background:#000;z-index:10;pointer-events:none;opacity:0;"></div>' : '',
+    '',
+    '  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"><\/script>',
+    '  <script>',
+    '    window.__timelines = window.__timelines || {};',
+    '    const tl = gsap.timeline({ paused: true });',
+  ]).concat(tweenLines).concat([
+    '    window.__timelines["aa-loop"] = tl;',
+    '  <\/script>',
+    '',
+    '</div>',
+    '</body>',
+    '</html>',
+  ]);
+
+  const html = lines.join('\n');
+  const blob = new Blob([html], { type: 'text/html' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'aural-alchemy-' + safeName + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(a.href); }, 10000);
+  lg('HyperFrames exported ✓ · ' + loopCount + ' clips · ' + totalDur + 's', 'lc');
 }
 
 // ── Fix doCF dissolve — canvas compositing, zero brightness dip ───────────────
