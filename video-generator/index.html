@@ -1278,7 +1278,7 @@ function updateAudioFade() {
   audioFadeOutEnabled = document.getElementById('audioFadeOutEnabled').checked;
 }
 
-function startExport() {
+async function startExport() {
   if (!currentClip) { lg('start a session first', 'lg'); return; }
 
   const btn = document.getElementById('btnExport');
