@@ -1,0 +1,70 @@
+name: Render HyperFrames Composition
+
+on:
+  push:
+    paths:
+      - 'compositions/**.html'
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'Filename inside compositions/ — e.g. aural-alchemy-nature.html'
+        required: true
+        type: string
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+
+      - name: Resolve composition file
+        id: comp
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            FILE="compositions/${{ github.event.inputs.file }}"
+          else
+            FILE=$(git diff --name-only HEAD~1 HEAD -- 'compositions/*.html' | head -1)
+            if [ -z "$FILE" ]; then
+              echo "No composition HTML changed — nothing to render."
+              exit 1
+            fi
+          fi
+          STEM=$(basename "$FILE" .html)
+          echo "path=$FILE"  >> $GITHUB_OUTPUT
+          echo "stem=$STEM"  >> $GITHUB_OUTPUT
+          echo "Rendering: $FILE"
+
+      - name: Prepare project directory
+        run: |
+          mkdir -p _render
+          cp "${{ steps.comp.outputs.path }}" _render/index.html
+
+      - name: Check environment
+        working-directory: _render
+        run: npx --yes hyperframes doctor
+
+      - name: Render
+        working-directory: _render
+        run: |
+          npx hyperframes render \
+            --output "../renders/${{ steps.comp.outputs.stem }}.mp4" \
+            --quality high \
+            --workers 2
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.comp.outputs.stem }}-run${{ github.run_number }}
+          path: renders/${{ steps.comp.outputs.stem }}.mp4
+          retention-days: 30
