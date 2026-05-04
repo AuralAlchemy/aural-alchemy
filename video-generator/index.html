@@ -571,6 +571,12 @@ const THEMES = {
 const PROXY         = 'https://white-cloud-27a9.nanomarche.workers.dev';
 const MIN_LOOP_SECS = 5;
 
+// ── GitHub render pipeline ────────────────────────────────────────────────────
+// Fine-grained PAT: Contents → Read & Write on this repo only.
+// Generate at: github.com/settings/personal-access-tokens
+const GH_TOKEN = '';  // paste your PAT here
+const GH_REPO  = 'AuralAlchemy/aural-alchemy';
+
 // ── State ─────────────────────────────────────────────────────────────────────
 let loopMode      = 'crossfade';
 let targetSecs    = 30;
@@ -1343,7 +1349,7 @@ function showDownloadButton(url, sizeMB) {
 }
 
 // ── HyperFrames composition export ───────────────────────────────────────────
-function exportHyperFrames() {
+async function exportHyperFrames() {
   if (!currentClip) { lg('start a session first', 'lg'); return; }
 
   const clipUrl   = currentClip.url;
@@ -1462,6 +1468,32 @@ function exportHyperFrames() {
   document.body.removeChild(a);
   setTimeout(function() { URL.revokeObjectURL(a.href); }, 10000);
   lg('HyperFrames exported ✓ · ' + loopCount + ' clips · ' + totalDur + 's', 'lc');
+
+  // Push to GitHub → triggers Actions render automatically
+  if (GH_TOKEN) {
+    lg('pushing to GitHub…', 'lt');
+    const ghFilename = 'aural-alchemy-' + safeName + '-' + Date.now() + '.html';
+    const encoded    = btoa(unescape(encodeURIComponent(html)));
+    try {
+      const res = await fetch(
+        'https://api.github.com/repos/' + GH_REPO + '/contents/compositions/' + ghFilename,
+        {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'render: ' + safeName, content: encoded }),
+        }
+      );
+      if (res.ok) {
+        lg('pushed ✓ · Actions render started · check GitHub Actions tab', 'lc');
+        window.open('https://github.com/' + GH_REPO + '/actions', '_blank');
+      } else {
+        const err = await res.json();
+        lg('GitHub push failed: ' + (err.message || res.status), 'lg');
+      }
+    } catch(e) {
+      lg('GitHub push error: ' + e.message, 'lg');
+    }
+  }
 }
 
 // ── Fix doCF dissolve — canvas compositing, zero brightness dip ───────────────
