@@ -442,24 +442,7 @@ input[type=range].handle { accent-color: var(--gold); }
   </div>
 </div>
 
-  <!-- Export email modal -->
-  <div id="exportModal" style="display:none;position:fixed;inset:0;background:rgba(8,12,24,0.92);z-index:1000;align-items:center;justify-content:center;">
-    <div style="background:#0d1225;border:1px solid var(--teal);border-radius:14px;padding:32px;max-width:420px;width:90%;display:flex;flex-direction:column;gap:18px;">
-      <div style="font-family:'Cinzel',serif;font-size:0.9rem;letter-spacing:0.2em;color:var(--teal);">EXPORT VIDEO</div>
-      <p style="font-family:'Jost',sans-serif;font-size:0.82rem;color:var(--text);line-height:1.6;">Your video will be processed in the cloud. Enter your email below and a download link will arrive when ready.</p>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <label style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">EMAIL ADDRESS</label>
-        <input type="email" id="exportEmail" placeholder="your@email.com"
-          style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:7px;padding:10px 14px;color:var(--text);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;width:100%;"
-          onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
-        <span id="exportEmailErr" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#ff6b6b;display:none;">Please enter a valid email address</span>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="cancelExport()" style="flex:1;background:transparent;border:1px solid var(--border);border-radius:7px;padding:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">CANCEL</button>
-        <button onclick="confirmExport()" style="flex:2;background:linear-gradient(135deg,rgba(77,217,192,0.15),rgba(201,168,76,0.08));border:1px solid var(--teal);border-radius:7px;padding:10px;color:var(--teal);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">START EXPORT</button>
-      </div>
-    </div>
-  </div>
+
 
 <div class="log" id="log"></div>
 
@@ -1190,28 +1173,8 @@ function clearAudio() {
   lg('audio removed · using manual duration', 'lt');
 }
 
-function startExport() {
+async function startExport() {
   if (!currentClip) { lg('start a session first', 'lg'); return; }
-  const modal = document.getElementById('exportModal');
-  modal.style.display = 'flex';
-  document.getElementById('exportEmail').focus();
-}
-
-function cancelExport() {
-  document.getElementById('exportModal').style.display = 'none';
-  document.getElementById('exportEmail').value = '';
-  document.getElementById('exportEmailErr').style.display = 'none';
-}
-
-async function confirmExport() {
-  const emailEl = document.getElementById('exportEmail');
-  const email   = emailEl.value.trim();
-  const errEl   = document.getElementById('exportEmailErr');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errEl.style.display = 'block'; return;
-  }
-  errEl.style.display = 'none';
-  document.getElementById('exportModal').style.display = 'none';
 
   const btn = document.getElementById('btnExport');
   btn.textContent = '⚙ PROCESSING...';
@@ -1226,19 +1189,34 @@ async function confirmExport() {
 
   let jobId;
   try {
-    const res = await fetch(MODAL_EXPORT, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clipUrl:    currentClip.url,
-        loopIn:     loopIn || 0,
-        loopOut:    loopOut || currentClip.duration,
-        duration:   exportDuration,
-        speed:      SPEED || 1.0,
-        resolution: fetchResolution || '1080',
-        fadeIn:     fadeInEnabled  ? fadeInDur  : 0,
-        fadeOut:    fadeOutEnabled ? fadeOutDur : 0,
-      }),
-    });
+    let res;
+    if (uploadedAudioFile) {
+      const form = new FormData();
+      form.append('clipUrl',    currentClip.url);
+      form.append('loopIn',     String(loopIn || 0));
+      form.append('loopOut',    String(loopOut || currentClip.duration));
+      form.append('duration',   String(exportDuration));
+      form.append('speed',      String(SPEED || 1.0));
+      form.append('resolution', fetchResolution || '1080');
+      form.append('fadeIn',     fadeInEnabled  ? String(fadeInDur)  : '0');
+      form.append('fadeOut',    fadeOutEnabled ? String(fadeOutDur) : '0');
+      form.append('audio',      uploadedAudioFile, uploadedAudioFile.name);
+      res = await fetch(MODAL_EXPORT, { method: 'POST', body: form });
+    } else {
+      res = await fetch(MODAL_EXPORT, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clipUrl:    currentClip.url,
+          loopIn:     loopIn || 0,
+          loopOut:    loopOut || currentClip.duration,
+          duration:   exportDuration,
+          speed:      SPEED || 1.0,
+          resolution: fetchResolution || '1080',
+          fadeIn:     fadeInEnabled  ? fadeInDur  : 0,
+          fadeOut:    fadeOutEnabled ? fadeOutDur : 0,
+        }),
+      });
+    }
     const data = await res.json();
     if (!data.jobId) throw new Error(data.error || 'no jobId');
     jobId = data.jobId;
@@ -1256,10 +1234,10 @@ async function confirmExport() {
   const msg = document.createElement('div');
   msg.id = 'exportMsg';
   msg.style.cssText = 'width:100%;max-width:620px;font-family:Share Tech Mono,monospace;font-size:0.68rem;color:var(--teal);padding:12px 16px;line-height:1.8;background:rgba(77,217,192,0.05);border:1px solid rgba(77,217,192,0.15);border-radius:8px;';
-  msg.innerHTML = '⚙ Processing in the cloud. Depending on video length this could take anywhere from a few minutes to a few hours. A download link will arrive at <span style="color:var(--gold)">' + email + '</span> when ready. This window can be closed.';
+  msg.innerHTML = '⚙ Processing in the cloud. Depending on length and resolution this may take a few minutes. A download button will appear here when ready.';
   const preview = document.getElementById('preview');
   preview.parentNode.insertBefore(msg, preview.nextSibling);
-  lg('job started · link will arrive at ' + email, 'lc');
+  lg('job started · download button will appear when ready', 'lc');
 
   let failCount = 0;
   const pollId = setInterval(async () => {
@@ -1274,8 +1252,8 @@ async function confirmExport() {
         btn.style.color = 'rgba(255,255,255,0.6)';
         btn.style.borderColor = 'rgba(255,255,255,0.2)';
         const sizeMB = (job.size / 1024 / 1024).toFixed(1);
-        lg('✓ export done · ' + sizeMB + 'MB · link sent to ' + email, 'lc');
-        msg.innerHTML = '✓ Export ready · ' + sizeMB + 'MB · Download link sent to <span style="color:var(--gold)">' + email + '</span>';
+        lg('✓ export done · ' + sizeMB + 'MB · click download button', 'lc');
+        msg.innerHTML = '✓ Export ready · ' + sizeMB + 'MB';
         showDownloadButton(MODAL_DOWNLOAD + '?jobId=' + jobId, sizeMB);
       } else if (job.status === 'error') {
         clearInterval(pollId);
