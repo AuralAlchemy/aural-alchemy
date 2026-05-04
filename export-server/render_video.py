@@ -15,11 +15,12 @@ image = (
 
 vol = modal.Volume.from_name("aural-alchemy-temp", create_if_missing=True)
 RENDER_DIR = "/renders"
+MAX_EXPORT_SECS = 7200  # reject requests over 2 hours
 
 
 # ── GPU render worker ─────────────────────────────────────────────────────────
 
-@app.function(image=image, gpu="A10G", timeout=3600, memory=8192, volumes={RENDER_DIR: vol})
+@app.function(image=image, gpu="A10G", timeout=600, memory=8192, volumes={RENDER_DIR: vol})
 def render_video(
     job_id: str,
     clip_url: str,
@@ -40,31 +41,51 @@ def render_video(
     tmp_in   = str(work / "input.mp4")
     tmp_loop = str(work / "loop.mp4")
     out_file = f"{RENDER_DIR}/{job_id}.mp4"
+    err_file = f"{RENDER_DIR}/{job_id}.err"
+
+    def fail(msg: str):
+        vol.reload()
+        with open(err_file, "w") as f:
+            f.write(msg[:500])
+        vol.commit()
+        raise RuntimeError(msg)
 
     vol.reload()
 
-    print(f"[{job_id}] downloading clip...")
-    urllib.request.urlretrieve(clip_url, tmp_in)
+    try:
+        print(f"[{job_id}] downloading clip...")
+        req = urllib.request.urlopen(clip_url, timeout=60)
+        with open(tmp_in, "wb") as f:
+            while chunk := req.read(1 << 16):
+                f.write(chunk)
+    except Exception as e:
+        fail(f"download failed: {e}")
 
     if loop_out is None:
         r = subprocess.run(
             ["ffprobe", "-v", "error", "-show_entries", "format=duration",
              "-of", "default=noprint_wrappers=1:nokey=1", tmp_in],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, timeout=30,
         )
         loop_out = float(r.stdout.strip())
 
     region_dur = loop_out - loop_in
-    pts        = 1.0 / speed
-    loops      = int((duration * speed) / region_dur) + 2
-    scale_map  = {"1080": "1920:1080", "2k": "2560:1440", "4k": "3840:2160"}
-    scale      = scale_map.get(resolution, "1920:1080")
+    if region_dur <= 0:
+        fail(f"invalid loop region: {loop_in}s – {loop_out}s")
+
+    pts       = 1.0 / speed
+    loops     = int((duration * speed) / region_dur) + 2
+    scale_map = {"1080": "1920:1080", "2k": "2560:1440", "4k": "3840:2160"}
+    scale     = scale_map.get(resolution, "1920:1080")
 
     print(f"[{job_id}] trimming {loop_in}s–{loop_out}s ({region_dur:.1f}s)...")
-    subprocess.run([
-        "ffmpeg", "-y", "-ss", str(loop_in), "-t", str(region_dur),
-        "-i", tmp_in, "-c", "copy", tmp_loop,
-    ], check=True)
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-ss", str(loop_in), "-t", str(region_dur),
+            "-i", tmp_in, "-c", "copy", tmp_loop,
+        ], check=True, timeout=60, capture_output=True)
+    except Exception as e:
+        fail(f"trim failed: {e}")
 
     vf_parts = [
         f"setpts={pts:.4f}*PTS",
@@ -81,6 +102,7 @@ def render_video(
         base_cmd += ["-i", audio_path]
     base_cmd += ["-t", str(duration), "-vf", vf]
 
+    encoded = False
     for codec, codec_args in [
         ("h264_nvenc", ["-c:v", "h264_nvenc", "-preset", "p4", "-cq", "23", "-b:v", "0"]),
         ("libx264",    ["-c:v", "libx264", "-preset", "fast", "-crf", "23"]),
@@ -100,13 +122,18 @@ def render_video(
         cmd += ["-movflags", "+faststart", out_file]
 
         print(f"[{job_id}] encoding with {codec}...")
-        result = subprocess.run(cmd, capture_output=True)
-        if result.returncode == 0:
-            print(f"[{job_id}] done with {codec}")
-            break
-        print(f"[{job_id}] {codec} failed: {result.stderr.decode()[-200:]}")
-    else:
-        raise RuntimeError("All codecs failed:\n" + result.stderr.decode()[-500:])
+        try:
+            result = subprocess.run(cmd, capture_output=True, timeout=480)
+            if result.returncode == 0:
+                print(f"[{job_id}] done with {codec}")
+                encoded = True
+                break
+            print(f"[{job_id}] {codec} failed: {result.stderr.decode()[-200:]}")
+        except subprocess.TimeoutExpired:
+            print(f"[{job_id}] {codec} timed out")
+
+    if not encoded:
+        fail("encode failed: both codecs failed or timed out")
 
     if audio_path:
         try: os.unlink(audio_path)
@@ -123,9 +150,16 @@ def render_video(
 @app.function(image=image, volumes={RENDER_DIR: vol})
 @modal.asgi_app(label="aa-api")
 def serve():
-    from fastapi import FastAPI, Request
+    from fastapi import FastAPI, Request, Response
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import JSONResponse, FileResponse
+
+    CORS = {"Access-Control-Allow-Origin": "*"}
+
+    def cjson(data, status_code=200):
+        r = JSONResponse(data, status_code=status_code)
+        r.headers.update(CORS)
+        return r
 
     web_app = FastAPI()
     web_app.add_middleware(
@@ -135,18 +169,27 @@ def serve():
         allow_headers=["*"],
     )
 
+    @web_app.options("/{path:path}")
+    async def preflight(path: str):
+        r = Response()
+        r.headers["Access-Control-Allow-Origin"] = "*"
+        r.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        r.headers["Access-Control-Allow-Headers"] = "*"
+        return r
+
     @web_app.post("/export")
     async def export_endpoint(request: Request):
-        content_type   = request.headers.get("content-type", "")
         audio_path     = None
         audio_fade_in  = 0.0
         audio_fade_out = 0.0
         try:
+            content_type = request.headers.get("content-type", "")
             if "multipart/form-data" in content_type:
                 form           = await request.form()
                 clip_url       = form.get("clipUrl")
                 loop_in        = float(form.get("loopIn")    or 0)
-                loop_out       = float(form.get("loopOut"))   if form.get("loopOut")   else None
+                loop_out_raw   = form.get("loopOut")
+                loop_out       = float(loop_out_raw) if loop_out_raw else None
                 duration       = float(form.get("duration")  or 60)
                 speed          = float(form.get("speed")     or 1.0)
                 resolution     = form.get("resolution")      or "1080"
@@ -166,7 +209,8 @@ def serve():
                 body           = await request.json()
                 clip_url       = body.get("clipUrl")
                 loop_in        = float(body.get("loopIn")    or 0)
-                loop_out       = float(body.get("loopOut"))   if body.get("loopOut")   else None
+                loop_out_raw   = body.get("loopOut")
+                loop_out       = float(loop_out_raw) if loop_out_raw else None
                 duration       = float(body.get("duration")  or 60)
                 speed          = float(body.get("speed")     or 1.0)
                 resolution     = body.get("resolution")      or "1080"
@@ -177,7 +221,9 @@ def serve():
                 job_id         = str(uuid.uuid4())
 
             if not clip_url:
-                return JSONResponse({"error": "clipUrl required"}, status_code=400)
+                return cjson({"error": "clipUrl required"}, 400)
+            if duration > MAX_EXPORT_SECS:
+                return cjson({"error": f"duration exceeds max {MAX_EXPORT_SECS}s"}, 400)
 
             render_video.spawn(
                 job_id=job_id, clip_url=clip_url, loop_in=loop_in, loop_out=loop_out,
@@ -185,30 +231,36 @@ def serve():
                 fade_in=fade_in, fade_out=fade_out, audio_path=audio_path,
                 audio_fade_in=audio_fade_in, audio_fade_out=audio_fade_out,
             )
-            return JSONResponse({"jobId": job_id, "status": "queued"})
+            return cjson({"jobId": job_id, "status": "queued"})
 
         except Exception as e:
             print(f"export error: {e}")
-            return JSONResponse({"error": str(e)}, status_code=500)
+            import traceback; traceback.print_exc()
+            return cjson({"error": str(e)}, 500)
 
     @web_app.get("/status")
     async def status_endpoint(job_id: str):
         vol.reload()
-        out_file = Path(f"{RENDER_DIR}/{job_id}.mp4")
-        if out_file.exists():
-            return {"status": "done", "progress": 100, "size": out_file.stat().st_size}
-        return {"status": "processing", "progress": 50}
+        if Path(f"{RENDER_DIR}/{job_id}.err").exists():
+            err = Path(f"{RENDER_DIR}/{job_id}.err").read_text()
+            return cjson({"status": "error", "error": err})
+        if Path(f"{RENDER_DIR}/{job_id}.mp4").exists():
+            size = Path(f"{RENDER_DIR}/{job_id}.mp4").stat().st_size
+            return cjson({"status": "done", "progress": 100, "size": size})
+        return cjson({"status": "processing", "progress": 50})
 
     @web_app.get("/download")
     async def download_endpoint(job_id: str):
         vol.reload()
         out_file = Path(f"{RENDER_DIR}/{job_id}.mp4")
         if not out_file.exists():
-            return JSONResponse({"error": "not ready"}, status_code=404)
-        return FileResponse(
+            return cjson({"error": "not ready"}, 404)
+        r = FileResponse(
             str(out_file),
             media_type="video/mp4",
             filename=f"aural-alchemy-{job_id[:8]}.mp4",
         )
+        r.headers.update(CORS)
+        return r
 
     return web_app

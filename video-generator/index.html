@@ -1319,19 +1319,16 @@ async function startExport() {
       form.append('audio',       uploadedAudioFile, uploadedAudioFile.name);
       res = await fetch(MODAL_EXPORT, { method: 'POST', body: form });
     } else {
-      res = await fetch(MODAL_EXPORT, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clipUrl:    currentClip.url,
-          loopIn:     loopIn || 0,
-          loopOut:    loopOut || currentClip.duration,
-          duration:   exportDuration,
-          speed:      SPEED || 1.0,
-          resolution: fetchResolution || '1080',
-          fadeIn:     fadeInEnabled  ? fadeInDur  : 0,
-          fadeOut:    fadeOutEnabled ? fadeOutDur : 0,
-        }),
-      });
+      const form = new FormData();
+      form.append('clipUrl',    currentClip.url);
+      form.append('loopIn',     String(loopIn || 0));
+      form.append('loopOut',    String(loopOut || currentClip.duration));
+      form.append('duration',   String(exportDuration));
+      form.append('speed',      String(SPEED || 1.0));
+      form.append('resolution', fetchResolution || '1080');
+      form.append('fadeIn',     fadeInEnabled  ? String(fadeInDur)  : '0');
+      form.append('fadeOut',    fadeOutEnabled ? String(fadeOutDur) : '0');
+      res = await fetch(MODAL_EXPORT, { method: 'POST', body: form });
     }
     const data = await res.json();
     if (!data.jobId) throw new Error(data.error || data.detail || JSON.stringify(data));
@@ -1691,6 +1688,8 @@ function tlDraw() {
   const H   = tlCanvas.height;
   const dur = currentClip.duration;
   if (!dur || !isFinite(dur)) return;
+  if (!isFinite(loopIn))            loopIn  = 0;
+  if (!isFinite(loopOut) || loopOut <= 0) loopOut = dur;
   const TY  = H * 0.62; // track center y
   const TH  = 5;
   const MH  = 11; // marker half-height above track
@@ -1733,6 +1732,8 @@ function renderTimeline() {
   if (!currentClip) return;
   const dur = currentClip.duration;
   if (!dur || !isFinite(dur)) return;
+  if (!isFinite(loopIn))            loopIn  = 0;
+  if (!isFinite(loopOut) || loopOut <= 0) loopOut = dur;
   document.getElementById('scrubEnd').textContent = fmtS(dur);
   document.getElementById('scrubMid').textContent = fmtS(dur/2);
   document.getElementById('inVal').textContent    = fmtS(loopIn);
