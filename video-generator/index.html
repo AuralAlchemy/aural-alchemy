@@ -431,13 +431,62 @@ input[type=range].handle { accent-color: var(--gold); }
   </div>
 
   <!-- Audio loaded state -->
-  <div id="audioInfo" style="display:none;background:rgba(77,217,192,0.05);border:1px solid var(--teal);border-radius:8px;padding:12px 16px;">
+  <div id="audioInfo" style="display:none;flex-direction:column;gap:12px;background:rgba(77,217,192,0.05);border:1px solid var(--teal);border-radius:8px;padding:12px 16px;">
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--teal);" id="audioFileName">—</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:2px;" id="audioDuration">—</div>
       </div>
       <button onclick="clearAudio()" style="background:transparent;border:1px solid var(--border);border-radius:5px;padding:4px 10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">✕ REMOVE</button>
+    </div>
+
+    <!-- Duration trim -->
+    <div style="border-top:1px solid rgba(77,217,192,0.15);padding-top:10px;display:flex;flex-direction:column;gap:6px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);display:flex;justify-content:space-between;">
+        <span>TRIM DURATION</span><span id="audioTrimVal" style="color:var(--teal);">full</span>
+      </div>
+      <input type="range" id="audioTrimSlider" min="30" max="3600" step="1" value="3600"
+        oninput="setAudioTrimDur(parseInt(this.value))"
+        style="width:100%;accent-color:var(--teal);cursor:pointer;">
+    </div>
+
+    <!-- Audio fades -->
+    <div style="border-top:1px solid rgba(77,217,192,0.15);padding-top:10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);letter-spacing:0.08em;">AUDIO FADE IN · FADE OUT</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">
+          <input type="checkbox" id="audioFadeInEnabled" onchange="updateAudioFade()" style="accent-color:var(--teal);cursor:pointer;">
+          Fade in
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">
+          <input type="checkbox" id="audioFadeOutEnabled" onchange="updateAudioFade()" style="accent-color:var(--teal);cursor:pointer;">
+          Fade out
+        </label>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);display:flex;justify-content:space-between;">
+            <span>Fade in duration</span><span id="audioFadeInVal" style="color:var(--teal);">3s</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="dur-chip" id="afi1"  onclick="setAudioFadeDur('in',1)"  >1s</button>
+            <button class="dur-chip active" id="afi3"  onclick="setAudioFadeDur('in',3)"  >3s</button>
+            <button class="dur-chip" id="afi5"  onclick="setAudioFadeDur('in',5)"  >5s</button>
+            <button class="dur-chip" id="afi10" onclick="setAudioFadeDur('in',10)" >10s</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);display:flex;justify-content:space-between;">
+            <span>Fade out duration</span><span id="audioFadeOutVal" style="color:var(--teal);">3s</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="dur-chip" id="afo1"  onclick="setAudioFadeDur('out',1)" >1s</button>
+            <button class="dur-chip active" id="afo3"  onclick="setAudioFadeDur('out',3)" >3s</button>
+            <button class="dur-chip" id="afo5"  onclick="setAudioFadeDur('out',5)" >5s</button>
+            <button class="dur-chip" id="afo10" onclick="setAudioFadeDur('out',10)">10s</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1136,6 +1185,11 @@ const EXPORT_SERVER  = 'https://aural-alchemy-export.onrender.com'; // legacy fa
 // ── Audio upload ──────────────────────────────────────────────────────────────
 let uploadedAudioFile = null;
 let uploadedAudioDuration = 0;
+let audioTrimDur       = null; // null = use full duration
+let audioFadeInEnabled  = false;
+let audioFadeOutEnabled = false;
+let audioFadeInDur      = 3;
+let audioFadeOutDur     = 3;
 
 function handleAudioDrop(e) {
   e.preventDefault();
@@ -1154,11 +1208,16 @@ function handleAudioFile(file) {
     if (dur > 65 * 60) { alert('Audio over 1 hour 5 minutes. Please trim to under 1 hour.'); URL.revokeObjectURL(url); return; }
     uploadedAudioFile = file;
     uploadedAudioDuration = dur;
+    audioTrimDur = dur;
     const mins = Math.floor(dur / 60), secs = Math.floor(dur % 60);
     document.getElementById('audioFileName').textContent = file.name;
     document.getElementById('audioDuration').textContent = `${mins}m ${secs}s · video will match this duration`;
+    const slider = document.getElementById('audioTrimSlider');
+    slider.max   = Math.floor(dur);
+    slider.value = Math.floor(dur);
+    document.getElementById('audioTrimVal').textContent = 'full';
     document.getElementById('audioDropZone').style.display = 'none';
-    document.getElementById('audioInfo').style.display = 'block';
+    document.getElementById('audioInfo').style.display = 'flex';
     URL.revokeObjectURL(url);
     lg(`audio: ${file.name} · ${mins}m ${secs}s`, 'lc');
   });
@@ -1166,14 +1225,60 @@ function handleAudioFile(file) {
 }
 
 function clearAudio() {
-  uploadedAudioFile = null; uploadedAudioDuration = 0;
+  uploadedAudioFile = null; uploadedAudioDuration = 0; audioTrimDur = null;
+  audioFadeInEnabled = false; audioFadeOutEnabled = false;
   document.getElementById('audioFileInput').value = '';
+  document.getElementById('audioFadeInEnabled').checked  = false;
+  document.getElementById('audioFadeOutEnabled').checked = false;
   document.getElementById('audioDropZone').style.display = 'block';
   document.getElementById('audioInfo').style.display = 'none';
   lg('audio removed · using manual duration', 'lt');
 }
 
-async function startExport() {
+async function setAudioTrimDur(secs) {
+  audioTrimDur = secs;
+  const full = Math.floor(uploadedAudioDuration);
+  if (secs >= full) {
+    audioTrimDur = uploadedAudioDuration;
+    document.getElementById('audioTrimVal').textContent = 'full';
+    document.getElementById('audioDuration').textContent =
+      `${Math.floor(full/60)}m ${full%60}s · video will match this duration`;
+  } else {
+    const m = Math.floor(secs / 60), s = secs % 60;
+    document.getElementById('audioTrimVal').textContent = `${m}m ${s}s`;
+    document.getElementById('audioDuration').textContent =
+      `trimmed to ${m}m ${s}s · video will match this duration`;
+  }
+}
+
+function setAudioFadeDur(which, secs) {
+  if (which === 'in') {
+    audioFadeInDur = secs;
+    document.getElementById('audioFadeInVal').textContent = secs + 's';
+    ['afi1','afi3','afi5','afi10'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.style.borderColor='var(--border)'; el.style.color='var(--text-dim)'; }
+    });
+    const a = document.getElementById('afi' + secs);
+    if (a) { a.style.borderColor='var(--teal)'; a.style.color='var(--teal)'; }
+  } else {
+    audioFadeOutDur = secs;
+    document.getElementById('audioFadeOutVal').textContent = secs + 's';
+    ['afo1','afo3','afo5','afo10'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.style.borderColor='var(--border)'; el.style.color='var(--text-dim)'; }
+    });
+    const a = document.getElementById('afo' + secs);
+    if (a) { a.style.borderColor='var(--teal)'; a.style.color='var(--teal)'; }
+  }
+}
+
+function updateAudioFade() {
+  audioFadeInEnabled  = document.getElementById('audioFadeInEnabled').checked;
+  audioFadeOutEnabled = document.getElementById('audioFadeOutEnabled').checked;
+}
+
+function startExport() {
   if (!currentClip) { lg('start a session first', 'lg'); return; }
 
   const btn = document.getElementById('btnExport');
@@ -1182,7 +1287,7 @@ async function startExport() {
   btn.style.borderColor = 'var(--gold)';
 
   // If audio uploaded, use its duration; otherwise use the selected chip duration
-  const exportDuration = uploadedAudioDuration > 0 ? Math.ceil(uploadedAudioDuration) : (targetSecs || 60);
+  const exportDuration = uploadedAudioFile ? Math.ceil(audioTrimDur || uploadedAudioDuration) : (targetSecs || 60);
 
   lg('sending to export server...', 'lt');
   if (uploadedAudioFile) lg(`audio: ${uploadedAudioFile.name} · ${Math.floor(exportDuration/60)}m ${exportDuration%60}s`, 'lt');
@@ -1198,9 +1303,11 @@ async function startExport() {
       form.append('duration',   String(exportDuration));
       form.append('speed',      String(SPEED || 1.0));
       form.append('resolution', fetchResolution || '1080');
-      form.append('fadeIn',     fadeInEnabled  ? String(fadeInDur)  : '0');
-      form.append('fadeOut',    fadeOutEnabled ? String(fadeOutDur) : '0');
-      form.append('audio',      uploadedAudioFile, uploadedAudioFile.name);
+      form.append('fadeIn',      fadeInEnabled      ? String(fadeInDur)      : '0');
+      form.append('fadeOut',     fadeOutEnabled     ? String(fadeOutDur)     : '0');
+      form.append('audioFadeIn',  audioFadeInEnabled  ? String(audioFadeInDur)  : '0');
+      form.append('audioFadeOut', audioFadeOutEnabled ? String(audioFadeOutDur) : '0');
+      form.append('audio',       uploadedAudioFile, uploadedAudioFile.name);
       res = await fetch(MODAL_EXPORT, { method: 'POST', body: form });
     } else {
       res = await fetch(MODAL_EXPORT, {

@@ -35,6 +35,8 @@ def render_video(
     fade_in: float,
     fade_out: float,
     audio_path: str | None,
+    audio_fade_in: float = 0,
+    audio_fade_out: float = 0,
 ):
     import tempfile
 
@@ -90,8 +92,10 @@ def render_video(
         cmd = base_cmd + codec_args
         if audio_path:
             af = []
-            if fade_in  > 0: af.append(f"afade=t=in:st=0:d={fade_in}")
-            if fade_out > 0: af.append(f"afade=t=out:st={max(0, duration - fade_out)}:d={fade_out}")
+            afi = audio_fade_in  if audio_fade_in  > 0 else fade_in
+            afo = audio_fade_out if audio_fade_out > 0 else fade_out
+            if afi > 0: af.append(f"afade=t=in:st=0:d={afi}")
+            if afo > 0: af.append(f"afade=t=out:st={max(0, duration - afo)}:d={afo}")
             cmd += ["-c:a", "aac", "-b:a", "192k"]
             if af: cmd += ["-af", ",".join(af)]
             cmd += ["-map", "0:v:0", "-map", "1:a:0", "-shortest"]
@@ -138,6 +142,8 @@ async def export_endpoint(request):
         fade_in    = float(form.get("fadeIn") or 0)
         fade_out   = float(form.get("fadeOut") or 0)
         audio_file = form.get("audio")
+        audio_fade_in  = float(form.get("audioFadeIn")  or 0)
+        audio_fade_out = float(form.get("audioFadeOut") or 0)
         if audio_file and hasattr(audio_file, "read"):
             job_id = str(uuid.uuid4())
             audio_path = f"{RENDER_DIR}/audio_{job_id}"
@@ -149,15 +155,17 @@ async def export_endpoint(request):
             job_id = str(uuid.uuid4())
     else:
         body = await request.json()
-        clip_url   = body.get("clipUrl")
-        loop_in    = float(body.get("loopIn") or 0)
-        loop_out   = float(body.get("loopOut")) if body.get("loopOut") else None
-        duration   = float(body.get("duration") or 60)
-        speed      = float(body.get("speed") or 1.0)
-        resolution = body.get("resolution") or "1080"
-        fade_in    = float(body.get("fadeIn") or 0)
-        fade_out   = float(body.get("fadeOut") or 0)
-        job_id     = str(uuid.uuid4())
+        clip_url       = body.get("clipUrl")
+        loop_in        = float(body.get("loopIn") or 0)
+        loop_out       = float(body.get("loopOut")) if body.get("loopOut") else None
+        duration       = float(body.get("duration") or 60)
+        speed          = float(body.get("speed") or 1.0)
+        resolution     = body.get("resolution") or "1080"
+        fade_in        = float(body.get("fadeIn") or 0)
+        fade_out       = float(body.get("fadeOut") or 0)
+        audio_fade_in  = float(body.get("audioFadeIn")  or 0)
+        audio_fade_out = float(body.get("audioFadeOut") or 0)
+        job_id         = str(uuid.uuid4())
 
     if not clip_url:
         return JSONResponse({"error": "clipUrl required"}, status_code=400)
@@ -166,6 +174,7 @@ async def export_endpoint(request):
         job_id=job_id, clip_url=clip_url, loop_in=loop_in, loop_out=loop_out,
         duration=duration, speed=speed, resolution=resolution,
         fade_in=fade_in, fade_out=fade_out, audio_path=audio_path,
+        audio_fade_in=audio_fade_in, audio_fade_out=audio_fade_out,
     )
     return JSONResponse({"jobId": job_id, "status": "queued"})
 
