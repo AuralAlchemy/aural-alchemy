@@ -1145,7 +1145,10 @@ let mediaRecorder = null;
 let recordedChunks = [];
 
 // ── Server-side export ────────────────────────────────────────────────────────
-const EXPORT_SERVER = 'https://aural-alchemy-export.onrender.com';
+const MODAL_EXPORT   = 'https://nanomarche--aa-export.modal.run';
+const MODAL_STATUS   = 'https://nanomarche--aa-status.modal.run';
+const MODAL_DOWNLOAD = 'https://nanomarche--aa-download.modal.run';
+const EXPORT_SERVER  = 'https://aural-alchemy-export.onrender.com'; // legacy fallback
 
 // ── Audio upload ──────────────────────────────────────────────────────────────
 let uploadedAudioFile = null;
@@ -1223,37 +1226,19 @@ async function confirmExport() {
 
   let jobId;
   try {
-    let res;
-    if (uploadedAudioFile) {
-      // Send as multipart/form-data so we can upload the audio file
-      const form = new FormData();
-      form.append('clipUrl',     currentClip.url);
-      form.append('loopIn',      String(loopIn || 0));
-      form.append('loopOut',     String(loopOut || currentClip.duration));
-      form.append('duration',    String(exportDuration));
-      form.append('speed',       String(SPEED || 1.0));
-      form.append('resolution',  fetchResolution || '1080');
-      form.append('email',       email);
-      form.append('fadeIn',      fadeInEnabled  ? String(fadeInDur)  : '0');
-      form.append('fadeOut',     fadeOutEnabled ? String(fadeOutDur) : '0');
-      form.append('audio',       uploadedAudioFile, uploadedAudioFile.name);
-      res = await fetch(EXPORT_SERVER + '/export', { method: 'POST', body: form });
-    } else {
-      res = await fetch(EXPORT_SERVER + '/export', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clipUrl:    currentClip.url,
-          loopIn:     loopIn || 0,
-          loopOut:    loopOut || currentClip.duration,
-          duration:   exportDuration,
-          speed:      SPEED || 1.0,
-          resolution: fetchResolution || '1080',
-          email,
-          fadeIn:     fadeInEnabled  ? fadeInDur  : 0,
-          fadeOut:    fadeOutEnabled ? fadeOutDur : 0,
-        }),
-      });
-    }
+    const res = await fetch(MODAL_EXPORT, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clipUrl:    currentClip.url,
+        loopIn:     loopIn || 0,
+        loopOut:    loopOut || currentClip.duration,
+        duration:   exportDuration,
+        speed:      SPEED || 1.0,
+        resolution: fetchResolution || '1080',
+        fadeIn:     fadeInEnabled  ? fadeInDur  : 0,
+        fadeOut:    fadeOutEnabled ? fadeOutDur : 0,
+      }),
+    });
     const data = await res.json();
     if (!data.jobId) throw new Error(data.error || 'no jobId');
     jobId = data.jobId;
@@ -1279,7 +1264,7 @@ async function confirmExport() {
   let failCount = 0;
   const pollId = setInterval(async () => {
     try {
-      const res = await fetch(EXPORT_SERVER + '/status/' + jobId);
+      const res = await fetch(MODAL_STATUS + '?jobId=' + jobId);
       if (!res.ok) throw new Error(res.status);
       const job = await res.json();
       failCount = 0;
@@ -1291,7 +1276,7 @@ async function confirmExport() {
         const sizeMB = (job.size / 1024 / 1024).toFixed(1);
         lg('✓ export done · ' + sizeMB + 'MB · link sent to ' + email, 'lc');
         msg.innerHTML = '✓ Export ready · ' + sizeMB + 'MB · Download link sent to <span style="color:var(--gold)">' + email + '</span>';
-        showDownloadButton(job.url, sizeMB);
+        showDownloadButton(MODAL_DOWNLOAD + '?jobId=' + jobId, sizeMB);
       } else if (job.status === 'error') {
         clearInterval(pollId);
         btn.textContent = '⬇ EXPORT MP4';
