@@ -1682,22 +1682,29 @@ window.addEventListener('resize', tlResize);
 // Delay resize until layout is stable
 requestAnimationFrame(() => requestAnimationFrame(tlResize));
 
-// Dedicated 60fps loop for the scrub head — independent of tick timer and other loops
-(function tlLoop() {
-  if (currentClip && !isDragging) {
-    const dur = currentClip.duration;
-    if (dur && isFinite(dur)) {
-      if (!isFinite(loopIn))                       loopIn  = 0;
-      if (!isFinite(loopOut) || loopOut <= loopIn) loopOut = dur;
-      const pos = loopMode === 'crossfade'
-        ? (activeVid && isFinite(activeVid.currentTime) ? activeVid.currentTime : null)
-        : (isFinite(pendPos) ? pendPos : null);
-      if (pos !== null) tlHead = Math.min(pos / dur, 1);
-      tlDraw();
+// Dedicated 60fps loop — heals NaN, updates playhead + labels, never dies
+function tlLoop() {
+  try {
+    if (currentClip) {
+      const dur = currentClip.duration;
+      if (dur && isFinite(dur)) {
+        if (!isFinite(loopIn))                       loopIn  = 0;
+        if (!isFinite(loopOut) || loopOut <= loopIn) loopOut = dur;
+        if (!isDragging) {
+          const pos = loopMode === 'crossfade'
+            ? (activeVid && isFinite(activeVid.currentTime) ? activeVid.currentTime : null)
+            : (isFinite(pendPos) ? pendPos : null);
+          if (pos !== null) tlHead = Math.min(pos / dur, 1);
+        }
+        document.getElementById('inVal').textContent  = fmtS(loopIn);
+        document.getElementById('outVal').textContent = fmtS(loopOut);
+        tlDraw();
+      }
     }
-  }
+  } catch(e) {}
   requestAnimationFrame(tlLoop);
-}());
+}
+requestAnimationFrame(tlLoop);
 
 function tlDraw() {
   if (!currentClip) return;
