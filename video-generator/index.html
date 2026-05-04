@@ -572,10 +572,10 @@ const PROXY         = 'https://white-cloud-27a9.nanomarche.workers.dev';
 const MIN_LOOP_SECS = 5;
 
 // ── GitHub render pipeline ────────────────────────────────────────────────────
-// Fine-grained PAT: Contents → Read & Write on this repo only.
-// Generate at: github.com/settings/personal-access-tokens
-const GH_TOKEN = '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';  // paste your PAT here
-const GH_REPO  = 'AuralAlchemy/aural-alchemy';
+// Token lives in localStorage only — never in source code.
+// Set once in your browser console: localStorage.setItem('gh_token', 'github_pat_...')
+function getGHToken() { return localStorage.getItem('gh_token') || ''; }
+const GH_REPO = 'AuralAlchemy/aural-alchemy';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let loopMode      = 'crossfade';
@@ -1470,7 +1470,8 @@ async function exportHyperFrames() {
   lg('HyperFrames exported ✓ · ' + loopCount + ' clips · ' + totalDur + 's', 'lc');
 
   // Push to GitHub → triggers Actions render automatically
-  if (GH_TOKEN) {
+  const ghToken = getGHToken();
+  if (ghToken) {
     lg('pushing to GitHub…', 'lt');
     const ghFilename = 'aural-alchemy-' + safeName + '-' + Date.now() + '.html';
     const encoded    = btoa(unescape(encodeURIComponent(html)));
@@ -1479,7 +1480,7 @@ async function exportHyperFrames() {
         'https://api.github.com/repos/' + GH_REPO + '/contents/compositions/' + ghFilename,
         {
           method: 'PUT',
-          headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': 'Bearer ' + ghToken, 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: 'render: ' + safeName, content: encoded }),
         }
       );
