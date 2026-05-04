@@ -54,7 +54,12 @@ def render_video(
 
     try:
         print(f"[{job_id}] downloading clip...")
-        req = urllib.request.urlopen(clip_url, timeout=60)
+        req_obj = urllib.request.Request(clip_url, headers={
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": "https://www.pexels.com/",
+            "Accept": "*/*",
+        })
+        req = urllib.request.urlopen(req_obj, timeout=60)
         with open(tmp_in, "wb") as f:
             while chunk := req.read(1 << 16):
                 f.write(chunk)

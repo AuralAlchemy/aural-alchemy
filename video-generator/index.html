@@ -756,7 +756,7 @@ function drawMirror() {
   // the blended frame during transitions (smooth loop) and inherits zoom.
   let src, vW, vH;
   if (loopMode === 'crossfade') {
-    if (!dissolveCanvas || dissolveCanvas.width === 0) return;
+    if (!dissolveCanvas || dissolveCanvas.width === 0 || dissolveCanvas.height === 0) return;
     src = dissolveCanvas;
     vW  = dissolveCanvas.width;
     vH  = dissolveCanvas.height;
@@ -1957,7 +1957,10 @@ async function startCrossfade(clip) {
 function scheduleCF() {
   if (!running) return;
   clearTimeout(cfTimer);
-  const cur   = activeVid ? activeVid.currentTime : loopIn;
+  const dur = currentClip?.duration;
+  if (!isFinite(loopIn))                       loopIn  = 0;
+  if (!isFinite(loopOut) || loopOut <= loopIn) loopOut = dur || loopIn + 10;
+  const cur   = isFinite(activeVid?.currentTime) ? activeVid.currentTime : loopIn;
   const delay = Math.max(((loopOut - cur) / SPEED * 1000) - CF_MS, 200);
   cfTimer = setTimeout(doCF, delay);
 }
@@ -2159,6 +2162,12 @@ function startTick() {
     setProgress(elapsed / targetSecs);
     document.getElementById('hudTime').textContent = fmt(elapsed);
     document.getElementById('infoL').innerHTML = `<span class="ok">${fmt(elapsed)}</span> / ${fmt(targetSecs)}`;
+    // Heal any NaN that crept into loop region
+    if (currentClip) {
+      const _d = currentClip.duration;
+      if (!isFinite(loopIn))                       loopIn  = 0;
+      if (!isFinite(loopOut) || loopOut <= loopIn) loopOut = _d || loopIn + 10;
+    }
     // Only update playhead from tick if nothing else is controlling it
     if (!isDragging && !manualPaused) {
       if (loopMode === 'crossfade' && activeVid && currentClip) updatePlayhead(activeVid.currentTime);
