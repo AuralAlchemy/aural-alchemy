@@ -752,11 +752,20 @@ function drawMirror() {
   const W = mirrorCanvas.width, H = mirrorCanvas.height;
   mirrorCtx.clearRect(0, 0, W, H);
 
-  const src = (loopMode === 'crossfade') ? activeVid : (pendVid || null);
-  if (!src || src.readyState < 2) return;
-
-  const vW = src.videoWidth  || W;
-  const vH = src.videoHeight || H;
+  // In crossfade mode read from the dissolve canvas so mirror reflects
+  // the blended frame during transitions (smooth loop) and inherits zoom.
+  let src, vW, vH;
+  if (loopMode === 'crossfade') {
+    if (!dissolveCanvas || dissolveCanvas.width === 0) return;
+    src = dissolveCanvas;
+    vW  = dissolveCanvas.width;
+    vH  = dissolveCanvas.height;
+  } else {
+    src = pendVid || null;
+    if (!src || src.readyState < 2) return;
+    vW = src.videoWidth  || W;
+    vH = src.videoHeight || H;
+  }
 
   if (mirrorMode === 'h-left') {
     // Take left half of video, display on left side
@@ -1177,10 +1186,10 @@ let mediaRecorder = null;
 let recordedChunks = [];
 
 // ── Server-side export ────────────────────────────────────────────────────────
-const MODAL_EXPORT   = 'https://nanomarche--aa-export.modal.run';
-const MODAL_STATUS   = 'https://nanomarche--aa-status.modal.run';
-const MODAL_DOWNLOAD = 'https://nanomarche--aa-download.modal.run';
-const EXPORT_SERVER  = 'https://aural-alchemy-export.onrender.com'; // legacy fallback
+const MODAL_BASE     = 'https://nanomarche--aa-api.modal.run';
+const MODAL_EXPORT   = MODAL_BASE + '/export';
+const MODAL_STATUS   = MODAL_BASE + '/status';
+const MODAL_DOWNLOAD = MODAL_BASE + '/download';
 
 // ── Audio upload ──────────────────────────────────────────────────────────────
 let uploadedAudioFile = null;
@@ -1325,7 +1334,7 @@ async function startExport() {
       });
     }
     const data = await res.json();
-    if (!data.jobId) throw new Error(data.error || 'no jobId');
+    if (!data.jobId) throw new Error(data.error || data.detail || JSON.stringify(data));
     jobId = data.jobId;
   } catch(e) {
     lg('export error: ' + e.message, 'lg');
@@ -1349,7 +1358,7 @@ async function startExport() {
   let failCount = 0;
   const pollId = setInterval(async () => {
     try {
-      const res = await fetch(MODAL_STATUS + '?jobId=' + jobId);
+      const res = await fetch(MODAL_STATUS + '?job_id=' + jobId);
       if (!res.ok) throw new Error(res.status);
       const job = await res.json();
       failCount = 0;
@@ -1361,7 +1370,7 @@ async function startExport() {
         const sizeMB = (job.size / 1024 / 1024).toFixed(1);
         lg('✓ export done · ' + sizeMB + 'MB · click download button', 'lc');
         msg.innerHTML = '✓ Export ready · ' + sizeMB + 'MB';
-        showDownloadButton(MODAL_DOWNLOAD + '?jobId=' + jobId, sizeMB);
+        showDownloadButton(MODAL_DOWNLOAD + '?job_id=' + jobId, sizeMB);
       } else if (job.status === 'error') {
         clearInterval(pollId);
         btn.textContent = '⬇ EXPORT MP4';
@@ -1681,6 +1690,7 @@ function tlDraw() {
   const W   = tlCanvas.width;
   const H   = tlCanvas.height;
   const dur = currentClip.duration;
+  if (!dur || !isFinite(dur)) return;
   const TY  = H * 0.62; // track center y
   const TH  = 5;
   const MH  = 11; // marker half-height above track
@@ -1722,6 +1732,7 @@ function tlDraw() {
 function renderTimeline() {
   if (!currentClip) return;
   const dur = currentClip.duration;
+  if (!dur || !isFinite(dur)) return;
   document.getElementById('scrubEnd').textContent = fmtS(dur);
   document.getElementById('scrubMid').textContent = fmtS(dur/2);
   document.getElementById('inVal').textContent    = fmtS(loopIn);
@@ -1735,7 +1746,9 @@ function renderTimeline() {
 
 function updatePlayhead(pos) {
   if (!currentClip || isDragging) return;
-  tlHead = Math.min(pos / currentClip.duration, 1);
+  const dur = currentClip.duration;
+  if (!dur || !isFinite(dur) || !isFinite(pos)) return;
+  tlHead = Math.min(pos / dur, 1);
   tlDraw();
 }
 

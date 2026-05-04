@@ -17,13 +17,9 @@ vol = modal.Volume.from_name("aural-alchemy-temp", create_if_missing=True)
 RENDER_DIR = "/renders"
 
 
-@app.function(
-    image=image,
-    gpu="A10G",
-    timeout=3600,
-    memory=8192,
-    volumes={RENDER_DIR: vol},
-)
+# ── GPU render worker ─────────────────────────────────────────────────────────
+
+@app.function(image=image, gpu="A10G", timeout=3600, memory=8192, volumes={RENDER_DIR: vol})
 def render_video(
     job_id: str,
     clip_url: str,
@@ -64,7 +60,7 @@ def render_video(
     scale_map  = {"1080": "1920:1080", "2k": "2560:1440", "4k": "3840:2160"}
     scale      = scale_map.get(resolution, "1920:1080")
 
-    print(f"[{job_id}] trimming {loop_in}s–{loop_out}s ({region_dur:.1f}s region)...")
+    print(f"[{job_id}] trimming {loop_in}s–{loop_out}s ({region_dur:.1f}s)...")
     subprocess.run([
         "ffmpeg", "-y", "-ss", str(loop_in), "-t", str(region_dur),
         "-i", tmp_in, "-c", "copy", tmp_loop,
@@ -91,9 +87,9 @@ def render_video(
     ]:
         cmd = base_cmd + codec_args
         if audio_path:
-            af = []
             afi = audio_fade_in  if audio_fade_in  > 0 else fade_in
             afo = audio_fade_out if audio_fade_out > 0 else fade_out
+            af = []
             if afi > 0: af.append(f"afade=t=in:st=0:d={afi}")
             if afo > 0: af.append(f"afade=t=out:st={max(0, duration - afo)}:d={afo}")
             cmd += ["-c:a", "aac", "-b:a", "192k"]
@@ -108,11 +104,10 @@ def render_video(
         if result.returncode == 0:
             print(f"[{job_id}] done with {codec}")
             break
-        print(f"[{job_id}] {codec} failed, trying next...")
+        print(f"[{job_id}] {codec} failed: {result.stderr.decode()[-200:]}")
     else:
         raise RuntimeError("All codecs failed:\n" + result.stderr.decode()[-500:])
 
-    # Clean up audio temp file
     if audio_path:
         try: os.unlink(audio_path)
         except: pass
@@ -123,94 +118,97 @@ def render_video(
     return {"size": size}
 
 
-@app.function(image=image, volumes={RENDER_DIR: vol})
-@modal.fastapi_endpoint(method="POST", label="aa-export")
-async def export_endpoint(request):
-    from fastapi.responses import JSONResponse
-
-    content_type = request.headers.get("content-type", "")
-    audio_path = None
-
-    if "multipart/form-data" in content_type:
-        form = await request.form()
-        clip_url   = form.get("clipUrl")
-        loop_in    = float(form.get("loopIn") or 0)
-        loop_out   = float(form.get("loopOut")) if form.get("loopOut") else None
-        duration   = float(form.get("duration") or 60)
-        speed      = float(form.get("speed") or 1.0)
-        resolution = form.get("resolution") or "1080"
-        fade_in    = float(form.get("fadeIn") or 0)
-        fade_out   = float(form.get("fadeOut") or 0)
-        audio_file = form.get("audio")
-        audio_fade_in  = float(form.get("audioFadeIn")  or 0)
-        audio_fade_out = float(form.get("audioFadeOut") or 0)
-        if audio_file and hasattr(audio_file, "read"):
-            job_id = str(uuid.uuid4())
-            audio_path = f"{RENDER_DIR}/audio_{job_id}"
-            audio_bytes = await audio_file.read()
-            with open(audio_path, "wb") as f:
-                f.write(audio_bytes)
-            vol.commit()
-        else:
-            job_id = str(uuid.uuid4())
-    else:
-        body = await request.json()
-        clip_url       = body.get("clipUrl")
-        loop_in        = float(body.get("loopIn") or 0)
-        loop_out       = float(body.get("loopOut")) if body.get("loopOut") else None
-        duration       = float(body.get("duration") or 60)
-        speed          = float(body.get("speed") or 1.0)
-        resolution     = body.get("resolution") or "1080"
-        fade_in        = float(body.get("fadeIn") or 0)
-        fade_out       = float(body.get("fadeOut") or 0)
-        audio_fade_in  = float(body.get("audioFadeIn")  or 0)
-        audio_fade_out = float(body.get("audioFadeOut") or 0)
-        job_id         = str(uuid.uuid4())
-
-    if not clip_url:
-        return JSONResponse({"error": "clipUrl required"}, status_code=400)
-
-    render_video.spawn(
-        job_id=job_id, clip_url=clip_url, loop_in=loop_in, loop_out=loop_out,
-        duration=duration, speed=speed, resolution=resolution,
-        fade_in=fade_in, fade_out=fade_out, audio_path=audio_path,
-        audio_fade_in=audio_fade_in, audio_fade_out=audio_fade_out,
-    )
-    return JSONResponse({"jobId": job_id, "status": "queued"})
-
+# ── Web API (ASGI + CORS) ─────────────────────────────────────────────────────
 
 @app.function(image=image, volumes={RENDER_DIR: vol})
-@modal.fastapi_endpoint(method="GET", label="aa-status")
-async def status_endpoint(request):
-    from fastapi.responses import JSONResponse
+@modal.asgi_app(label="aa-api")
+def serve():
+    from fastapi import FastAPI, Request
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.responses import JSONResponse, FileResponse
 
-    job_id = request.query_params.get("jobId")
-    if not job_id:
-        return JSONResponse({"error": "jobId required"}, status_code=400)
-
-    vol.reload()
-    out_file = Path(f"{RENDER_DIR}/{job_id}.mp4")
-    if out_file.exists():
-        return JSONResponse({"status": "done", "progress": 100, "size": out_file.stat().st_size})
-    return JSONResponse({"status": "processing", "progress": 50})
-
-
-@app.function(image=image, volumes={RENDER_DIR: vol}, timeout=600)
-@modal.fastapi_endpoint(method="GET", label="aa-download")
-async def download_endpoint(request):
-    from fastapi.responses import FileResponse, JSONResponse
-
-    job_id = request.query_params.get("jobId")
-    if not job_id:
-        return JSONResponse({"error": "jobId required"}, status_code=400)
-
-    vol.reload()
-    out_file = Path(f"{RENDER_DIR}/{job_id}.mp4")
-    if not out_file.exists():
-        return JSONResponse({"error": "not ready"}, status_code=404)
-
-    return FileResponse(
-        str(out_file),
-        media_type="video/mp4",
-        filename=f"aural-alchemy-{job_id[:8]}.mp4",
+    web_app = FastAPI()
+    web_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
+
+    @web_app.post("/export")
+    async def export_endpoint(request: Request):
+        content_type   = request.headers.get("content-type", "")
+        audio_path     = None
+        audio_fade_in  = 0.0
+        audio_fade_out = 0.0
+        try:
+            if "multipart/form-data" in content_type:
+                form           = await request.form()
+                clip_url       = form.get("clipUrl")
+                loop_in        = float(form.get("loopIn")    or 0)
+                loop_out       = float(form.get("loopOut"))   if form.get("loopOut")   else None
+                duration       = float(form.get("duration")  or 60)
+                speed          = float(form.get("speed")     or 1.0)
+                resolution     = form.get("resolution")      or "1080"
+                fade_in        = float(form.get("fadeIn")    or 0)
+                fade_out       = float(form.get("fadeOut")   or 0)
+                audio_fade_in  = float(form.get("audioFadeIn")  or 0)
+                audio_fade_out = float(form.get("audioFadeOut") or 0)
+                audio_file     = form.get("audio")
+                job_id         = str(uuid.uuid4())
+                if audio_file and hasattr(audio_file, "read"):
+                    audio_path  = f"{RENDER_DIR}/audio_{job_id}"
+                    audio_bytes = await audio_file.read()
+                    with open(audio_path, "wb") as f:
+                        f.write(audio_bytes)
+                    vol.commit()
+            else:
+                body           = await request.json()
+                clip_url       = body.get("clipUrl")
+                loop_in        = float(body.get("loopIn")    or 0)
+                loop_out       = float(body.get("loopOut"))   if body.get("loopOut")   else None
+                duration       = float(body.get("duration")  or 60)
+                speed          = float(body.get("speed")     or 1.0)
+                resolution     = body.get("resolution")      or "1080"
+                fade_in        = float(body.get("fadeIn")    or 0)
+                fade_out       = float(body.get("fadeOut")   or 0)
+                audio_fade_in  = float(body.get("audioFadeIn")  or 0)
+                audio_fade_out = float(body.get("audioFadeOut") or 0)
+                job_id         = str(uuid.uuid4())
+
+            if not clip_url:
+                return JSONResponse({"error": "clipUrl required"}, status_code=400)
+
+            render_video.spawn(
+                job_id=job_id, clip_url=clip_url, loop_in=loop_in, loop_out=loop_out,
+                duration=duration, speed=speed, resolution=resolution,
+                fade_in=fade_in, fade_out=fade_out, audio_path=audio_path,
+                audio_fade_in=audio_fade_in, audio_fade_out=audio_fade_out,
+            )
+            return JSONResponse({"jobId": job_id, "status": "queued"})
+
+        except Exception as e:
+            print(f"export error: {e}")
+            return JSONResponse({"error": str(e)}, status_code=500)
+
+    @web_app.get("/status")
+    async def status_endpoint(job_id: str):
+        vol.reload()
+        out_file = Path(f"{RENDER_DIR}/{job_id}.mp4")
+        if out_file.exists():
+            return {"status": "done", "progress": 100, "size": out_file.stat().st_size}
+        return {"status": "processing", "progress": 50}
+
+    @web_app.get("/download")
+    async def download_endpoint(job_id: str):
+        vol.reload()
+        out_file = Path(f"{RENDER_DIR}/{job_id}.mp4")
+        if not out_file.exists():
+            return JSONResponse({"error": "not ready"}, status_code=404)
+        return FileResponse(
+            str(out_file),
+            media_type="video/mp4",
+            filename=f"aural-alchemy-{job_id[:8]}.mp4",
+        )
+
+    return web_app
